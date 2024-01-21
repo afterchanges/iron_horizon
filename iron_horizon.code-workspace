@@ -1,0 +1,883 @@
+{
+	"folders": [
+		{
+			"name": "iron_horizon",
+			"path": "."
+		},
+		{
+			"name": "UE5",
+			"path": "D:\\unreal engine\\UE_5.3"
+		}
+	],
+	"settings": {
+		"typescript.tsc.autoDetect": "off",
+		"npm.autoDetect": "off"
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-dotnettools.csharp"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "iron_horizon Win64 Debug Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Debug Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon Win64 Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Debug Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 DebugGame Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon Win64 DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 DebugGame Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Development Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Development Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon Win64 Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Development Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Test Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Test",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Test Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Test",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon Win64 Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Test Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Test",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Shipping Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Shipping",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Shipping Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Shipping",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon Win64 Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon Win64 Shipping Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"Win64",
+					"Shipping",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Debug Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Debug Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon IOS Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Debug Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS DebugGame Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon IOS DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS DebugGame Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Development Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Development Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon IOS Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Development Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Test Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Test",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Test Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Test",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon IOS Test Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Test Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Test",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Shipping Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Shipping",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Shipping Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Shipping",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizon IOS Shipping Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizon IOS Shipping Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizon",
+					"IOS",
+					"Shipping",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 Debug Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 Debug Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizonEditor Win64 Debug Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 Debug Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"Debug",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 DebugGame Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 DebugGame Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizonEditor Win64 DebugGame Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 DebugGame Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"DebugGame",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 Development Build",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 Development Rebuild",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Build.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"dependsOn": [
+					"iron_horizonEditor Win64 Development Clean"
+				],
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"label": "iron_horizonEditor Win64 Development Clean",
+				"group": "build",
+				"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+				"args": [
+					"iron_horizonEditor",
+					"Win64",
+					"Development",
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-waitmutex"
+				],
+				"problemMatcher": "$msCompile",
+				"type": "shell",
+				"options": {
+					"cwd": "D:\\unreal engine\\UE_5.3"
+				}
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Launch iron_horizon (Debug)",
+				"request": "launch",
+				"program": "D:\\unreal projects\\iron_horizon\\iron_horizon\\Binaries\\Win64\\UnrealGame-Win64-Debug.exe",
+				"preLaunchTask": "iron_horizon Win64 Debug Build",
+				"args": [
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Launch iron_horizon (DebugGame)",
+				"request": "launch",
+				"program": "D:\\unreal projects\\iron_horizon\\iron_horizon\\Binaries\\Win64\\UnrealGame-Win64-DebugGame.exe",
+				"preLaunchTask": "iron_horizon Win64 DebugGame Build",
+				"args": [
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Launch iron_horizon (Development)",
+				"request": "launch",
+				"program": "D:\\unreal projects\\iron_horizon\\iron_horizon\\Binaries\\Win64\\UnrealGame.exe",
+				"preLaunchTask": "iron_horizon Win64 Development Build",
+				"args": [
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Launch iron_horizon (Test)",
+				"request": "launch",
+				"program": "D:\\unreal projects\\iron_horizon\\iron_horizon\\Binaries\\Win64\\UnrealGame-Win64-Test.exe",
+				"preLaunchTask": "iron_horizon Win64 Test Build",
+				"args": [
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Launch iron_horizon (Shipping)",
+				"request": "launch",
+				"program": "D:\\unreal projects\\iron_horizon\\iron_horizon\\Binaries\\Win64\\UnrealGame-Win64-Shipping.exe",
+				"preLaunchTask": "iron_horizon Win64 Shipping Build",
+				"args": [
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Launch iron_horizonEditor (Debug)",
+				"request": "launch",
+				"program": "D:\\unreal engine\\UE_5.3\\Engine\\Binaries\\Win64\\UnrealEditor-Win64-Debug.exe",
+				"preLaunchTask": "iron_horizonEditor Win64 Debug Build",
+				"args": [
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject"
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Launch iron_horizonEditor (DebugGame)",
+				"request": "launch",
+				"program": "D:\\unreal engine\\UE_5.3\\Engine\\Binaries\\Win64\\UnrealEditor-Win64-DebugGame.exe",
+				"preLaunchTask": "iron_horizonEditor Win64 DebugGame Build",
+				"args": [
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject"
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Launch iron_horizonEditor (Development)",
+				"request": "launch",
+				"program": "D:\\unreal engine\\UE_5.3\\Engine\\Binaries\\Win64\\UnrealEditor.exe",
+				"preLaunchTask": "iron_horizonEditor Win64 Development Build",
+				"args": [
+					"D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject"
+				],
+				"cwd": "D:\\unreal engine\\UE_5.3",
+				"stopAtEntry": false,
+				"console": "externalTerminal",
+				"type": "cppvsdbg",
+				"visualizerFile": "D:\\unreal engine\\UE_5.3\\Engine\\Extras\\VisualStudioDebugging\\Unreal.natvis",
+				"sourceFileMap": {
+					"D:\\build\\++UE5\\Sync": "D:\\unreal engine\\UE_5.3"
+				}
+			},
+			{
+				"name": "Generate Project Files",
+				"type": "coreclr",
+				"request": "launch",
+				"preLaunchTask": "UnrealBuildTool Win64 Development Build",
+				"program": "D:\\unreal engine\\UE_5.3\\Engine\\Build\\BatchFiles\\RunUBT.bat",
+				"args": [
+					"-projectfiles",
+					"-vscode",
+					"-project=D:\\unreal projects\\iron_horizon\\iron_horizon\\iron_horizon.uproject",
+					"-game",
+					"-engine",
+					"-dotnet"
+				],
+				"console": "externalTerminal",
+				"stopAtEntry": false,
+				"cwd": "D:\\unreal engine\\UE_5.3"
+			}
+		]
+	}
+}
