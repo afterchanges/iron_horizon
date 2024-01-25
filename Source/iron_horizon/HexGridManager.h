@@ -1,6 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-#ifndef IRON_HORIZON_HEXGRIDMANAGER_H
-#define IRON_HORIZON_HEXGRIDMANAGER_H
 #pragma once
 
 #include "HexTile.h"
@@ -37,5 +35,3 @@ protected:
 	virtual void BeginPlay() override;
 
 };
-
-#endif //IRON_HORIZON_HEXGRIDMANAGER_H
