@@ -1,8 +1,4 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-#ifndef IRON_HORIZON_HEXTILE_H
-#define IRON_HORIZON_HEXTILE_H
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -42,5 +38,3 @@ protected:
 public:	
 	AHexTile();
 };
-
-#endif //IRON_HORIZON_HEXTILE_H
