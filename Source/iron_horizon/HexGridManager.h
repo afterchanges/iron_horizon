@@ -24,9 +24,16 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "HexGridSetup")
 	TSubclassOf<AHexTile> GrassHexTile;
+	UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+	TSubclassOf<AHexTile> WaterHexTile;
 
+	TMap<HexTileType, TSubclassOf<AHexTile>> TileTypeMap = {
+		{HexTileType::GRASS, GrassHexTile},
+		{HexTileType::WATER, WaterHexTile}
+	};
+	
 
-public:	
+    public:	
 	// Sets default values for this actor's properties
 	AHexGridManager();
 
