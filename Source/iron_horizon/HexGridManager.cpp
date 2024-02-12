@@ -198,7 +198,7 @@ void AHexGridManager::BeginPlay() {
 
             FVector Location = FVector(
                 (y % 2) * sqrt(3) / 2 * HexTileSize + x * sqrt(3) * HexTileSize,
-                y * 1.5 * HexTileSize, newTileHeightAdjusted * 1000.0f
+                y * 1.5 * HexTileSize, newTileHeightAdjusted * 500.0f
             );
 
             TSubclassOf<AHexTile> TileToSpawn = TileTypeMap[spawnTileType];
