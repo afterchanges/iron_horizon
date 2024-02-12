@@ -28,9 +28,24 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
 	FIntPoint GridPositionIndex;
 
-protected:
+	bool hasForest = false;
+	bool isRiverStart = false;
+	bool isRiverEnd = false;
+	bool isRiverSegment = false;
+	bool isRailroad = false;
+	bool isCity = false;
+	bool isWater = false;
+	bool isBuildable = false;
+
+	int prestige = 0;
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	HexTileType TileType;
+
+
+protected:
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	UStaticMeshComponent* TileMesh;
