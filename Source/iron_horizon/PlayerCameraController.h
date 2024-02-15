@@ -32,11 +32,15 @@ class IRON_HORIZON_API APlayerCameraController : public APlayerController {
     float CameraPitch = 0.0f;
 
 public:
-    virtual void SetupInputComponent() override;
-
     UPROPERTY(EditAnywhere, Category = "Camera")
-    class UInputMappingContext* PawnMappingContext;
+    class UInputMappingContext *PawnMappingContext;
 
     UPROPERTY(EditAnywhere, Category = "Camera movement")
-    class UInputAction* MoveAction;
+    class UInputAction *MoveAction;
+
+    UPROPERTY(EditAnywhere, Category = "Camera movement")
+    class UInputAction *RotateAction;
+
+    void Move(const struct FInputActionValue &ActionValue);
+    virtual void SetupInputComponent() override;
 };

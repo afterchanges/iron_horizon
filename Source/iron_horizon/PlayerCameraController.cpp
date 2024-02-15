@@ -1,8 +1,35 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "PlayerCameraController.h"
-#include "InputMappingContext.h"
 #include "InputAction.h"
+#include "InputMappingContext.h"
+#include "InputModifiers.h"
+#include "IronHorizonPlayerPawn.h"
+
+static void MapKey(
+    UInputMappingContext *InputMappingContext,
+    UInputAction *InputAction,
+    FKey Key,
+    bool bNegate = false,
+    bool bSwizzle = false,
+    EInputAxisSwizzle SwizzleOrder = EInputAxisSwizzle::YXZ
+) {
+    FEnhancedActionKeyMapping &MoveActionMapping =
+        InputMappingContext->MapKey(InputAction, Key);
+    UObject *Outer = InputMappingContext->GetOuter();
+
+    if (bNegate) {
+        UInputModifierNegate *Negate = NewObject<UInputModifierNegate>(Outer);
+        MoveActionMapping.Modifiers.Add(Negate);
+    }
+
+    if (bSwizzle) {
+        UInputModifierSwizzleAxis *Swizzle =
+            NewObject<UInputModifierSwizzleAxis>(Outer);
+        Swizzle->Order = SwizzleOrder;
+        MoveActionMapping.Modifiers.Add(Swizzle);
+    }
+}
 
 void APlayerCameraController::SetupInputComponent() {
     Super::SetupInputComponent();
@@ -11,5 +38,23 @@ void APlayerCameraController::SetupInputComponent() {
 
     MoveAction = NewObject<UInputAction>(this);
     MoveAction->ValueType = EInputActionValueType::Axis3D;
-    PawnMappingContext->MapKey(MoveAction, EKeys::W);
+
+    MapKey(PawnMappingContext, MoveAction, EKeys::W);
+    MapKey(PawnMappingContext, MoveAction, EKeys::S, true);
+    MapKey(PawnMappingContext, MoveAction, EKeys::A, true, true);
+    MapKey(PawnMappingContext, MoveAction, EKeys::D, false, true);
+    MapKey(
+        PawnMappingContext, MoveAction, EKeys::SpaceBar, false, true,
+        EInputAxisSwizzle::ZYX
+    );
+    MapKey(
+        PawnMappingContext, MoveAction, EKeys::LeftShift, true, true,
+        EInputAxisSwizzle::ZYX
+    );
+
+    RotateAction = NewObject<UInputAction>(this);
+    RotateAction->ValueType = EInputActionValueType::Axis3D;
+
+    MapKey(PawnMappingContext, RotateAction, EKeys::R);
+    MapKey(PawnMappingContext, RotateAction, EKeys::Q, true);
 }

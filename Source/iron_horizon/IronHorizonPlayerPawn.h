@@ -1,0 +1,51 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Pawn.h"
+#include "IronHorizonPlayerPawn.generated.h"
+
+UCLASS()
+
+class IRON_HORIZON_API AIronHorizonPlayerPawn : public APawn {
+    GENERATED_BODY()
+public:
+    AIronHorizonPlayerPawn();
+    // Called every frame
+
+private:
+    virtual void SetupPlayerInputComponent(
+        class UInputComponent *PlayerInputComponent
+    ) override;
+
+    UPROPERTY(EditAnywhere)
+    class USphereComponent *SphereComponent;
+
+    /** Spring arm to hold camera, attached to the root. */
+    UPROPERTY(EditAnywhere)
+    class USpringArmComponent *SpringArmComponent;
+
+    /** Camera attached to spring arm to provide pawn's view. */
+    UPROPERTY(EditAnywhere)
+    class UCameraComponent *CameraComponent;
+
+    /** Handle input to update spring arm length. */
+    void UpdateSpringArmLength(const struct FInputActionValue &ActionValue);
+
+    /** Use floating pawn movement to smooth out motion. */
+    UPROPERTY(EditAnywhere)
+    class UFloatingPawnMovement *Movement;
+
+    /** Scale to apply to location input. */
+    UPROPERTY(EditAnywhere, Category = "Movement")
+    float MoveScale;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float RotateScale;
+
+    /** Handle input to update location. */
+    void Move(const struct FInputActionValue &ActionValue);
+
+	void Rotate(const struct FInputActionValue &ActionValue);
+};
