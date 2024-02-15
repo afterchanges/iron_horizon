@@ -41,6 +41,8 @@ public:
     UPROPERTY(EditAnywhere, Category = "Camera movement")
     class UInputAction *RotateAction;
 
-    void Move(const struct FInputActionValue &ActionValue);
+    UPROPERTY(EditAnywhere, Category = "Camera movement")
+    class UInputAction *SpringArmLengthAction;
+
     virtual void SetupInputComponent() override;
 };

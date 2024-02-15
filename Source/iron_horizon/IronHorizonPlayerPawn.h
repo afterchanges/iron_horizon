@@ -30,22 +30,33 @@ private:
     UPROPERTY(EditAnywhere)
     class UCameraComponent *CameraComponent;
 
-    /** Handle input to update spring arm length. */
-    void UpdateSpringArmLength(const struct FInputActionValue &ActionValue);
-
     /** Use floating pawn movement to smooth out motion. */
     UPROPERTY(EditAnywhere)
     class UFloatingPawnMovement *Movement;
 
     /** Scale to apply to location input. */
-    UPROPERTY(EditAnywhere, Category = "Movement")
-    float MoveScale;
+    UPROPERTY(EditAnywhere, Category = "Camera movement")
+    float MoveScale = 20.0f;
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	float RotateScale;
+	UPROPERTY(EditAnywhere, Category = "Camera movement")
+	float RotateScale = 60.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera movement")
+	float SpringArmLength = 2000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera movement")
+	float SpringArmLengthScale = 100.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera movement")
+	float MinSpringArmLength = 500.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera movement")
+	float MaxSpringArmLength = 5000.0f;
 
     /** Handle input to update location. */
     void Move(const struct FInputActionValue &ActionValue);
 
 	void Rotate(const struct FInputActionValue &ActionValue);
+
+    void UpdateSpringArmLength(const struct FInputActionValue &ActionValue);
 };

@@ -98,10 +98,10 @@ void AHexGridManager::BeginPlay() {
                      TileHeightRanges[spawnTileType].first) +
                 TileHeightRanges[spawnTileType].first;
 
-            UE_LOG(
-                LogTemp, Warning, TEXT("Tile at (%d, %d) is of type %d"), x, y,
-                (int32)spawnTileType
-            );
+            // UE_LOG(
+            //     LogTemp, Warning, TEXT("Tile at (%d, %d) is of type %d"), x, y,
+            //     (int32)spawnTileType
+            // );
 
             FVector Location = FVector(
                 (y % 2) * sqrt(3) / 2 * HexTileSize + x * sqrt(3) * HexTileSize,

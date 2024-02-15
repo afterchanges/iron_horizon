@@ -31,8 +31,6 @@ AIronHorizonPlayerPawn::AIronHorizonPlayerPawn() {
     Movement =
         CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent")
         );
-    MoveScale = 3.0f;
-    RotateScale = 60.0f;
 }
 
 // Called to bind functionality to input
@@ -58,6 +56,11 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(
         &AIronHorizonPlayerPawn::Rotate
     );
 
+	EIController->BindAction(
+		FPController->SpringArmLengthAction, ETriggerEvent::Triggered, this,
+		&AIronHorizonPlayerPawn::UpdateSpringArmLength
+	);
+
     ULocalPlayer *LocalPlayer = Cast<ULocalPlayer>(FPController->Player);
     check(LocalPlayer);
 
@@ -71,8 +74,7 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(
 void AIronHorizonPlayerPawn::Move(const FInputActionValue &ActionValue) {
     UE_LOG(LogTemp, Warning, TEXT("Move called"));
     FVector Input = ActionValue.Get<FInputActionValue::Axis3D>();
-	Input *= MoveScale;
-    AddMovementInput(GetActorRotation().RotateVector(Input), MoveScale);
+    AddMovementInput(GetActorRotation().RotateVector(Input), 2000.0f, true);
 }
 
 void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
@@ -82,4 +84,17 @@ void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
     Input *= GetWorld()->GetDeltaSeconds() * RotateScale;
     Input += GetActorRotation();
     SetActorRotation(Input);
+}
+
+void AIronHorizonPlayerPawn::UpdateSpringArmLength(
+    const FInputActionValue &ActionValue
+) {
+	UE_LOG(LogTemp, Warning, TEXT("UpdateSpringArmLength called %f"), ActionValue[0]);
+    SpringArmComponent->TargetArmLength +=
+        ActionValue[0] * GetWorld()->GetDeltaSeconds() * SpringArmLengthScale * -1.0f;
+    SpringArmComponent->TargetArmLength = FMath::Clamp(
+        SpringArmComponent->TargetArmLength, MinSpringArmLength, MaxSpringArmLength
+    );
+
+	UE_LOG(LogTemp, Warning, TEXT("SpringArmComponent->TargetArmLength: %f"), SpringArmComponent->TargetArmLength);
 }
