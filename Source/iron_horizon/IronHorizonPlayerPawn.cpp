@@ -77,7 +77,8 @@ void AIronHorizonPlayerPawn::Move(const FInputActionValue &ActionValue) {
 
 void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
     UE_LOG(LogTemp, Warning, TEXT("Rotate called"));
-    FRotator Input(ActionValue[0], 0.0f, ActionValue[2]);
+    FRotator Input(ActionValue[0], ActionValue[1], ActionValue[2]);
+	UE_LOG(LogTemp, Warning, TEXT("Input: %f, %f, %f"), ActionValue[0], ActionValue[1], ActionValue[2]);
     Input *= GetWorld()->GetDeltaSeconds() * RotateScale;
     Input += GetActorRotation();
     SetActorRotation(Input);

@@ -55,6 +55,10 @@ void APlayerCameraController::SetupInputComponent() {
     RotateAction = NewObject<UInputAction>(this);
     RotateAction->ValueType = EInputActionValueType::Axis3D;
 
-    MapKey(PawnMappingContext, RotateAction, EKeys::R);
-    MapKey(PawnMappingContext, RotateAction, EKeys::Q, true);
+    MapKey(
+        PawnMappingContext, RotateAction, EKeys::E, false, true, EInputAxisSwizzle::ZXY
+    );
+    MapKey(
+        PawnMappingContext, RotateAction, EKeys::Q, true, true, EInputAxisSwizzle::ZXY
+    );
 }
