@@ -27,8 +27,9 @@ class IRON_HORIZON_API AHexTile : public AActor
 public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
 	FIntPoint GridPositionIndex;
+	std::vector<int> CubicGridPositionIndex;
 
-	bool hasForest = false;
+	bool isForest = false;
 	bool isRiverStart = false;
 	bool isRiverEnd = false;
 	bool isRiverSegment = false;
@@ -37,6 +38,9 @@ public:
 	bool isWater = false;
 	bool isBuildable = false;
 
+	bool wasVisitedByBiomeBFS = false;
+
+	int biome_id = -1;
 	int prestige = 0;
 
 

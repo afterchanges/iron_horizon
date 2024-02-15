@@ -152,6 +152,90 @@ float redistributeHeights(float x) {
            427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5;
 }
 
+void AHexGridManager::generateNoiseMaps() {
+    height_noise_map =
+        generatePerlinNoise(GridWidth, GridHeight, redistributeHeights);
+
+    moisture_noise_map =
+        generatePerlinNoise(GridWidth, GridHeight, [](float x) { return x; });
+
+    temperature_noise_map =
+        generatePerlinNoise(GridWidth, GridHeight, [](float x) { return x; });
+    
+    river_noise_map.resize(GridWidth);
+    for (int32 i = 0; i < GridWidth; i++) {
+        river_noise_map[i].resize(GridHeight, false);
+    }
+}
+
+void biomeBFS(int tile_count, int current_biome_id, int x, int y){};
+
+void assignBiomes(auto HexGridLayout, int32 GridWidth, int32 GridHeight) {
+    int biome_count = 0;
+    for (int32 y = 0; y < GridHeight; ++y) {
+        for (int32 x = 0; x < GridWidth; ++x) {
+            if (!(HexGridLayout[x][y]->wasVisitedByBiomeBFS)) {
+                biomeBFS(0, biome_count, x, y);
+                biome_count++;
+            }
+        }
+    }
+}
+
+void AHexGridManager::riverPathfinding(int x, int y) {
+    std::vector<std::pair<int, int>> HexDirections = {
+        {0, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, 0}, {-1, 1}};
+    auto current_height = height_noise_map[x][y];
+    bool found_next_segment = false;
+    river_noise_map[x][y] = true;
+    if (current_height < 0.0f) {
+        return;
+    }
+
+    std::pair<int, int> next_river_segment;
+    float next_river_segment_height = 1000.0f;
+    UE_LOG(LogTemp, Warning, TEXT("River pathfinding at (%d, %d)"), x, y);
+    for (int i = 0; i < 6; i++) {
+        int new_x = x + HexDirections[i].first;
+        int new_y = y + HexDirections[i].second;
+        if (new_x >= 0 && new_x < GridWidth && new_y >= 0 &&
+            new_y < GridHeight) {
+            if (river_noise_map[new_x][new_y]) {
+                continue;
+            }
+            if (height_noise_map[new_x][new_y] < current_height &&
+                height_noise_map[new_x][new_y] < next_river_segment_height) {
+                next_river_segment = std::make_pair(new_x, new_y);
+                found_next_segment = true;
+                next_river_segment_height = height_noise_map[new_x][new_y];
+            }
+        }
+    }
+
+    if (found_next_segment) {
+        riverPathfinding(
+            next_river_segment.first, next_river_segment.second
+        );
+    } else {
+        return;
+        // HexGridLayout[x][y]->isRiverEnd = true;
+    }
+};
+
+void AHexGridManager::createRivers() {
+    int river_count = sqrt(sqrt(GridWidth * GridHeight));
+    for (int i = 0; i < river_count; i++) {
+        int x = rand() % GridWidth;
+        int y = rand() % GridHeight;
+        while (height_noise_map[x][y] < 0.0f || river_noise_map[x][y]) {
+            x = rand() % GridWidth;
+            y = rand() % GridHeight;
+        }
+        height_noise_map[x][y] -= 0.1f;
+        riverPathfinding(x, y);
+    }
+}
+
 // Called when the game starts or when spawned
 void AHexGridManager::BeginPlay() {
     std::map<HexTileType, TSubclassOf<AHexTile>> TileTypeMap = {
@@ -170,25 +254,28 @@ void AHexGridManager::BeginPlay() {
         HexGridLayout[i].SetNumZeroed(GridHeight);
     }
 
-    std::vector<std::vector<float>> noise_height_map = generatePerlinNoise(
-        GridWidth, GridHeight, redistributeHeights
-    );
-
-    // std::vector<std::vector<float>> forest_feature_map =
-    //     generatePerlinNoise(GridWidth, GridHeight, redistributeHeights);
+    generateNoiseMaps();
+    // createRivers();
 
     for (int32 y = 0; y < GridHeight; ++y) {
         for (int32 x = 0; x < GridWidth; ++x) {
             HexTileType spawnTileType =
-                terrainTilesByHeight[heightTileGroupDecider(noise_height_map[x][y])][0];
+                terrainTilesByHeight[heightTileGroupDecider(height_noise_map[x][y])][0];
             float newTileHeightAdjusted =
                 GenerateRandomFloat(0.0f, 1.0f) *
                     (TileHeightRanges[spawnTileType].second -
                      TileHeightRanges[spawnTileType].first) +
                 TileHeightRanges[spawnTileType].first;
 
-            newTileHeightAdjusted = noise_height_map[x][y] >= 0.0f
-                                       ? noise_height_map[x][y]
+            if (HexGridLayout[x][y]->isRiverSegment) {
+                spawnTileType = HexTileType::WATER;
+                newTileHeightAdjusted = height_noise_map[x][y] >= 0.0f
+                                           ? height_noise_map[x][y]
+                                           : 0.0f;
+            }
+
+            newTileHeightAdjusted = height_noise_map[x][y] >= 0.0f
+                                       ? height_noise_map[x][y]
                                        : 0.0f;
 
             // UE_LOG(
@@ -208,6 +295,8 @@ void AHexGridManager::BeginPlay() {
             );
 
             NewTile->GridPositionIndex = FIntPoint(x, y);
+            NewTile->isWater = heightTileGroupDecider(height_noise_map[x][y]) == heightTerrainGroup::waterHeightGroup ? true : false;
+            NewTile->TileType = spawnTileType;
 
             HexGridLayout[x][y] = NewTile;
         }
