@@ -22,7 +22,8 @@ std::unordered_map<HexTileType, std::pair<float, float>> TileHeightRanges = {
     {HexTileType::GRASS, {0.0f, 0.5f}},
     {HexTileType::FOREST, {0.5f, 1.0f}},
     {HexTileType::MOUNTAIN, {1.0f, 2.0f}},
-    {HexTileType::DESERT, {0.0f, 0.5f}}};
+    {HexTileType::DESERT, {0.0f, 0.5f}}
+};
 
 HexTileType getTileTypeByHeight(float h) {
     if (h < 1.0f) {
@@ -99,8 +100,8 @@ void AHexGridManager::BeginPlay() {
                 TileHeightRanges[spawnTileType].first;
 
             // UE_LOG(
-            //     LogTemp, Warning, TEXT("Tile at (%d, %d) is of type %d"), x, y,
-            //     (int32)spawnTileType
+            //     LogTemp, Warning, TEXT("Tile at (%d, %d) is of type %d"), x,
+            //     y, (int32)spawnTileType
             // );
 
             FVector Location = FVector(

@@ -53,18 +53,18 @@ void APlayerCameraController::SetupInputComponent() {
         EInputAxisSwizzle::ZYX
     );
 
-
     RotateAction = NewObject<UInputAction>(this);
     RotateAction->ValueType = EInputActionValueType::Axis3D;
     MapKey(
-        PawnMappingContext, RotateAction, EKeys::E, false, true, EInputAxisSwizzle::ZXY
+        PawnMappingContext, RotateAction, EKeys::E, false, true,
+        EInputAxisSwizzle::ZXY
     );
     MapKey(
-        PawnMappingContext, RotateAction, EKeys::Q, true, true, EInputAxisSwizzle::ZXY
+        PawnMappingContext, RotateAction, EKeys::Q, true, true,
+        EInputAxisSwizzle::ZXY
     );
 
-
     SpringArmLengthAction = NewObject<UInputAction>(this);
-	SpringArmLengthAction->ValueType = EInputActionValueType::Axis1D;
-	MapKey(PawnMappingContext, SpringArmLengthAction, EKeys::MouseWheelAxis);
+    SpringArmLengthAction->ValueType = EInputActionValueType::Axis1D;
+    MapKey(PawnMappingContext, SpringArmLengthAction, EKeys::MouseWheelAxis);
 }

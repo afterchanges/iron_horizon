@@ -13,6 +13,7 @@ class IRON_HORIZON_API AIronHorizonPlayerPawn : public APawn {
 public:
     AIronHorizonPlayerPawn();
     // Called every frame
+    virtual void Tick(float DeltaTime) override;
 
 private:
     virtual void SetupPlayerInputComponent(
@@ -59,4 +60,6 @@ private:
 	void Rotate(const struct FInputActionValue &ActionValue);
 
     void UpdateSpringArmLength(const struct FInputActionValue &ActionValue);
+
+    void UpdateCameraPosition();
 };

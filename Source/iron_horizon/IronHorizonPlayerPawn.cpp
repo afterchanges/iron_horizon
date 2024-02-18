@@ -33,7 +33,6 @@ AIronHorizonPlayerPawn::AIronHorizonPlayerPawn() {
         );
 }
 
-// Called to bind functionality to input
 void AIronHorizonPlayerPawn::SetupPlayerInputComponent(
     UInputComponent *PlayerInputComponent
 ) {
@@ -56,10 +55,10 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(
         &AIronHorizonPlayerPawn::Rotate
     );
 
-	EIController->BindAction(
-		FPController->SpringArmLengthAction, ETriggerEvent::Triggered, this,
-		&AIronHorizonPlayerPawn::UpdateSpringArmLength
-	);
+    EIController->BindAction(
+        FPController->SpringArmLengthAction, ETriggerEvent::Triggered, this,
+        &AIronHorizonPlayerPawn::UpdateSpringArmLength
+    );
 
     ULocalPlayer *LocalPlayer = Cast<ULocalPlayer>(FPController->Player);
     check(LocalPlayer);
@@ -71,6 +70,50 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(
     Subsystem->AddMappingContext(FPController->PawnMappingContext, 0);
 }
 
+FVector2D LastMousePosition;
+
+void AIronHorizonPlayerPawn::UpdateCameraPosition() {
+    APlayerController *PlayerController = Cast<APlayerController>(Controller);
+    if (PlayerController) {
+        FVector2D MousePosition;
+        FVector2D ViewportSize;
+        int32 ViewportSizeX, ViewportSizeY;
+        PlayerController->GetViewportSize(ViewportSizeX, ViewportSizeY);
+        ViewportSize.X = ViewportSizeX;
+        ViewportSize.Y = ViewportSizeY;
+
+        if (PlayerController->GetMousePosition(
+                MousePosition.X, MousePosition.Y
+            )) {
+            FVector NewLocation = GetActorLocation();
+            float BorderSize = 550.0f;
+
+            // Check if the mouse is at the edge of the screen and move the
+            // camera accordingly
+            float MoveSpeed = 100.0f;
+            if (MousePosition.X <= BorderSize) {
+                NewLocation -= GetActorRightVector() * MoveSpeed;
+            } else if (MousePosition.X >= ViewportSize.X - BorderSize) {
+                NewLocation += GetActorRightVector() * MoveSpeed;
+            }
+
+            if (MousePosition.Y <= BorderSize) {
+                NewLocation += GetActorForwardVector() * MoveSpeed;
+            } else if (MousePosition.Y >= ViewportSize.Y - BorderSize) {
+                NewLocation -= GetActorForwardVector() * MoveSpeed;
+            }
+
+            SetActorLocation(NewLocation);
+        }
+    }
+}
+
+void AIronHorizonPlayerPawn::Tick(float DeltaTime) {
+    Super::Tick(DeltaTime);
+
+    UpdateCameraPosition();
+}
+
 void AIronHorizonPlayerPawn::Move(const FInputActionValue &ActionValue) {
     UE_LOG(LogTemp, Warning, TEXT("Move called"));
     FVector Input = ActionValue.Get<FInputActionValue::Axis3D>();
@@ -80,7 +123,10 @@ void AIronHorizonPlayerPawn::Move(const FInputActionValue &ActionValue) {
 void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
     UE_LOG(LogTemp, Warning, TEXT("Rotate called"));
     FRotator Input(ActionValue[0], ActionValue[1], ActionValue[2]);
-	UE_LOG(LogTemp, Warning, TEXT("Input: %f, %f, %f"), ActionValue[0], ActionValue[1], ActionValue[2]);
+    UE_LOG(
+        LogTemp, Warning, TEXT("Input: %f, %f, %f"), ActionValue[0],
+        ActionValue[1], ActionValue[2]
+    );
     Input *= GetWorld()->GetDeltaSeconds() * RotateScale;
     Input += GetActorRotation();
     SetActorRotation(Input);
@@ -89,12 +135,20 @@ void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
 void AIronHorizonPlayerPawn::UpdateSpringArmLength(
     const FInputActionValue &ActionValue
 ) {
-	UE_LOG(LogTemp, Warning, TEXT("UpdateSpringArmLength called %f"), ActionValue[0]);
-    SpringArmComponent->TargetArmLength +=
-        ActionValue[0] * GetWorld()->GetDeltaSeconds() * SpringArmLengthScale * -1.0f;
+    UE_LOG(
+        LogTemp, Warning, TEXT("UpdateSpringArmLength called %f"),
+        ActionValue[0]
+    );
+    SpringArmComponent->TargetArmLength += ActionValue[0] *
+                                           GetWorld()->GetDeltaSeconds() *
+                                           SpringArmLengthScale * -1.0f;
     SpringArmComponent->TargetArmLength = FMath::Clamp(
-        SpringArmComponent->TargetArmLength, MinSpringArmLength, MaxSpringArmLength
+        SpringArmComponent->TargetArmLength, MinSpringArmLength,
+        MaxSpringArmLength
     );
 
-	UE_LOG(LogTemp, Warning, TEXT("SpringArmComponent->TargetArmLength: %f"), SpringArmComponent->TargetArmLength);
+    UE_LOG(
+        LogTemp, Warning, TEXT("SpringArmComponent->TargetArmLength: %f"),
+        SpringArmComponent->TargetArmLength
+    );
 }
