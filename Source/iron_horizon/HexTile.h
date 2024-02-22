@@ -16,6 +16,7 @@ enum class HexTileType : uint8
 	MOUNTAIN,
 	WATER,
 	DESERT,
+	CITY,
 	MAX UMETA(Hidden)
 };
 
@@ -27,6 +28,12 @@ class IRON_HORIZON_API AHexTile : public AActor
 public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
 	FIntPoint GridPositionIndex;
+
+	void SetColor(FLinearColor NewColor);
+
+	void SetTileType(HexTileType NewType);
+
+	HexTileType GetTileType() const { return TileType; }
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
