@@ -10,7 +10,7 @@ class UStaticMeshComponent;
 UENUM()
 enum class HexTileType : uint8
 {
-	INVALID,
+	DEFAULT,
 	GRASS,
 	FOREST,
 	MOUNTAIN,
@@ -29,11 +29,14 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
 	FIntPoint GridPositionIndex;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
+    FIntPoint NormalizedGridPositionIndex;
+
 	void SetColor(FLinearColor NewColor);
 
 	void SetTileType(HexTileType NewType);
 
-	HexTileType GetTileType() const { return TileType; }
+	HexTileType GetTileType() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
@@ -42,6 +45,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	UStaticMeshComponent* TileMesh;
 	
-public:	
+public:    
 	AHexTile();
+
 };

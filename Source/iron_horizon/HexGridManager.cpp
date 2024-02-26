@@ -1,44 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "HexGridManager.h"
+#include <__ranges/size.h>
 #include <cmath>
 #include <iostream>
 #include <random>
 #include <unordered_map>
 #include "PerlinNoise.hpp"
+#include "TIntPointHash.h"
+#include "astar.hpp"
 
 // Sets default values
 AHexGridManager::AHexGridManager() {
-}
-
-
-std::vector<FIntPoint> AHexGridManager::getNeighbors(FIntPoint point) {
-    std::vector<FIntPoint> neighbors;
-
-    // Add all six neighbors of a hexagonal grid
-    neighbors.push_back(FIntPoint(point.X + 1, point.Y));
-    neighbors.push_back(FIntPoint(point.X - 1, point.Y));
-    neighbors.push_back(FIntPoint(point.X, point.Y + 1));
-    neighbors.push_back(FIntPoint(point.X, point.Y - 1));
-    neighbors.push_back(FIntPoint(point.X + 1, point.Y - 1));
-    neighbors.push_back(FIntPoint(point.X - 1, point.Y + 1));
-
-    return neighbors;
-}
-
-int AHexGridManager::cost(FIntPoint from, FIntPoint to) {
-    // TODO: modify this to take into account different types of terrain 
-    return 1;
-}
-
-int AHexGridManager::heuristic(FIntPoint from, FIntPoint to) {
-    // Use Manhattan distance as a heuristic
-    return std::abs(from.X - to.X) + std::abs(from.Y - to.Y);
-}
-
-
-
-std::vector<FIntPoint> AHexGridManager::AStar(FIntPoint start, FIntPoint goal) {
-    // TODO
 }
 
 float GenerateRandomFloat(float left_border, float right_border) {
@@ -49,12 +20,9 @@ float GenerateRandomFloat(float left_border, float right_border) {
 }
 
 std::unordered_map<HexTileType, std::pair<float, float>> TileHeightRanges = {
-    {HexTileType::WATER, {0.0f, 0.0f}},
-    {HexTileType::GRASS, {0.0f, 0.5f}},
-    {HexTileType::FOREST, {0.5f, 1.0f}},
-    {HexTileType::MOUNTAIN, {1.0f, 2.0f}},
-    {HexTileType::DESERT, {0.0f, 0.5f}},
-    {HexTileType::CITY, {0.0f, 0.5f}}
+    {HexTileType::WATER, {0.0f, 0.0f}},  {HexTileType::GRASS, {0.0f, 0.5f}},
+    {HexTileType::FOREST, {0.5f, 1.0f}}, {HexTileType::MOUNTAIN, {1.0f, 2.0f}},
+    {HexTileType::DESERT, {0.0f, 0.5f}}, {HexTileType::CITY, {0.0f, 0.5f}}
 };
 
 HexTileType getTileTypeByHeight(float h) {
@@ -64,7 +32,7 @@ HexTileType getTileTypeByHeight(float h) {
         return HexTileType::GRASS;
     } else if (h < 1.8f) {
         return HexTileType::CITY;
-    }else if (h < 2.0f) {
+    } else if (h < 2.0f) {
         return HexTileType::FOREST;
     } else if (h < 2.5f) {
         return HexTileType::MOUNTAIN;
@@ -73,31 +41,16 @@ HexTileType getTileTypeByHeight(float h) {
     }
 }
 
-void AHexTile::SetTileType(HexTileType NewType)
-{
+void AHexTile::SetTileType(HexTileType NewType) {
     TileType = NewType;
 }
 
-
-void AHexGridManager::generateCities(int numCities) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    for (int i = 0; i < numCities; ++i) {
-        int x, y;
-
-        // Ensure we don't select the same tile twice
-        do {
-            std::uniform_int_distribution<> disX(0, GridWidth - 1);
-            std::uniform_int_distribution<> disY(0, GridHeight - 1);
-
-            x = disX(gen);
-            y = disY(gen);
-        } while (HexGridLayout[x][y]->GetTileType() == HexTileType::CITY);
-
-        // Change the tile type to CITY
-        HexGridLayout[x][y]->SetTileType(HexTileType::CITY);
+HexTileType AHexTile::GetTileType() const {
+    if (TileType < HexTileType::DEFAULT || TileType >= HexTileType::MAX) {
+        UE_LOG(LogTemp, Error, TEXT("Invalid TileType"));
+        return HexTileType::DEFAULT;
     }
+    return TileType;
 }
 
 std::vector<std::vector<float>> generatePerlinNoise(int32 width, int32 height) {
@@ -130,17 +83,48 @@ std::vector<std::vector<float>> generatePerlinNoise(int32 width, int32 height) {
     return noise_map;
 }
 
-std::vector<FIntPoint> AHexGridManager::determineCities() {
-    std::vector<FIntPoint> cities;
+AHexTile *AHexGridManager::GetTileAtPosition(const FIntPoint &GridPositionIndex
+) {
+    if (GridPositionIndex.X < 0 || GridPositionIndex.X >= HexGridLayout.Num() ||
+        GridPositionIndex.Y < 0 ||
+        GridPositionIndex.Y >= HexGridLayout[GridPositionIndex.X].Num()) {
+        return nullptr;
+    }
+    return HexGridLayout[GridPositionIndex.X][GridPositionIndex.Y];
+}
 
+void AHexGridManager::generateCities(int numCities) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> disWidth(0, GridWidth - 1);
+    std::uniform_int_distribution<> disHeight(0, GridHeight - 1);
+
+    for (int i = 0; i < numCities; ++i) {
+        int x, y;
+        do {
+            x = disWidth(gen);
+            y = disHeight(gen);
+        } while (x >= HexGridLayout.Num() || y >= HexGridLayout[x].Num() ||
+                 !HexGridLayout[x][y] ||
+                 HexGridLayout[x][y]->GetTileType() == HexTileType::CITY);
+
+        if (HexGridLayout[x][y]) {
+            HexGridLayout[x][y]->SetTileType(HexTileType::CITY);
+        }
+    }
+}
+
+TArray<FIntPoint> AHexGridManager::determineCities() {
+    TArray<FIntPoint> cities;
     for (int32 x = 0; x < GridWidth; ++x) {
         for (int32 y = 0; y < GridHeight; ++y) {
-            if (HexGridLayout[x][y]->GetTileType() == HexTileType::CITY) {
-                cities.push_back(FIntPoint(x, y));
+            if (x < HexGridLayout.Num() && y < HexGridLayout[x].Num() &&
+                HexGridLayout[x][y] &&
+                HexGridLayout[x][y]->GetTileType() == HexTileType::CITY) {
+                cities.Add(FIntPoint(x, y));
             }
         }
     }
-
     return cities;
 }
 
@@ -187,26 +171,46 @@ void AHexGridManager::BeginPlay() {
 
             TSubclassOf<AHexTile> TileToSpawn = TileTypeMap[spawnTileType];
 
-            AHexTile *NewTile = GetWorld()->SpawnActor<AHexTile>(
-                TileToSpawn, Location, FRotator::ZeroRotator
-            );
-
-            NewTile->GridPositionIndex = FIntPoint(x, y);
-
-            HexGridLayout[x][y] = NewTile;
+            if (TileToSpawn) {
+                UWorld *World = GetWorld();
+                if (World) {
+                    AHexTile *NewTile = World->SpawnActor<AHexTile>(
+                        TileToSpawn, Location, FRotator::ZeroRotator
+                    );
+                    if (NewTile) {
+                        NewTile->GridPositionIndex = FIntPoint(x, y);
+                        HexGridLayout[x][y] = NewTile;
+                    }
+                } else {
+                    UE_LOG(
+                        LogTemp, Warning,
+                        TEXT("Failed to spawn actor at (%d, %d)"), x, y
+                    );
+                }
+            } else {
+                UE_LOG(
+                    LogTemp, Warning,
+                    TEXT("No class specified for tile type %d"),
+                    (int32)spawnTileType
+                );
+            }
         }
     }
 
-    std::vector<FIntPoint> cities;
+    TArray<FIntPoint> cities;
     bool allCitiesConnected = false;
     while (!allCitiesConnected) {
-        generateCities(5); // Generate 5 cities
+        generateCities(5);  // Generate 5 cities
         cities = determineCities();
         allCitiesConnected = true;
 
-        for (size_t i = 0; i < cities.size(); ++i) {
-            for (size_t j = i + 1; j < cities.size(); ++j) {
-                if (this->AStar(cities[i], cities[j]).empty()) {
+        for (size_t i = 0; i < cities.Num(); ++i) {
+            for (size_t j = i + 1; j < cities.Num(); ++j) {
+                if (!HexGridAStar(
+                         HexGridLayout[cities[i].X][cities[i].Y],
+                         HexGridLayout[cities[j].X][cities[j].Y], this
+                    )
+                         .Num()) {
                     allCitiesConnected = false;
                     break;
                 }
@@ -215,13 +219,12 @@ void AHexGridManager::BeginPlay() {
                 break;
             }
         }
-    }
 
-
-    if (allCitiesConnected) {
-        for (FIntPoint city : cities) {
-            AHexTile* tile = HexGridLayout[city.X][city.Y];
-            tile->SetTileType(HexTileType::CITY);
+        if (allCitiesConnected) {
+            for (FIntPoint city : cities) {
+                AHexTile *tile = HexGridLayout[city.X][city.Y];
+                tile->SetTileType(HexTileType::CITY);
+            }
         }
     }
 }

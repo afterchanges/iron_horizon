@@ -25,13 +25,12 @@ protected:
 
 public: 
         AHexGridManager();
-        std::vector<FIntPoint> getNeighbors(FIntPoint point);
-        int cost(FIntPoint from, FIntPoint to);
-        int heuristic(FIntPoint from, FIntPoint to);
-        std::vector<FIntPoint> AStar(FIntPoint start, FIntPoint goal);
         void generateCities(int numCities);
-        std::vector<FIntPoint> determineCities();
+        TArray<FIntPoint> determineCities();
         bool allCitiesConnected();
+        void generateHexGrid();
+        AHexTile* GetTileAtPosition(const FIntPoint &GridPositionIndex);
+        TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
 
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
         TSubclassOf<AHexTile> GrassHexTile;
