@@ -1,5 +1,5 @@
 #include "HexGridManager.h"
-#include <__ranges/size.h>
+// #include <__ranges/size.h>
 #include <cmath>
 #include <iostream>
 #include <random>
@@ -30,8 +30,6 @@ HexTileType getTileTypeByHeight(float h) {
         return HexTileType::WATER;
     } else if (h < 1.5f) {
         return HexTileType::GRASS;
-    } else if (h < 1.8f) {
-        return HexTileType::CITY;
     } else if (h < 2.0f) {
         return HexTileType::FOREST;
     } else if (h < 2.5f) {
@@ -159,10 +157,10 @@ void AHexGridManager::BeginPlay() {
                      TileHeightRanges[spawnTileType].first) +
                 TileHeightRanges[spawnTileType].first;
 
-            UE_LOG(
-                LogTemp, Warning, TEXT("Tile at (%d, %d) is of type %d"), x, y,
-                (int32)spawnTileType
-            );
+            // UE_LOG(
+            //     LogTemp, Warning, TEXT("Tile at (%d, %d) is of type %d"), x, y,
+            //     (int32)spawnTileType
+            // );
 
             FVector Location = FVector(
                 (y % 2) * sqrt(3) / 2 * HexTileSize + x * sqrt(3) * HexTileSize,
@@ -223,7 +221,25 @@ void AHexGridManager::BeginPlay() {
         if (allCitiesConnected) {
             for (FIntPoint city : cities) {
                 AHexTile *tile = HexGridLayout[city.X][city.Y];
-                tile->SetTileType(HexTileType::CITY);
+                if (tile) {
+                    tile->Destroy();  // Despawn the current tile
+
+                    // Spawn a new tile of CITY class
+                    FVector Location = tile->GetActorLocation();
+                    UWorld *World = GetWorld();
+                    if (World) {
+                        AHexTile *NewTile = World->SpawnActor<AHexTile>(
+                            CityHexTile, Location, FRotator::ZeroRotator
+                        );
+                        if (NewTile) {
+                            NewTile->GridPositionIndex = FIntPoint(city.X, city.Y);
+                            HexGridLayout[city.X][city.Y] = NewTile;
+                            UE_LOG(
+                                LogTemp, Warning, TEXT("City at (%d, %d)"), city.X, city.Y
+                            );
+                        }
+                    }
+                }
             }
         }
     }
