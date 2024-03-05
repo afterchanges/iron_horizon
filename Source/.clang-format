@@ -3,10 +3,17 @@ IndentWidth: 4
 AccessModifierOffset: -4
 PointerAlignment: Right
 IncludeBlocks: Preserve
-AllowShortBlocksOnASingleLine: false
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Left
+AlignConsecutiveNewlines: Left
+AlignOperands: Align
+AllowShortBlocksOnASingleLine: true
 AllowShortFunctionsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AllowShortEnumsOnASingleLine: true
+BinPackArguments: false
+BinPackParameters: false
 ColumnLimit: 100
 
 # Only from clang-format 14.0.0
