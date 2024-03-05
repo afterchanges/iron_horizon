@@ -54,7 +54,23 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Camera movement")
 	float MaxSpringArmLength = 5000.0f;
 
+
+    UPROPERTY(EditAnywhere, Category = "Movement on cursor")
+    float FastBorderSizeThreshold = 0.05f;
+    UPROPERTY(EditAnywhere, Category = "Movement on cursor")
+    float MediumBorderSizeThreshold = 0.1f;
+    UPROPERTY(EditAnywhere, Category = "Movement on cursor")
+    float SlowBorderSizeThreshold = 0.2f;
+    UPROPERTY(EditAnywhere, Category = "Movement on cursor")
+    float FastSpeed = 5000.0f;
+    UPROPERTY(EditAnywhere, Category = "Movement on cursor")
+    float MediumSpeed = 2000.0f;
+    UPROPERTY(EditAnywhere, Category = "Movement on cursor")
+    float SlowSpeed = 500.0f;
+
     /** Handle input to update location. */
+    float determineMouseMovementSpeedOnAxis(float MousePosition, float ViewportSize);
+
     void Move(const struct FInputActionValue &ActionValue);
 
 	void Rotate(const struct FInputActionValue &ActionValue);
