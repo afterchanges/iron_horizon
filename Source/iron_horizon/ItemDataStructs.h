@@ -8,7 +8,6 @@ UENUM()
 enum class EItemType : uint8 {
     Surface_Railway UMETA (DisplayName = "Surface Railway"),
     Tunnel_Railway UMETA (DisplayName = "Tunnel Railway"),
-    Bridge_Railway UMETA (DisplayName = "Bridge Railway"),
 };
 
 USTRUCT()
