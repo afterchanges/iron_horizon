@@ -2,11 +2,28 @@
 #pragma once
 
 #include "HexTile.h"
+#include "InteractableInterface.h"
 #include <map>
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "HexGridManager.generated.h"
+
+USTRUCT()
+struct FInteractionData {   // info about the interaction
+    GENERATED_USTRUCT_BODY()
+
+    FInteractionData() :
+        CurrentInteractable(nullptr),
+        LastInteractionTime(0.0f)
+    {};
+
+    UPROPERTY()
+    AActor* CurrentInteractable;    // for checking if the interactable is still in focus
+
+    UPROPERTY()
+    float LastInteractionTime;
+};
 
 UCLASS()
 class IRON_HORIZON_API AHexGridManager : public AActor
@@ -22,6 +39,20 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "HexGridManager")
 	float HexTileSize;
+
+    UPROPERTY(VisibleAnywhere, Category = "Interaction")
+    TScriptInterface<IInteractionInterface> TargetInteractable;
+
+    float InteractionCheckFrequency;
+
+    FTimerHandle InteractionCheckTimer;
+
+    FInteractionData InteractionData;
+
+    // that acting on
+    void FoundNewInteractable(AActor* NewInteractable);
+    void NoInteractableFound();
+    void Interact();
 
     public:
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
