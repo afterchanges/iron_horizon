@@ -34,8 +34,9 @@
 			"Enabled": true
 		},
 		{
-			"Name": "rts_camera",
+			"Name": "EnhancedInput",
 			"Enabled": true
 		}
+
 	]
 }

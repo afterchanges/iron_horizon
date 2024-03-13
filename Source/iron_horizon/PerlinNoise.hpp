@@ -6,22 +6,23 @@
 //	Copyright (C) 2013-2021 Ryo Suzuki <reputeless@gmail.com>
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
-//copy 	of this software and associated documentation files(the "Software"), to
-//deal 	in the Software without restriction, including without limitation the
-//rights 	to use, copy, modify, merge, publish, distribute, sublicense, and / or
-//sell 	copies of the Software, and to permit persons to whom the Software is
-//	furnished to do so, subject to the following conditions :
+// copy 	of this software and associated documentation files(the
+// "Software"), to deal 	in the Software without restriction, including
+// without limitation the rights 	to use, copy, modify, merge, publish,
+// distribute, sublicense, and / or sell 	copies of the Software, and to
+// permit persons to whom the Software is 	furnished to do so, subject to the
+//following conditions :
 //
 //	The above copyright notice and this permission notice shall be included
-//in 	all copies or substantial portions of the Software.
+// in 	all copies or substantial portions of the Software.
 //
 //	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-//OR 	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// OR 	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 //	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL
-//THE 	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// THE 	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 //	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//FROM, 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-//IN 	THE SOFTWARE.
+// FROM, 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN 	THE SOFTWARE.
 //
 //----------------------------------------------------------------------------------------
 
@@ -33,7 +34,6 @@
 #include <numeric>
 #include <random>
 #include <type_traits>
-
 
 #if __has_include(<concepts>) && defined(__cpp_concepts)
 #include <concepts>
@@ -308,7 +308,7 @@ namespace perlin_detail {
 //
 //	These functions are provided for consistency.
 //	You may get different results from std::shuffle() with different
-//standard library implementations.
+// standard library implementations.
 //
 SIVPERLIN_CONCEPT_URBG
 [[nodiscard]] inline std::uint64_t
@@ -488,7 +488,8 @@ inline constexpr BasicPerlinNoise<Float>::BasicPerlinNoise() noexcept
           145, 235, 249, 14,  239, 107, 49,  192, 214, 31,  181, 199, 106, 157,
           184, 84,  204, 176, 115, 121, 50,  45,  127, 4,   150, 254, 138, 236,
           205, 93,  222, 114, 67,  29,  24,  72,  243, 141, 128, 195, 78,  66,
-          215, 61,  156, 180} {
+          215, 61,  156, 180
+      } {
 }
 
 template <class Float>

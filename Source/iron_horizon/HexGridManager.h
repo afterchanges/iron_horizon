@@ -15,15 +15,23 @@ class IRON_HORIZON_API AHexGridManager : public AActor
 
 protected:
 	TArray<TArray<AHexTile*>> HexGridLayout;
-	UPROPERTY(EditAnywhere, Category = "HexGridLayout")
+    
+    UPROPERTY(EditAnywhere, Category = "HexGridLayout")
 	int32 GridWidth;
 	UPROPERTY(EditAnywhere, Category = "HexGridLayout")
 	int32 GridHeight;
-
 	UPROPERTY(EditAnywhere, Category = "HexGridManager")
 	float HexTileSize;
 
-    public:
+public: 
+        AHexGridManager();
+        void generateCities(int numCities);
+        TArray<FIntPoint> determineCities();
+        bool allCitiesConnected();
+        void generateHexGrid();
+        AHexTile* GetTileAtPosition(const FIntPoint &GridPositionIndex);
+        TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
+
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
         TSubclassOf<AHexTile> GrassHexTile;
 
@@ -38,8 +46,9 @@ protected:
         
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
         TSubclassOf<AHexTile> DesertHexTile;
-        // Sets default values for this actor's properties
-	AHexGridManager();
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> CityHexTile;
+        
 
 protected:
 	// Called when the game starts or when spawned
