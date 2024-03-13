@@ -2,6 +2,7 @@
 #pragma once
 
 #include "HexTile.h"
+#include <map>
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -22,12 +23,22 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HexGridManager")
 	float HexTileSize;
 
-	UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-	TSubclassOf<AHexTile> GrassHexTile;
+    public:
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> GrassHexTile;
 
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> WaterHexTile;
 
-public:	
-	// Sets default values for this actor's properties
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> ForestHexTile;
+
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> MountainHexTile;
+        
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> DesertHexTile;
+        // Sets default values for this actor's properties
 	AHexGridManager();
 
 protected:
