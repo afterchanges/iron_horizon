@@ -5,7 +5,7 @@
 #include <Components/StaticMeshComponent.h>
 
 // Sets default values
-AHexTile::AHexTile() {
+AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     RootComponent =
         CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
     TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
