@@ -32,6 +32,8 @@ class IRON_HORIZON_API APlayerCameraController : public APlayerController {
     float CameraPitch = 0.0f;
 
 public:
+    APlayerCameraController();
+
     UPROPERTY(EditAnywhere, Category = "Camera")
     class UInputMappingContext *PawnMappingContext;
 

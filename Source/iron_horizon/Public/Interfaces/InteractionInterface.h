@@ -49,8 +49,7 @@ class IRON_HORIZON_API IInteractionInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual void Highlight() = 0;
-    virtual void Unhighlight() = 0;
+    virtual void SetHighlight(bool highlight) = 0;
 	// that receives the action
     virtual void BeginFocus();
     virtual void EndFocus();

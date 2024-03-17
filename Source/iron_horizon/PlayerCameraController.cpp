@@ -68,3 +68,7 @@ void APlayerCameraController::SetupInputComponent() {
     SpringArmLengthAction->ValueType = EInputActionValueType::Axis1D;
     MapKey(PawnMappingContext, SpringArmLengthAction, EKeys::MouseWheelAxis);
 }
+
+APlayerCameraController::APlayerCameraController() {
+    bEnableMouseOverEvents = true;
+}

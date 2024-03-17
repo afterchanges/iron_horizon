@@ -115,11 +115,6 @@ void AIronHorizonPlayerPawn::Tick(float DeltaTime) {
     Super::Tick(DeltaTime);
 
     UpdateCameraPosition();
-
-    if (GetWorld()->GetTimeSeconds() - InteractionData.LastInteractionCheckTime >
-        InteractionCheckFrequency) {
-        PerformInteractionCheck();
-    }
 }
 
 void AIronHorizonPlayerPawn::Move(const FInputActionValue &ActionValue) {
@@ -150,54 +145,4 @@ void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &Acti
         LogTemp, Warning, TEXT("SpringArmComponent->TargetArmLength: %f"),
         SpringArmComponent->TargetArmLength
     );
-}
-
-void AIronHorizonPlayerPawn::PerformInteractionCheck() {
-    InteractionData.LastInteractionCheckTime = GetWorld()->GetTimeSeconds();
-
-    FVector Start = CameraComponent->GetComponentLocation();
-    FVector End = Start + CameraComponent->GetForwardVector() * 1000.0f;
-
-    FCollisionQueryParams QueryParams;
-    QueryParams.AddIgnoredActor(this);
-    FHitResult HitResult;
-
-    if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams)) {
-        AActor *HitActor = HitResult.GetActor();
-        if (HitActor) {
-            IInteractionInterface *Interactable = Cast<IInteractionInterface>(HitActor);
-            if (Interactable) {
-                FoundInteractable(HitActor);
-                return;
-            }
-        }
-    }
-
-    NoInteractableFound();
-}
-
-void AIronHorizonPlayerPawn::FoundInteractable(AActor *NewInteractable) {
-    IInteractionInterface *Interactable = Cast<IInteractionInterface>(NewInteractable);
-    if (Interactable)
-    {
-        Interactable->Highlight();
-    }
-}
-
-void AIronHorizonPlayerPawn::NoInteractableFound() {
-    if (InteractionData.CurrentInteractable) {
-        IInteractionInterface *Interactable = Cast<IInteractionInterface>(InteractionData.CurrentInteractable);
-        if (Interactable) {
-            Interactable->Unhighlight();
-        }
-    }
-    InteractionData.CurrentInteractable = nullptr;
-}
-
-void AIronHorizonPlayerPawn::Highlight() {
-    
-}
-
-void AIronHorizonPlayerPawn::Unhighlight() {
-    
 }

@@ -4,24 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "Interfaces/InteractionInterface.h"
 #include "IronHorizonPlayerPawn.generated.h"
-
-USTRUCT()
-struct FInteractionData {
-    GENERATED_USTRUCT_BODY()
-
-    FInteractionData() :
-        CurrentInteractable(nullptr), 
-        LastInteractionCheckTime(0.0f)
-    {};
-
-    UPROPERTY()
-    AActor* CurrentInteractable;
-
-    UPROPERTY()
-    float LastInteractionCheckTime;
-};
 
 UCLASS()
 
@@ -96,28 +79,4 @@ private:
 
     void UpdateCameraPosition();
 
-    /** Interaction. */
-    void Highlight();
-
-    void Unhighlight();
-
-    void PerformInteractionCheck();
-
-    void FoundInteractable(AActor* NewInteractable);
-
-    void NoInteractableFound();
-
-    bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); };
-
-    UPROPERTY(VisibleAnywhere, Category = "Interaction")
-    TScriptInterface<IInteractionInterface> TargetInteractable;
-
-    UPROPERTY(VisibleAnywhere, Category = "Interaction")
-    TScriptInterface<IInteractionInterface> CurrentInteractable;
-
-    float InteractionCheckFrequency = 0.1;
-
-    FTimerHandle TimerHandle_Interaction;
-
-    FInteractionData InteractionData;
 };

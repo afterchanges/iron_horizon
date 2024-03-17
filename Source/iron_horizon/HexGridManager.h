@@ -5,8 +5,29 @@
 #include <map>
 
 #include "CoreMinimal.h"
+#include "Interfaces/InteractionInterface.h"
 #include "GameFramework/Actor.h"
 #include "HexGridManager.generated.h"
+
+USTRUCT()
+struct FInteractionData {
+    GENERATED_USTRUCT_BODY()
+
+    FInteractionData() :
+        CurrentInteractable(nullptr), 
+        LastInteractionCheckTime(0.0f),
+        InteractionCheckFrequency(0.1f)
+    {};
+
+    UPROPERTY()
+    AActor* CurrentInteractable;
+
+    UPROPERTY()
+    float LastInteractionCheckTime;
+
+    UPROPERTY()
+    float InteractionCheckFrequency;
+};
 
 UCLASS()
 class IRON_HORIZON_API AHexGridManager : public AActor
@@ -22,6 +43,8 @@ protected:
 	int32 GridHeight;
 	UPROPERTY(EditAnywhere, Category = "HexGridManager")
 	float HexTileSize;
+
+    virtual void Tick(float DeltaTime) override;
 
 public: 
         AHexGridManager();
@@ -48,6 +71,28 @@ public:
         TSubclassOf<AHexTile> DesertHexTile;
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
         TSubclassOf<AHexTile> CityHexTile;
+
+
+        /** Interaction. */
+        void SetHighlight(bool bHighlight);
+
+        void PerformInteractionCheck();
+
+        void FoundInteractable(AActor* NewInteractable);
+
+        void NoInteractableFound();
+
+        bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); };
+
+        UPROPERTY(VisibleAnywhere, Category = "Interaction")
+        TScriptInterface<IInteractionInterface> TargetInteractable;
+
+        UPROPERTY(VisibleAnywhere, Category = "Interaction")
+        TScriptInterface<IInteractionInterface> CurrentInteractable;
+
+        FTimerHandle TimerHandle_Interaction;
+
+        FInteractionData InteractionData;
         
 
 protected:

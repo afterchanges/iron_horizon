@@ -38,6 +38,18 @@ public:
 
 	HexTileType GetTileType() const;
 
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* DefaultMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* HighlightMaterial;
+
+	UFUNCTION()
+	void OnBeginCursorOver(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void OnEndCursorOver(UPrimitiveComponent* TouchedComponent);
+
 protected:
 	bool hasForest = false;
 	bool isRiverStart = false;
