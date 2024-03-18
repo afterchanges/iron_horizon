@@ -16,7 +16,7 @@ struct FInteractionData {
     FInteractionData() :
         CurrentInteractable(nullptr), 
         LastInteractionCheckTime(0.0f),
-        InteractionCheckFrequency(0.1f)
+        InteractionCheckFrequency(0.01f)
     {};
 
     UPROPERTY()

@@ -47,4 +47,6 @@ public:
     class UInputAction *SpringArmLengthAction;
 
     virtual void SetupInputComponent() override;
+
+    void OnJKeyPressed();
 };
