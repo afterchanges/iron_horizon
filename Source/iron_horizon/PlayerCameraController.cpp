@@ -83,6 +83,8 @@ APlayerCameraController::APlayerCameraController() {
 }
 
 void APlayerCameraController::OnJKeyPressed() {
+    UE_LOG(LogTemp, Warning, TEXT("J key pressed"));
+
     // Get the current mouse position
     float MouseX, MouseY;
     if (GetMousePosition(MouseX, MouseY)) {
@@ -95,7 +97,6 @@ void APlayerCameraController::OnJKeyPressed() {
             if (HexTile) {
                 // Change the tile color and type
                 HexTile->ChangeToRailway();
-                UE_LOG(LogTemp, Warning, TEXT("CHANGED"));
             }
         }
     }

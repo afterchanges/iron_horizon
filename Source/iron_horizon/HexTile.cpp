@@ -12,13 +12,13 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
     TileMesh->SetupAttachment(RootComponent);
 
-    static ConstructorHelpers::FObjectFinder<UMaterialInterface> HighlightMaterialAsset(TEXT("/Content/Static/Materials/HighlightMaterial.uasset"));
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> HighlightMaterialAsset(TEXT("/Game/Static/Materials/HighlightMaterial"));
     UE_LOG(LogTemp, Warning, TEXT("HighlightMaterialAsset.Succeeded() = %d"), HighlightMaterialAsset.Succeeded());
     if (HighlightMaterialAsset.Succeeded()) {
         HighlightMaterial = HighlightMaterialAsset.Object;
     }
 
-    static ConstructorHelpers::FObjectFinder<UMaterialInterface> RailwayMaterialAsset(TEXT("/Content/Static/Materials/RailwayMaterial.uasset"));
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> RailwayMaterialAsset(TEXT("/Game/Static/Materials/RailwayMaterial"));
     if (RailwayMaterialAsset.Succeeded()) {
         RailwayMaterial = RailwayMaterialAsset.Object;
     }
@@ -46,15 +46,41 @@ void AHexTile::OnBeginCursorOver(UPrimitiveComponent* TouchedComponent) {
 }
 
 void AHexTile::OnEndCursorOver(UPrimitiveComponent* TouchedComponent) {
-    TileMesh->SetMaterial(0, DefaultMaterial);
+    if (TileType == HexTileType::RAILWAY) {
+        TileMesh->SetMaterial(0, RailwayMaterial);
+    } else {
+        TileMesh->SetMaterial(0, DefaultMaterial);
+    }
+}
+
+FString AHexTile::HexTileTypeToString(HexTileType Type) {
+    switch (Type) {
+        case HexTileType::DEFAULT:
+            return "DEFAULT";
+        case HexTileType::RAILWAY:
+            return "RAILWAY";
+        default:
+            return "UNKNOWN";
+    }
 }
 
 void AHexTile::ChangeToRailway() {
-    // Change the tile type
+    if (TileType == HexTileType::RAILWAY) {
+        return;
+    }
+    // Change the tile type to railway
     TileType = HexTileType::RAILWAY;
 
     // Change the tile color to red
-    UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(RailwayMaterial, this);
-    DynamicMaterial->SetVectorParameterValue("Color", FLinearColor::Red);
-    TileMesh->SetMaterial(0, DynamicMaterial);
+    if (RailwayMaterial) {
+        UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(RailwayMaterial, this);
+        if (DynamicMaterial) {
+            DynamicMaterial->SetVectorParameterValue("Color", FLinearColor::Red);
+            TileMesh->SetMaterial(0, DynamicMaterial);
+        } else {
+            UE_LOG(LogTemp, Warning, TEXT("Failed to create dynamic material instance"));
+        }
+    } else {
+        UE_LOG(LogTemp, Warning, TEXT("RailwayMaterial is not set"));
+    }
 }

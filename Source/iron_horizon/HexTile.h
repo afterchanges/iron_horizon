@@ -58,6 +58,8 @@ public:
 
 	void BeginPlay();
 
+	FString HexTileTypeToString(HexTileType Type);
+
 protected:
 	bool hasForest = false;
 	bool isRiverStart = false;
