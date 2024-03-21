@@ -9,7 +9,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"CoreUObject"
 			]
 		}
 	],
@@ -37,6 +38,5 @@
 			"Name": "EnhancedInput",
 			"Enabled": true
 		}
-
 	]
 }

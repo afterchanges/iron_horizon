@@ -4,6 +4,7 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "InputModifiers.h"
+#include "HexTile.h"
 #include "IronHorizonPlayerPawn.h"
 
 static void MapKey(
@@ -67,4 +68,36 @@ void APlayerCameraController::SetupInputComponent() {
     SpringArmLengthAction = NewObject<UInputAction>(this);
     SpringArmLengthAction->ValueType = EInputActionValueType::Axis1D;
     MapKey(PawnMappingContext, SpringArmLengthAction, EKeys::MouseWheelAxis);
+
+    // Create a new action for the J key press
+    UInputAction* JKeyPressAction = NewObject<UInputAction>(this);
+    JKeyPressAction->ValueType = EInputActionValueType::Axis1D;
+    MapKey(PawnMappingContext, JKeyPressAction, EKeys::J);
+
+    // Bind the action to the OnJKeyPressed function
+    InputComponent->BindKey(EKeys::J, IE_Pressed, this, &APlayerCameraController::OnJKeyPressed);
+}
+
+APlayerCameraController::APlayerCameraController() {
+    bEnableMouseOverEvents = true;
+}
+
+void APlayerCameraController::OnJKeyPressed() {
+    UE_LOG(LogTemp, Warning, TEXT("J key pressed"));
+
+    // Get the current mouse position
+    float MouseX, MouseY;
+    if (GetMousePosition(MouseX, MouseY)) {
+        // Convert the mouse screen position to a world space ray
+        FCollisionQueryParams TraceParams;
+        FHitResult HitResult;
+        if (GetHitResultAtScreenPosition(FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult)) {
+            // Check if the hit actor is a hex tile
+            AHexTile* HexTile = Cast<AHexTile>(HitResult.GetActor());
+            if (HexTile) {
+                // Change the tile color and type
+                HexTile->ChangeToRailway();
+            }
+        }
+    }
 }

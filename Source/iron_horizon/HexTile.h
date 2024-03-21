@@ -17,6 +17,7 @@ enum class HexTileType : uint8
 	WATER,
 	DESERT,
 	CITY,
+	RAILWAY,
 	MAX UMETA(Hidden)
 };
 
@@ -37,6 +38,27 @@ public:
 	void SetTileType(HexTileType NewType);
 
 	HexTileType GetTileType() const;
+
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* DefaultMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* HighlightMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* RailwayMaterial;
+
+	UFUNCTION()
+	void OnBeginCursorOver(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
+	void OnEndCursorOver(UPrimitiveComponent* TouchedComponent);
+
+	void ChangeToRailway();
+
+	void BeginPlay();
+
+	FString HexTileTypeToString(HexTileType Type);
 
 protected:
 	bool hasForest = false;
