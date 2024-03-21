@@ -13,7 +13,7 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     TileMesh->SetupAttachment(RootComponent);
 
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> HighlightMaterialAsset(TEXT("/Game/Static/Materials/HighlightMaterial"));
-    UE_LOG(LogTemp, Warning, TEXT("HighlightMaterialAsset.Succeeded() = %d"), HighlightMaterialAsset.Succeeded());
+    // UE_LOG(LogTemp, Warning, TEXT("HighlightMaterialAsset.Succeeded() = %d"), HighlightMaterialAsset.Succeeded());
     if (HighlightMaterialAsset.Succeeded()) {
         HighlightMaterial = HighlightMaterialAsset.Object;
     }
@@ -36,10 +36,14 @@ void AHexTile::BeginPlay() {
 
     if (PlayerController) {
         EnableInput(PlayerController);
+        PlayerController->bShowMouseCursor = true; 
+        PlayerController->bEnableClickEvents = true; 
+        PlayerController->bEnableMouseOverEvents = true;
     }
 }
 
 void AHexTile::OnBeginCursorOver(UPrimitiveComponent* TouchedComponent) {
+    UE_LOG(LogTemp, Warning, TEXT("Highlighted tile: %s"), GridPositionIndex.ToString().GetCharArray().GetData());
     DefaultMaterial = TileMesh->GetMaterial(0);
 
     TileMesh->SetMaterial(0, HighlightMaterial);

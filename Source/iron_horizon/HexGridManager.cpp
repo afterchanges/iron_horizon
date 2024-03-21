@@ -187,7 +187,7 @@ TArray<FIntPoint> AHexGridManager::determineCities() {
 }
 
 float redistributeHeights(float x) {
-    UE_LOG(LogTemp, Warning, TEXT("Redistributing height %f, got %f"), x, 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5);
+    // UE_LOG(LogTemp, Warning, TEXT("Redistributing height %f, got %f"), x, 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5);
     return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x +
            427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5;
 }

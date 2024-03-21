@@ -71,17 +71,17 @@ float AIronHorizonPlayerPawn::determineMouseMovementSpeedOnAxis(
             } else {
                 newPositionDifference +=
                     SlowSpeed * FMath::Sign(SlowBorderSizeThreshold * ViewportSize - MousePosition);
-                UE_LOG(LogTemp, Warning, TEXT("SlowSpeed"));
+                // UE_LOG(LogTemp, Warning, TEXT("SlowSpeed"));
             }
         } else {
             newPositionDifference +=
                 MediumSpeed * FMath::Sign(MediumBorderSizeThreshold * ViewportSize - MousePosition);
-            UE_LOG(LogTemp, Warning, TEXT("MediumSpeed"));
+            // UE_LOG(LogTemp, Warning, TEXT("MediumSpeed"));
         }
     } else {
         newPositionDifference +=
             FastSpeed * FMath::Sign(FastBorderSizeThreshold * ViewportSize - MousePosition);
-        UE_LOG(LogTemp, Warning, TEXT("FastSpeed"));
+        // UE_LOG(LogTemp, Warning, TEXT("FastSpeed"));
     }
 
     return newPositionDifference;
@@ -135,14 +135,14 @@ void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
 }
 
 void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &ActionValue) {
-    UE_LOG(LogTemp, Warning, TEXT("UpdateSpringArmLength called %f"), ActionValue[0]);
+    // UE_LOG(LogTemp, Warning, TEXT("UpdateSpringArmLength called %f"), ActionValue[0]);
     SpringArmComponent->TargetArmLength +=
         ActionValue[0] * GetWorld()->GetDeltaSeconds() * SpringArmLengthScale * -1.0f;
     SpringArmComponent->TargetArmLength =
         FMath::Clamp(SpringArmComponent->TargetArmLength, MinSpringArmLength, MaxSpringArmLength);
 
-    UE_LOG(
-        LogTemp, Warning, TEXT("SpringArmComponent->TargetArmLength: %f"),
-        SpringArmComponent->TargetArmLength
-    );
+    // UE_LOG(
+    //     LogTemp, Warning, TEXT("SpringArmComponent->TargetArmLength: %f"),
+    //     SpringArmComponent->TargetArmLength
+    // );
 }
