@@ -17,6 +17,25 @@ TMap<HexTileType, TArray<float>> TileHeightRanges = {
     {HexTileType::DESERT, {0.0f, 0.5f}}
 };
 
+TArray<FIntPoint> AxialNeighbors = {
+    FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
+    FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1)
+};
+
+TArray<float> PrestigeRangeInfluenceModifier = {
+    1.0f, 0.7f, 0.5f, 0.2f
+};
+
+//! order is the same as on unit circle (from right, anti-clockwise)
+
+TMap<HexTileType, float> TilePrestige = {
+    {HexTileType::WATER, 6.0f},
+    {HexTileType::GRASS, 4.0f},
+    {HexTileType::FOREST, 7.0f},
+    {HexTileType::MOUNTAIN, 10.0f},
+    {HexTileType::DESERT, 2.0f}
+};
+
 enum class heightTerrainGroup : uint8 {
     waterHeightGroup,
     shorelineHeightGroup,
@@ -186,6 +205,21 @@ TArray<FIntPoint> AHexGridManager::determineCities() {
     return cities;
 }
 
+float AHexGridManager::GetTilePrestige(const FIntPoint &GridPositionIndex) {
+    if (GridPositionIndex.X < 0 || GridPositionIndex.X >= HexGridLayout.Num() ||
+        GridPositionIndex.Y < 0 ||
+        GridPositionIndex.Y >= HexGridLayout[GridPositionIndex.X].Num()) {
+        return 0.0f;
+    }
+    return TilePrestige[HexGridLayout[GridPositionIndex.X][GridPositionIndex.Y]->GetTileType()];
+}
+
+void setTlieCubeCoordinates(AHexTile *tile) {
+    int x = tile->GridPositionIndex.X;
+    int y = tile->GridPositionIndex.Y;
+    tile->CubeCoordinates = FIntVector(x, y, -x - y);
+}
+
 float redistributeHeights(float x) {
     UE_LOG(LogTemp, Warning, TEXT("Redistributing height %f, got %f"), x, 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5);
     return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x +
@@ -206,7 +240,6 @@ void AHexGridManager::BeginPlay() {
     Super::BeginPlay();
 
     HexGridLayout.SetNumZeroed(GridWidth);
-
     for (int32 i = 0; i < HexGridLayout.Num(); i++) {
         HexGridLayout[i].SetNumZeroed(GridHeight);
     }
@@ -252,7 +285,10 @@ void AHexGridManager::BeginPlay() {
                     );
                     if (NewTile) {
                         NewTile->GridPositionIndex = FIntPoint(x, y);
+
+                        NewTile->CubeCoordinates = FIntVector(x - (y - (y&1)) / 2, y,  - (x - (y - (y&1)) / 2) - y);
                         HexGridLayout[x][y] = NewTile;
+                        HexGridLayoutAxial[NewTile->CubeCoordinates] = NewTile;
                     }
                 } else {
                     UE_LOG(

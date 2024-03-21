@@ -2,7 +2,6 @@
 #pragma once
 
 #include "HexTile.h"
-#include <map>
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
@@ -15,6 +14,7 @@ class IRON_HORIZON_API AHexGridManager : public AActor
 
 protected:
 	TArray<TArray<AHexTile*>> HexGridLayout;
+    TMap<FIntVector, AHexTile*> HexGridLayoutAxial;
     
     UPROPERTY(EditAnywhere, Category = "HexGridLayout")
 	int32 GridWidth;
@@ -25,12 +25,17 @@ protected:
 
 public: 
         AHexGridManager();
+
         void generateCities(int numCities);
         TArray<FIntPoint> determineCities();
         bool allCitiesConnected();
+
         void generateHexGrid();
         AHexTile* GetTileAtPosition(const FIntPoint &GridPositionIndex);
         TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
+        TArray<AHexTile *> GetNeighborsOnRingOfRadius(AHexTile*, int32 radius);
+
+        float GetTilePrestige(const FIntPoint &GridPositionIndex);
 
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
         TSubclassOf<AHexTile> GrassHexTile;
