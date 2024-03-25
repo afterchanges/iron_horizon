@@ -192,6 +192,68 @@ float redistributeHeights(float x) {
            427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5;
 }
 
+bool floodFillStep(FIntPoint current_tile, int current_biome_id, TArray<TArray<int>> &HexGridBiomesIDs, TArray<TArray<FIntPoint>> &biome_tiles) {
+    int column_offset = current_tile.X % 2 == 0 ? -1 : 0;
+    bool no_tiles_converted = true;
+    TArray<FIntPoint> tile_neighbors = {
+        {current_tile.X - 1, current_tile.Y},
+        {current_tile.X + 1, current_tile.Y},
+        {current_tile.X + column_offset + 1, current_tile.Y - 1},
+        {current_tile.X + column_offset, current_tile.Y - 1},
+        {current_tile.X + column_offset + 1, current_tile.Y + 1},
+        {current_tile.X + column_offset, current_tile.Y + 1}
+    };
+
+    for (FIntPoint neighbor : tile_neighbors) {
+        if (neighbor.X >= 0 && neighbor.X < HexGridBiomesIDs.Num() &&
+            neighbor.Y >= 0 && neighbor.Y < HexGridBiomesIDs[neighbor.X].Num() &&
+            HexGridBiomesIDs[neighbor.X][neighbor.Y] == 0) {
+            HexGridBiomesIDs[neighbor.X][neighbor.Y] = current_biome_id;
+            biome_tiles[current_biome_id - 1].Add(neighbor);
+            no_tiles_converted = false;
+        }
+    }
+
+    return no_tiles_converted;
+}
+
+TArray<TArray<FIntPoint>> floodFillManager(
+    TArray<TArray<int>> &biome_center_points,
+    TArray<TArray<int>> &biome_tiles,
+    TArray<TArray<int>> &biome_grid,
+) {
+    bool all_tiles_covered = true;
+    while (!all_tiles_covered) {
+        for (int i = 0; i < biome_center_points.Num(); ++i) {
+            bool this_biome_covered = true;
+            for (int j = 0; j < biome_tiles[i].Num(); ++j) {
+                if (!floodFillStep(biome_tiles[i][j], i + 1, biome_grid, biome_tiles)) {
+                    this_biome_covered = true;
+                };
+            }
+            if (!this_biome_covered) {
+                all_tiles_covered = false;
+            }
+        }
+    }
+    
+}
+
+int AHexGridManager::distribute_biomes() {
+    TArray<TArray<FIntPoint>> biome_center_points;
+    TArray<TArray<FIntPoint>> biome_tiles;
+    int x, y;
+    for (int i = 0; i < NumBiomes; ++i) {
+        x = FMath::RandRange(0, GridWidth - 1);
+        y = FMath::RandRange(0, GridHeight - 1);
+        biome_center_points.Add({x, y});
+        HexGridBiomesIDs[x][y] = i + 1;
+        biome_tiles[i].Add({x, y});
+    }
+
+    floodFillManager(biome_center_points, biome_tiles, HexGridBiomesIDs);
+}
+
 // Called when the game starts or when spawned
 void AHexGridManager::BeginPlay() {
     TMap<HexTileType, TSubclassOf<AHexTile>> TileTypeMap = {

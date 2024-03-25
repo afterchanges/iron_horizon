@@ -36,6 +36,8 @@ class IRON_HORIZON_API AHexGridManager : public AActor
 
 protected:
 	TArray<TArray<AHexTile*>> HexGridLayout;
+
+    TArray<TArray<int>> HexGridBiomesIDs;
     
     UPROPERTY(EditAnywhere, Category = "HexGridLayout")
 	int32 GridWidth;
@@ -44,11 +46,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "HexGridManager")
 	float HexTileSize;
 
+    UPROPERTY(EditAnywhere, Category = "GeneratedWorldSettings")
+    int32 NumBiomes = 20;
+    UPROPERTY(EditAnywhere, Category = "GeneratedWorldSettings")
+    int32 NumCitiesInBiome = 1;
+
     virtual void Tick(float DeltaTime) override;
 
 public: 
         AHexGridManager();
-        void generateCities(int numCities);
+        void generateCities(int numCitiesInBiome);
+        void generateBiomes(int numBiomes);
         TArray<FIntPoint> determineCities();
         bool allCitiesConnected();
         void generateHexGrid();
