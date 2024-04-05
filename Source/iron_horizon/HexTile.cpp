@@ -29,6 +29,9 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     TileMesh->OnEndCursorOver.AddDynamic(this, &AHexTile::OnEndCursorOver);
 }
 
+AHexTile* AHexTile::StartTile = nullptr;
+AHexTile* AHexTile::EndTile = nullptr;
+
 void AHexTile::BeginPlay() {
     Super::BeginPlay();
 

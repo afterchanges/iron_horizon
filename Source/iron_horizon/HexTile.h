@@ -86,4 +86,7 @@ protected:
 public:    
 	AHexTile();
 
+	static AHexTile* StartTile;
+    static AHexTile* EndTile;
+
 };

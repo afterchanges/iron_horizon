@@ -49,4 +49,6 @@ public:
     virtual void SetupInputComponent() override;
 
     void OnJKeyPressed();
+
+    void OnPKeyPressed();
 };

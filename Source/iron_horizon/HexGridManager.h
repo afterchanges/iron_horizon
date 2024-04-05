@@ -50,10 +50,12 @@ public:
         AHexGridManager();
         void generateCities(int numCities);
         TArray<FIntPoint> determineCities();
+        TArray<FIntPoint> HexGridAStar(AHexTile* StartTile, AHexTile* EndTile, AHexGridManager* hexGridManagerInstance);
         bool allCitiesConnected();
         void generateHexGrid();
         AHexTile* GetTileAtPosition(const FIntPoint &GridPositionIndex);
         TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
+
 
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
         TSubclassOf<AHexTile> GrassHexTile;

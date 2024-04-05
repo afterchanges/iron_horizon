@@ -2,8 +2,8 @@
 #include "Math/UnrealMathUtility.h"
 #include "PerlinNoise.hpp"
 #include "TIntPointHash.h"
-// #include "astar.hpp"
 #include "Containers/Map.h"
+#include "astar.hpp"
 
 // Sets default values
 AHexGridManager::AHexGridManager() {

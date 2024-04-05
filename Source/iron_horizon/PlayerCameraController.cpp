@@ -2,10 +2,12 @@
 
 #include "PlayerCameraController.h"
 #include "InputAction.h"
+#include "EngineUtils.h"
 #include "InputMappingContext.h"
 #include "InputModifiers.h"
 #include "HexTile.h"
 #include "IronHorizonPlayerPawn.h"
+#include "HexGridManager.h"
 
 static void MapKey(
     UInputMappingContext *InputMappingContext,
@@ -76,6 +78,14 @@ void APlayerCameraController::SetupInputComponent() {
 
     // Bind the action to the OnJKeyPressed function
     InputComponent->BindKey(EKeys::J, IE_Pressed, this, &APlayerCameraController::OnJKeyPressed);
+
+    // Create a new action for the P key press
+    UInputAction* PKeyPressAction = NewObject<UInputAction>(this);
+    PKeyPressAction->ValueType = EInputActionValueType::Axis1D;
+    MapKey(PawnMappingContext, PKeyPressAction, EKeys::P);
+
+    // Bind the action to the OnPKeyPressed function
+    InputComponent->BindKey(EKeys::P, IE_Pressed, this, &APlayerCameraController::OnPKeyPressed);
 }
 
 APlayerCameraController::APlayerCameraController() {
@@ -99,5 +109,75 @@ void APlayerCameraController::OnJKeyPressed() {
                 HexTile->ChangeToRailway();
             }
         }
+    }
+}
+
+
+void APlayerCameraController::OnPKeyPressed() {
+    UE_LOG(LogTemp, Warning, TEXT("P key pressed"));
+
+    // Get the current mouse position
+    float MouseX, MouseY;
+    if (GetMousePosition(MouseX, MouseY)) {
+        // Convert the mouse screen position to a world space ray
+        FCollisionQueryParams TraceParams;
+        FHitResult HitResult;
+        if (GetHitResultAtScreenPosition(FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult)) {
+            // Check if the hit actor is a hex tile
+            AHexTile* HexTile = Cast<AHexTile>(HitResult.GetActor());
+            if (HexTile) {
+                UE_LOG(LogTemp, Warning, TEXT("HexTile hit"));
+
+                // Check if it's the first or second tile selected
+                if (!AHexTile::StartTile) {
+                    AHexTile::StartTile = HexTile;
+                    UE_LOG(LogTemp, Warning, TEXT("StartTile set"));
+                } else if (!AHexTile::EndTile) {
+                    AHexTile::EndTile = HexTile;
+                    UE_LOG(LogTemp, Warning, TEXT("EndTile set"));
+
+                    // Get the hex grid manager instance
+                    AHexGridManager* HexGridManager = nullptr;
+                    for (TActorIterator<AHexGridManager> It(GetWorld()); It; ++It)
+                    {
+                        HexGridManager = *It;
+                        break;
+                    }
+
+                    if (!HexGridManager) {
+                        UE_LOG(LogTemp, Warning, TEXT("Failed to find HexGridManager instance"));
+                        return;
+                    }
+
+                    UE_LOG(LogTemp, Warning, TEXT("HexGridManager instance obtained"));
+                    if (HexGridManager) {
+                        UE_LOG(LogTemp, Warning, TEXT("HexGridManager instance obtained"));
+
+                        // Call the A* algorithm function
+                        TArray<FIntPoint> Path = HexGridManager->HexGridAStar(AHexTile::StartTile, AHexTile::EndTile, HexGridManager);
+                        UE_LOG(LogTemp, Warning, TEXT("Shortest path length: %d"), Path.Num());
+                        // Iterate over the tiles in the path and change their type
+                        for (FIntPoint Point : Path) {
+                            AHexTile* Tile = HexGridManager->GetTileAtPosition(Point);
+                            if (Tile) {
+                                Tile->ChangeToRailway();
+                            }
+                        }
+
+                        // Reset the start and end tiles
+                        AHexTile::StartTile = nullptr;
+                        AHexTile::EndTile = nullptr;
+                    } else {
+                        UE_LOG(LogTemp, Warning, TEXT("Failed to get HexGridManager instance"));
+                    }
+                }
+            } else {
+                UE_LOG(LogTemp, Warning, TEXT("No HexTile hit"));
+            }
+        } else {
+            UE_LOG(LogTemp, Warning, TEXT("No hit result at screen position"));
+        }
+    } else {
+        UE_LOG(LogTemp, Warning, TEXT("Failed to get mouse position"));
     }
 }
