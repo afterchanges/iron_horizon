@@ -192,7 +192,7 @@ float redistributeHeights(float x) {
            427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5;
 }
 
-bool floodFillStep(FIntPoint current_tile, int current_biome_id, TArray<TArray<int>> &HexGridBiomesIDs, TArray<TArray<FIntPoint>> &biome_tiles) {
+bool AHexGridManager::floodFillStep(FIntPoint current_tile, int current_biome_id, TArray<TArray<FIntPoint>> &biome_tiles) {
     int column_offset = current_tile.X % 2 == 0 ? -1 : 0;
     bool no_tiles_converted = true;
     TArray<FIntPoint> tile_neighbors = {
@@ -217,17 +217,16 @@ bool floodFillStep(FIntPoint current_tile, int current_biome_id, TArray<TArray<i
     return no_tiles_converted;
 }
 
-TArray<TArray<FIntPoint>> floodFillManager(
-    TArray<TArray<int>> &biome_center_points,
-    TArray<TArray<int>> &biome_tiles,
-    TArray<TArray<int>> &biome_grid,
+bool AHexGridManager::floodFillManager(
+    TArray<TArray<FIntPoint>> &biome_center_points,
+    TArray<TArray<FIntPoint>> &biome_tiles
 ) {
     bool all_tiles_covered = true;
     while (!all_tiles_covered) {
         for (int i = 0; i < biome_center_points.Num(); ++i) {
             bool this_biome_covered = true;
             for (int j = 0; j < biome_tiles[i].Num(); ++j) {
-                if (!floodFillStep(biome_tiles[i][j], i + 1, biome_grid, biome_tiles)) {
+                if (!floodFillStep(biome_tiles[i][j], i + 1, biome_tiles)) {
                     this_biome_covered = true;
                 };
             }
@@ -236,10 +235,11 @@ TArray<TArray<FIntPoint>> floodFillManager(
             }
         }
     }
+    return all_tiles_covered;
     
 }
 
-int AHexGridManager::distribute_biomes() {
+void AHexGridManager::distributeBiomes() {
     TArray<TArray<FIntPoint>> biome_center_points;
     TArray<TArray<FIntPoint>> biome_tiles;
     int x, y;
@@ -251,7 +251,7 @@ int AHexGridManager::distribute_biomes() {
         biome_tiles[i].Add({x, y});
     }
 
-    floodFillManager(biome_center_points, biome_tiles, HexGridBiomesIDs);
+    floodFillManager(biome_center_points, biome_tiles);
 }
 
 // Called when the game starts or when spawned

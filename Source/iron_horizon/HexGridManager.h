@@ -57,6 +57,12 @@ public:
         AHexGridManager();
         void generateCities(int numCitiesInBiome);
         void generateBiomes(int numBiomes);
+        void distributeBiomes();
+        bool floodFillManager(
+            TArray<TArray<FIntPoint>> &biome_center_points,
+            TArray<TArray<FIntPoint>> &biome_tiles
+        );
+        bool floodFillStep(FIntPoint current_tile, int current_biome_id, TArray<TArray<FIntPoint>> &biome_tiles);
         TArray<FIntPoint> determineCities();
         bool allCitiesConnected();
         void generateHexGrid();
