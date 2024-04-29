@@ -44,7 +44,7 @@ void AIronHorizonHUD::HideMenu()
     }
 }
 
-void AIronHorizonHUD::ShowInteractionWidget()
+void AIronHorizonHUD::ShowInteractionWidget() const
 {
     if (InteractionWidget)
     {
@@ -52,7 +52,7 @@ void AIronHorizonHUD::ShowInteractionWidget()
     }
 }
 
-void AIronHorizonHUD::HideInteractionWidget()
+void AIronHorizonHUD::HideInteractionWidget() const
 {
     if (InteractionWidget)
     {
@@ -60,7 +60,7 @@ void AIronHorizonHUD::HideInteractionWidget()
     }
 }
 
-void AIronHorizonHUD::UpdateInteractionWidget(const FInteractableData& InteractableData)
+void AIronHorizonHUD::UpdateInteractionWidget(const FInteractableData& InteractableData) const
 {
     if (InteractionWidget)
     {
@@ -68,7 +68,7 @@ void AIronHorizonHUD::UpdateInteractionWidget(const FInteractableData& Interacta
         {
             InteractionWidget->SetVisibility(ESlateVisibility::Visible);
         }
-        // InteractionWidget->UpdateWidget(InteractibleData);
+        InteractionWidget->UpdateWidget(InteractibleData);
     }
 }
 

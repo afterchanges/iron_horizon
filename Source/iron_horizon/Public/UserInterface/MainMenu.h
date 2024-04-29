@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MainMenu.generated.h"
 
-class AIronHorizonPlayerPawn;
+class AHexTile;
 
 UCLASS()
 class IRON_HORIZON_API UMainMenu : public UUserWidget
@@ -14,7 +14,7 @@ class IRON_HORIZON_API UMainMenu : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY()
-	AIronHorizonPlayerPawn* PlayerPawn;
+	AHexTile* PlayerPawn;
 
 protected:
 	virtual void NativeConstruct() override;

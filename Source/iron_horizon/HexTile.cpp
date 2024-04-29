@@ -4,6 +4,7 @@
 #include <Components/SceneComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <UObject/ConstructorHelpers.h> 
+#include "UserInterface/IronHorizonHUD.h"
 
 // Sets default values
 AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
@@ -27,6 +28,9 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     TileMesh->SetNotifyRigidBodyCollision(true);
     TileMesh->OnBeginCursorOver.AddDynamic(this, &AHexTile::OnBeginCursorOver);
     TileMesh->OnEndCursorOver.AddDynamic(this, &AHexTile::OnEndCursorOver);
+
+    PrimaryActorTick.bCanEverTick = true;
+	SetRootComponent(TileMesh);
 }
 
 AHexTile* AHexTile::StartTile = nullptr;
@@ -34,6 +38,10 @@ AHexTile* AHexTile::EndTile = nullptr;
 
 void AHexTile::BeginPlay() {
     Super::BeginPlay();
+
+    HUD = Cast<AIronHorizonHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+    InteractableData = InstanceInteractableData;
 
     APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 
@@ -90,4 +98,38 @@ void AHexTile::ChangeToRailway() {
     } else {
         UE_LOG(LogTemp, Warning, TEXT("RailwayMaterial is not set"));
     }
+}
+
+void AHexTile::BeginFocus() {
+if (TileMesh)
+	{
+		TileMesh->SetRenderCustomDepth(true);
+	}
+}
+
+void AHexTile::EndFocus() {
+if (TileMesh)
+    {
+        TileMesh->SetRenderCustomDepth(false);
+    }
+}
+
+void AHexTile::BeginInteract() {
+    UE_LOG(LogTemp, Warning, TEXT("Begin Interact"));
+}
+
+void AHexTile::EndInteract() {
+    UE_LOG(LogTemp, Warning, TEXT("End Interact"));
+}
+
+void AHexTile::Interact(AHexTile* PlayerPawn) {
+    UE_LOG(LogTemp, Warning, TEXT("Interact"));
+}
+
+void AHexTile::FoundInteractable(AIronHorizonPlayerPawn* NewInteractable) {
+    UE_LOG(LogTemp, Warning, TEXT("Found Interactable"));
+}
+
+void AHexTile::NoInteractableFound() {
+    UE_LOG(LogTemp, Warning, TEXT("No Interactable Found"));
 }

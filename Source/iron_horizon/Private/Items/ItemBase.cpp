@@ -20,6 +20,6 @@ UItemBase* UItemBase::CreateItemCopy() const {
     return NewItem;
 }
 
-void UItemBase::Use() {
+void UItemBase::Use(AIronHorizonPlayerPawn* PlayerPawn) {
     // Placeholder for use function
 }

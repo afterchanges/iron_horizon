@@ -3,9 +3,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/InteractionInterface.h"
 #include "HexTile.generated.h"
 
 class UStaticMeshComponent;
+class AIronHorizonHUD;
 
 UENUM()
 enum class HexTileType : uint8
@@ -22,7 +24,7 @@ enum class HexTileType : uint8
 };
 
 UCLASS()
-class IRON_HORIZON_API AHexTile : public AActor
+class IRON_HORIZON_API AHexTile : public AActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -48,6 +50,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Materials")
 	UMaterialInterface* RailwayMaterial;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HexTile")
+    UStaticMeshComponent* TileMesh;
+    
+    UPROPERTY(EditInstanceOnly, Category = "HexTile")
+    FInteractableData InstanceInteractableData;
+
 	UFUNCTION()
 	void OnBeginCursorOver(UPrimitiveComponent* TouchedComponent);
 
@@ -56,9 +64,16 @@ public:
 
 	void ChangeToRailway();
 
-	void BeginPlay();
-
 	FString HexTileTypeToString(HexTileType Type);
+
+	virtual void BeginFocus() override;
+    virtual void EndFocus() override;
+    virtual void BeginInteract() override;
+    virtual void EndInteract() override;
+    virtual void Interact(AHexTile *HexTile) override;
+    virtual void BeginPlay() override;
+	virtual void FoundInteractable(AIronHorizonPlayerPawn* NewInteractable) override;
+	virtual void NoInteractableFound() override;
 
 protected:
 	bool hasForest = false;
@@ -76,12 +91,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	HexTileType TileType;
 
+	UPROPERTY()
+	AIronHorizonHUD* HUD;
+
 
 protected:
 
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
-	UStaticMeshComponent* TileMesh;
 	
 public:    
 	AHexTile();

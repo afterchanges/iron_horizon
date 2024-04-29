@@ -2,12 +2,13 @@
 
 #include "../HexTile.h"
 #include "UserInterface/MainMenu.h"
+#include "../HexTile.h"
 
 void UMainMenu::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    PlayerPawn = Cast<APlayerPawn>(GetOwningPlayerPawn());
+    PlayerPawn = Cast<AHexTile>(GetOwningPlayerPawn());
 }
 
 void UMainMenu::NativeOnInitialized()
