@@ -11,7 +11,7 @@ void IInteractionInterface::BeginFocus() {
 void IInteractionInterface::EndFocus() {
 }
 
-void IInteractionInterface::Interact() {
+void IInteractionInterface::Interact(AIronHorizonPlayerPawn* PlayerPawn) {
 }
 
 void IInteractionInterface::BeginInteract() {

@@ -146,3 +146,19 @@ void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &Acti
     //     SpringArmComponent->TargetArmLength
     // );
 }
+
+void AIronHorizonPlayerPawn::BeginFocus() {
+   
+}
+
+void AIronHorizonPlayerPawn::EndFocus() {
+}
+
+void AIronHorizonPlayerPawn::BeginInteract() {
+}
+
+void AIronHorizonPlayerPawn::EndInteract() {
+}
+
+void AIronHorizonPlayerPawn::Interact(AIronHorizonPlayerPawn *PlayerPawn) {
+}

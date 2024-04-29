@@ -10,21 +10,22 @@ class IRON_HORIZON_API UItemBase : public UObject {
 
 public:
 
+    UPROPERTY(VisibleAnywhere, Category = "Item Data")
 	int32 Quantity;
 
     UPROPERTY(VisibleAnywhere, Category = "Item Data", meta = (UIMin=1, UIMax=100))
     FName ID;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item Data")
     EItemType ItemType;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item Data")
     FItemTextData TextData;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item Data")
     FItemAssetData AssetData;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item Data")
     FItemNumericData NumericData;
 
     UItemBase();
@@ -49,7 +50,7 @@ public:
     FORCEINLINE bool IsFullItemStack() const {return Quantity == NumericData.MaxStackSize;}
 
     UFUNCTION(Category = "Item")
-    virtual void Use();
+    virtual void Use(AIronHorizonPlayerPawn* PlayerPawn);
 
 protected:
 

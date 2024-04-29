@@ -68,6 +68,12 @@ private:
     UPROPERTY(EditAnywhere, Category = "Movement on cursor")
     float SlowSpeed = 500.0f;
 
+    // Interaction
+    UPROPERTY(EditAnywhere, Category = "Test Actor")
+	UStaticMeshComponent* Mesh;
+	UPROPERTY(EditInstanceOnly, Category = "Test Actor")
+	FInteractableData InstanceInteractableData;
+
     /** Handle input to update location. */
     float determineMouseMovementSpeedOnAxis(float MousePosition, float ViewportSize);
 
@@ -78,5 +84,12 @@ private:
     void UpdateSpringArmLength(const struct FInputActionValue &ActionValue);
 
     void UpdateCameraPosition();
+
+
+    virtual void BeginFocus() override;
+	virtual void EndFocus() override;
+	virtual void BeginInteract() override;
+	virtual void EndInteract() override;
+	virtual void Interact(AIronHorizonPlayerPawn* PlayerPawn) override;
 
 };
