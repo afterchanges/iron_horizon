@@ -321,25 +321,3 @@ void AHexGridManager::BeginPlay() {
     }
 }
 
-void AHexGridManager::Tick(float DeltaTime) {
-    Super::Tick(DeltaTime);
-
-    if (GetWorld()->GetTimeSeconds() - InteractionData.LastInteractionCheckTime >
-        InteractionData.InteractionCheckFrequency) {
-        PerformInteractionCheck();
-    }
-}
-
-void AHexGridManager::PerformInteractionCheck() {
-    
-}
-
-void AHexGridManager::FoundInteractable(AActor *NewInteractable) {
-    
-}
-
-void AHexGridManager::NoInteractableFound() {
-    
-}
-
-

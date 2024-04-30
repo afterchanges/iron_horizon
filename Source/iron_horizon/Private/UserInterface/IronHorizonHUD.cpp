@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UserInterface/IronHorizonHUD.h"
+#include "UserInterface/MainMenu.h"
+#include "UserInterface/Interaction/InteractionWidget.h"
 
 AIronHorizonHUD::AIronHorizonHUD()
 {
@@ -68,7 +68,7 @@ void AIronHorizonHUD::UpdateInteractionWidget(const FInteractableData& Interacta
         {
             InteractionWidget->SetVisibility(ESlateVisibility::Visible);
         }
-        InteractionWidget->UpdateWidget(InteractibleData);
+        InteractionWidget->UpdateWidget(&InteractableData);
     }
 }
 

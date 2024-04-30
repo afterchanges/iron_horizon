@@ -9,24 +9,27 @@ class IRON_HORIZON_API UItemBase : public UObject {
     GENERATED_BODY()
 
 public:
+    // UPROPERTY()
+    // UInventoryComponent* OwningInventory;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
 	int32 Quantity;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item Data", meta = (UIMin=1, UIMax=100))
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FName ID;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     EItemType ItemType;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FItemTextData TextData;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FItemAssetData AssetData;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item Data")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FItemNumericData NumericData;
+
 
     UItemBase();
 
@@ -34,11 +37,7 @@ public:
     UItemBase* CreateItemCopy() const;
 
     UFUNCTION(Category = "Item")
-    FORCEINLINE void SetQuantity(int32 NewQuantity) {
-        if (NewQuantity != Quantity) {
-            Quantity = FMath::Clamp(NewQuantity, 0, NumericData.bIsStackable ? NumericData.MaxStackSize : 1);
-        }
-    }
+    void SetQuantity(const int32 NewQuantity);
 
     UFUNCTION(Category = "Item")
     FORCEINLINE float GetItemStackWeight() const { return NumericData.Weight * Quantity; }
@@ -50,12 +49,12 @@ public:
     FORCEINLINE bool IsFullItemStack() const {return Quantity == NumericData.MaxStackSize;}
 
     UFUNCTION(Category = "Item")
-    virtual void Use(AIronHorizonPlayerPawn* PlayerPawn);
+    virtual void Use(AHexTile* HexTile);
 
 protected:
 
     bool operator==(const FName& OtherID) const {
-        return ID == OtherID;
+        return this->ID == OtherID;
     }
 
 };

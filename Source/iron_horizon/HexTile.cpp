@@ -31,6 +31,8 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
 
     PrimaryActorTick.bCanEverTick = true;
 	SetRootComponent(TileMesh);
+
+    InteractionCheckFrequency = 0.1f;
 }
 
 AHexTile* AHexTile::StartTile = nullptr;
@@ -100,36 +102,95 @@ void AHexTile::ChangeToRailway() {
     }
 }
 
-void AHexTile::BeginFocus() {
-if (TileMesh)
-	{
-		TileMesh->SetRenderCustomDepth(true);
-	}
-}
+void AHexTile::Tick(float DeltaTime) {
+    Super::Tick(DeltaTime);
 
-void AHexTile::EndFocus() {
-if (TileMesh)
-    {
-        TileMesh->SetRenderCustomDepth(false);
+    if (IsInteracting()) {
+        PerformInteractionCheck();
     }
 }
 
+void AHexTile::Interact() {
+    Interact(this);
+}
+
 void AHexTile::BeginInteract() {
-    UE_LOG(LogTemp, Warning, TEXT("Begin Interact"));
+    // Verify nothing has changed with the interactable state since beginning interaction
+    PerformInteractionCheck();
+    if (InteractionData.CurrentInteractable) {
+        if (IsValid(TargetInteractable.GetObject())) {
+            TargetInteractable->BeginInteract();
+        }
+        if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f)) {
+            Interact();
+        } else {
+            GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AHexTile::Interact, TargetInteractable->InteractableData.InteractionDuration, false);
+        }
+    }
 }
 
 void AHexTile::EndInteract() {
-    UE_LOG(LogTemp, Warning, TEXT("End Interact"));
+    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+    if (IsValid(TargetInteractable.GetObject())) {
+        TargetInteractable->EndInteract();
+    }
 }
 
-void AHexTile::Interact(AHexTile* PlayerPawn) {
-    UE_LOG(LogTemp, Warning, TEXT("Interact"));
+void AHexTile::Interact(AHexTile* HexTile) {
+    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+    if (IsValid(TargetInteractable.GetObject())) {
+        TargetInteractable->Interact(this);
+    }
 }
 
-void AHexTile::FoundInteractable(AIronHorizonPlayerPawn* NewInteractable) {
-    UE_LOG(LogTemp, Warning, TEXT("Found Interactable"));
+void AHexTile::FoundInteractable(AHexTile* NewInteractable) {
+    if (IsInteracting()) {
+        EndInteract();
+    }
+    if (InteractionData.CurrentInteractable) {
+        TargetInteractable = InteractionData.CurrentInteractable;
+        TargetInteractable->EndFocus();
+    }
+    InteractionData.CurrentInteractable = NewInteractable;
+    TargetInteractable = NewInteractable;
+
+    HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
+    TargetInteractable->BeginFocus();
 }
 
 void AHexTile::NoInteractableFound() {
-    UE_LOG(LogTemp, Warning, TEXT("No Interactable Found"));
+    if (IsInteracting()) {
+        GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+    }
+    if (InteractionData.CurrentInteractable) {
+        if (IsValid(TargetInteractable.GetObject())) {
+            TargetInteractable->EndFocus();
+        }
+        HUD->HideInteractionWidget();
+
+        InteractionData.CurrentInteractable = nullptr;
+        TargetInteractable = nullptr;
+    }
+}
+
+void AHexTile::PerformInteractionCheck() {
+    FVector2D MousePosition;
+    APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+    PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
+
+    FHitResult TraceHitResult;
+    PlayerController->GetHitResultAtScreenPosition(MousePosition, ECC_Visibility, true, TraceHitResult);
+
+    AHexTile* HitTile = Cast<AHexTile>(TraceHitResult.GetActor());
+    if (HitTile) {
+        if (HitTile->InteractableData.bIsInteractable) {
+            if (HitTile != InteractionData.CurrentInteractable) {
+                FoundInteractable(HitTile);
+            }
+        } else {
+            NoInteractableFound();
+        }
+    } else {
+        NoInteractableFound();
+    }
 }

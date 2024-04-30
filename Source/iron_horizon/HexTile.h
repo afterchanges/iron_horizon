@@ -23,6 +23,19 @@ enum class HexTileType : uint8
 	MAX UMETA(Hidden)
 };
 
+USTRUCT()
+struct FInteractionData {
+	GENERATED_USTRUCT_BODY()
+
+	FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f) {};
+
+	UPROPERTY()
+	AHexTile* CurrentInteractable;
+
+	UPROPERTY()
+	float LastInteractionCheckTime;
+};
+
 UCLASS()
 class IRON_HORIZON_API AHexTile : public AActor, public IInteractionInterface
 {
@@ -56,6 +69,8 @@ public:
     UPROPERTY(EditInstanceOnly, Category = "HexTile")
     FInteractableData InstanceInteractableData;
 
+	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
+
 	UFUNCTION()
 	void OnBeginCursorOver(UPrimitiveComponent* TouchedComponent);
 
@@ -66,14 +81,13 @@ public:
 
 	FString HexTileTypeToString(HexTileType Type);
 
-	virtual void BeginFocus() override;
-    virtual void EndFocus() override;
-    virtual void BeginInteract() override;
-    virtual void EndInteract() override;
-    virtual void Interact(AHexTile *HexTile) override;
-    virtual void BeginPlay() override;
-	virtual void FoundInteractable(AIronHorizonPlayerPawn* NewInteractable) override;
-	virtual void NoInteractableFound() override;
+	void PerformInteractionCheck();
+	void FoundInteractable(AHexTile* InteractableTile);
+	void NoInteractableFound();
+	void BeginInteract();
+	void EndInteract();
+	void Interact();
+	void Interact(AHexTile* HexTile);
 
 protected:
 	bool hasForest = false;
@@ -94,9 +108,18 @@ protected:
 	UPROPERTY()
 	AIronHorizonHUD* HUD;
 
+	UPROPERTY(VisibleAnywhere, Category = "HexTile | Interaction")
+	TScriptInterface<IInteractionInterface> TargetInteractable;
 
-protected:
+	float InteractionCheckFrequency;
 
+	FTimerHandle TimerHandle_Interaction;
+
+	FInteractionData InteractionData;
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	virtual void BeginPlay() override;
 	
 public:    
 	AHexTile();

@@ -8,6 +8,7 @@
 #include "MainMenu.h"
 #include "IronHorizonHUD.generated.h"
 
+struct FInteractableData;
 class UInteractionWidget;
 class UMainMenu;
 

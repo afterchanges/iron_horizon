@@ -10,6 +10,9 @@
 
 class AHexTile;
 struct FInteractableData;
+class UTextBlock;
+class UProgressBar;
+
 
 UCLASS()
 class IRON_HORIZON_API UInteractionWidget : public UUserWidget
@@ -19,7 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Interaction Widget | Player Reference")
 	AHexTile* PlayerReference;
 
-	void UpdateWidget(const FInteractableData* InteractableData);
+	void UpdateWidget(const FInteractableData* InteractableData) const;
 
 protected:	
 	UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")

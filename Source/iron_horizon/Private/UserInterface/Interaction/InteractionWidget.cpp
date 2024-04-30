@@ -3,6 +3,8 @@
 
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "../HexTile.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 #include "Interfaces/InteractionInterface.h"
 
 void UInteractionWidget::NativeConstruct()
@@ -38,17 +40,13 @@ void UInteractionWidget::UpdateWidget(const FInteractableData* InteractableData)
                 Quantity->SetVisibility(ESlateVisibility::Visible);
             }
             break;
-        case EInteractableType::Move:
-            KeyPressText->SetText(FText::FromString("Press"));
+        case EInteractableType::NonPlayerCharacter:
             break;
-        case EInteractableType::Set:
-            KeyPressText->SetText(FText::FromString("Set"));
+        case EInteractableType::Device:
             break;
-        case EInteractableType::Use:
-            KeyPressText->SetText(FText::FromString("Use"));
+        case EInteractableType::Toggle:
             break;
         case EInteractableType::Container:
-            KeyPressText->SetText(FText::FromString("Open"));
             break;
         default: ;
     }
