@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interfaces/InteractionInterface.h"
+#include "Components/InventoryComponent.h"
 #include "HexTile.generated.h"
 
 class UStaticMeshComponent;
@@ -71,6 +72,10 @@ public:
 
 	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
 
+	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; }
+
+	void UpdateInteractionWidget() const;
+
 	UFUNCTION()
 	void OnBeginCursorOver(UPrimitiveComponent* TouchedComponent);
 
@@ -90,6 +95,8 @@ public:
 	void Interact(AHexTile* HexTile);
 
 protected:
+	FTimerHandle TimerHandle_Interaction;
+
 	bool hasForest = false;
 	bool isRiverStart = false;
 	bool isRiverEnd = false;
@@ -111,9 +118,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "HexTile | Interaction")
 	TScriptInterface<IInteractionInterface> TargetInteractable;
 
-	float InteractionCheckFrequency;
+	UPROPERTY(VisibleAnywhere, Category = "HexTile | Inventory")
+	UInventoryComponent* PlayerInventory;
 
-	FTimerHandle TimerHandle_Interaction;
+	float InteractionCheckFrequency;
 
 	FInteractionData InteractionData;
 

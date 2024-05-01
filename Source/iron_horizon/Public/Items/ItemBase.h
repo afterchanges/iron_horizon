@@ -4,13 +4,15 @@
 #include "Items/ItemDataStructs.h"
 #include "ItemBase.generated.h"
 
+class UInventoryComponent;
+
 UCLASS()
 class IRON_HORIZON_API UItemBase : public UObject {
     GENERATED_BODY()
 
 public:
-    // UPROPERTY()
-    // UInventoryComponent* OwningInventory;
+    UPROPERTY()
+    UInventoryComponent* OwningInventory;
 
     UPROPERTY(VisibleAnywhere, Category = "Item")
 	int32 Quantity;
@@ -50,6 +52,11 @@ public:
 
     UFUNCTION(Category = "Item")
     virtual void Use(AHexTile* HexTile);
+
+    bool bIsPickup;
+    bool bIsCopy;
+
+    void ResetItemFlags();
 
 protected:
 

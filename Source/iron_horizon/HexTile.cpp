@@ -5,6 +5,8 @@
 #include <Components/StaticMeshComponent.h>
 #include <UObject/ConstructorHelpers.h> 
 #include "UserInterface/IronHorizonHUD.h"
+#include "Components/InventoryComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
@@ -33,6 +35,10 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
 	SetRootComponent(TileMesh);
 
     InteractionCheckFrequency = 0.1f;
+
+    PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+    PlayerInventory->SetSlotsCapacity(20);
+    PlayerInventory->SetWeightCapacity(100.0f);
 }
 
 AHexTile* AHexTile::StartTile = nullptr;
@@ -192,5 +198,11 @@ void AHexTile::PerformInteractionCheck() {
         }
     } else {
         NoInteractableFound();
+    }
+}
+
+void AHexTile::UpdateInteractionWidget() const {
+    if (IsValid(TargetInteractable.GetObject())) {
+        HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
     }
 }

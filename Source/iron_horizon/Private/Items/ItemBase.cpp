@@ -3,8 +3,14 @@
 
 #include "Items/ItemBase.h"
 #include "Items/ItemDataStructs.h"
+#include "Components/InventoryComponent.h"
 
-UItemBase::UItemBase() {
+UItemBase::UItemBase() : bIsPickup(false), bIsCopy(false) {
+}
+
+void UItemBase::ResetItemFlags() {
+    bIsPickup = false;
+    bIsCopy = false;
 }
 
 UItemBase* UItemBase::CreateItemCopy() const {
@@ -16,6 +22,7 @@ UItemBase* UItemBase::CreateItemCopy() const {
     NewItem->TextData = this->TextData;
     NewItem->AssetData = this->AssetData;
     NewItem->NumericData = this->NumericData;
+    NewItem->bIsCopy = true;
 
     return NewItem;
 }
@@ -28,10 +35,10 @@ void UItemBase::SetQuantity(const int32 NewQuantity) {
     if (NewQuantity != Quantity) {
         Quantity = FMath::Clamp(NewQuantity, 0, NumericData.bIsStackable ? NumericData.MaxStackSize : 1);
 
-        // if (OwningInventory) {
-        //    if (Quantity <= 0) {
-        //        OwningInventory->RemoveItem(this);
-        //    } 
-        // }
+        if (OwningInventory) {
+           if (Quantity <= 0) {
+               OwningInventory->RemoveSingleInstanceOfItem(this);
+            } 
+         }
     }
 }
