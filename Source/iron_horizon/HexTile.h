@@ -38,10 +38,11 @@ public:
 	void SetColor(FLinearColor NewColor);
 
 	void SetTileType(HexTileType NewType);
+	void AddPrestige(int prestige_value);
 
 	HexTileType GetTileType() const;
 
-protected:
+public:
 	bool hasForest = false;
 	bool isRiverStart = false;
 	bool isRiverEnd = false;
@@ -53,14 +54,11 @@ protected:
 
 	int prestige = 0;
 
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	HexTileType TileType;
 
 
 protected:
-
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	UStaticMeshComponent* TileMesh;
 	

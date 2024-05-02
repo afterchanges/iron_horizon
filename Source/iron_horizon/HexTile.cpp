@@ -11,3 +11,7 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
     TileMesh->SetupAttachment(RootComponent);
 }
+
+void AHexTile::AddPrestige(int prestige_value) {
+    prestige += prestige_value;
+}

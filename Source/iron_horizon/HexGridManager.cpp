@@ -17,6 +17,7 @@ TMap<HexTileType, TArray<float>> TileHeightRanges = {
     {HexTileType::DESERT, {0.0f, 0.5f}}
 };
 
+//! order is the same as on unit circle (from right, anti-clockwise)
 TArray<FIntPoint> AxialNeighbors = {
     FIntPoint(1, 0), FIntPoint(1, -1), FIntPoint(0, -1),
     FIntPoint(-1, 0), FIntPoint(-1, 1), FIntPoint(0, 1)
@@ -25,8 +26,6 @@ TArray<FIntPoint> AxialNeighbors = {
 TArray<float> PrestigeRangeInfluenceModifier = {
     1.0f, 0.7f, 0.5f, 0.2f
 };
-
-//! order is the same as on unit circle (from right, anti-clockwise)
 
 TMap<HexTileType, float> TilePrestige = {
     {HexTileType::WATER, 6.0f},
@@ -205,13 +204,30 @@ TArray<FIntPoint> AHexGridManager::determineCities() {
     return cities;
 }
 
-float AHexGridManager::GetTilePrestige(const FIntPoint &GridPositionIndex) {
+float AHexGridManager::GetTilePrestige(const FIntVector &GridPositionIndex) {
     if (GridPositionIndex.X < 0 || GridPositionIndex.X >= HexGridLayout.Num() ||
         GridPositionIndex.Y < 0 ||
         GridPositionIndex.Y >= HexGridLayout[GridPositionIndex.X].Num()) {
         return 0.0f;
     }
-    return TilePrestige[HexGridLayout[GridPositionIndex.X][GridPositionIndex.Y]->GetTileType()];
+    return TilePrestige[HexGridLayoutAxial[{GridPositionIndex.X, GridPositionIndex.Y, 0}]->GetTileType()];
+}
+
+void AHexGridManager::SetTilesPrestige() {
+    for (int32 x = 0; x < GridWidth; ++x) {
+        for (int32 y = 0; y < GridHeight; ++y) {
+            auto current_tile = HexGridLayout[x][y];
+            for (int32 radius = 0; radius < 1; radius++) {
+                for (auto neighbor : AxialNeighbors) {
+                    // current_tile->AddPrestige(GetTilePrestige({
+                    // current_tile->CubeCoordinates[0] + neighbor.X,
+                    // current_tile->CubeCoordinates[1] + neighbor.Y,
+                    // current_tile->CubeCoordinates[2] - neighbor.X - neighbor.Y})
+                    //  * PrestigeRangeInfluenceModifier[radius]);
+                }
+            }
+        }
+    }
 }
 
 void setTlieCubeCoordinates(AHexTile *tile) {
@@ -306,10 +322,12 @@ void AHexGridManager::BeginPlay() {
         }
     }
 
+    SetTilesPrestige();
+
     TArray<FIntPoint> cities;
     bool allCitiesConnected = false;
     while (!allCitiesConnected) {
-        generateCities(5);  // Generate 5 cities
+        // generateCities(5);  // Generate 5 cities
         cities = determineCities();
         allCitiesConnected = true;
 

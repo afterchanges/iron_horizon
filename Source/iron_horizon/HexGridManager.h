@@ -35,7 +35,8 @@ public:
         TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
         TArray<AHexTile *> GetNeighborsOnRingOfRadius(AHexTile*, int32 radius);
 
-        float GetTilePrestige(const FIntPoint &GridPositionIndex);
+        float GetTilePrestige(const FIntVector &GridPositionIndex);
+        void SetTilesPrestige();
 
         UPROPERTY(EditAnywhere, Category = "HexGridSetup")
         TSubclassOf<AHexTile> GrassHexTile;
