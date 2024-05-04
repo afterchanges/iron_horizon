@@ -65,7 +65,7 @@ int HexDistance(FIntPoint start, FIntPoint end) {
     int dy = std::abs(start.Y - end.Y);
     int dz = std::abs(-start.X - start.Y - (-end.X - end.Y));
 
-    return std::max({dx, dy, dz});
+    return std::max(dx, (std::max(dy, dz)));
 }
 
 struct FIntPointHash {
