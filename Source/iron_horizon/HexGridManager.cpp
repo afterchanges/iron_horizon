@@ -214,7 +214,7 @@ void AHexGridManager::SetTilesPrestige() {
             AHexTile* current_tile = HexGridLayout[x][y];
             for (int32 radius = 0; radius < 1; radius++) {
                 for (FIntPoint &neighbor : AxialNeighbors) {
-                    FIntVector neighbor_cube_coords = FIntVector(
+                    const FIntVector neighbor_cube_coords = FIntVector(
                         current_tile->CubeCoordinates.X + neighbor.X,
                         current_tile->CubeCoordinates.Y + neighbor.Y,
                         current_tile->CubeCoordinates.Z - neighbor.X - neighbor.Y
