@@ -205,27 +205,27 @@ TArray<FIntPoint> AHexGridManager::determineCities() {
 }
 
 float AHexGridManager::GetTilePrestige(const FIntVector &GridPositionIndex) {
-    if (GridPositionIndex.X < 0 || GridPositionIndex.X >= HexGridLayout.Num() ||
-        GridPositionIndex.Y < 0 ||
-        GridPositionIndex.Y >= HexGridLayout[GridPositionIndex.X].Num()) {
-        return 0.0f;
-    }
-    return TilePrestige[HexGridLayoutAxial[{GridPositionIndex.X, GridPositionIndex.Y, 0}]->GetTileType()];
+    return TilePrestige[HexGridLayoutAxial[GridPositionIndex]->GetTileType()];
 }
 
 void AHexGridManager::SetTilesPrestige() {
     for (int32 x = 0; x < GridWidth; ++x) {
         for (int32 y = 0; y < GridHeight; ++y) {
-            auto current_tile = HexGridLayout[x][y];
+            AHexTile* current_tile = HexGridLayout[x][y];
             for (int32 radius = 0; radius < 1; radius++) {
-                for (auto neighbor : AxialNeighbors) {
-                    // current_tile->AddPrestige(GetTilePrestige({
-                    // current_tile->CubeCoordinates[0] + neighbor.X,
-                    // current_tile->CubeCoordinates[1] + neighbor.Y,
-                    // current_tile->CubeCoordinates[2] - neighbor.X - neighbor.Y})
-                    //  * PrestigeRangeInfluenceModifier[radius]);
+                for (FIntPoint &neighbor : AxialNeighbors) {
+                    FIntVector neighbor_cube_coords = FIntVector(
+                        current_tile->CubeCoordinates.X + neighbor.X,
+                        current_tile->CubeCoordinates.Y + neighbor.Y,
+                        current_tile->CubeCoordinates.Z - neighbor.X - neighbor.Y
+                    );
+                    if (HexGridLayoutAxial.Contains(neighbor_cube_coords)) {
+                        UE_LOG(LogTemp, Warning, TEXT("Neighbor at (%d, %d) has prestige value of (%f)"), neighbor_cube_coords.X, neighbor_cube_coords.Y, GetTilePrestige(neighbor_cube_coords));
+                        current_tile->prestige += GetTilePrestige(neighbor_cube_coords) * PrestigeRangeInfluenceModifier[radius];
+                    }
                 }
             }
+            UE_LOG(LogTemp, Warning, TEXT("Tile at (%d, %d) has prestige %f"), x, y, current_tile->prestige);
         }
     }
 }
@@ -304,7 +304,7 @@ void AHexGridManager::BeginPlay() {
 
                         NewTile->CubeCoordinates = FIntVector(x - (y - (y&1)) / 2, y,  - (x - (y - (y&1)) / 2) - y);
                         HexGridLayout[x][y] = NewTile;
-                        HexGridLayoutAxial[NewTile->CubeCoordinates] = NewTile;
+                        HexGridLayoutAxial.Add(NewTile->CubeCoordinates, NewTile);
                     }
                 } else {
                     UE_LOG(
