@@ -4,18 +4,37 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/Actor.h"
+#include "Interfaces/InteractionInterface.h"
+#include "Components/InventoryComponent.h"
 #include "IronHorizonPlayerPawn.generated.h"
 
-UCLASS()
+class UStaticMeshComponent;
+class AIronHorizonHUD;
 
-class IRON_HORIZON_API AIronHorizonPlayerPawn : public APawn {
+USTRUCT()
+struct FInteractionData {
+	GENERATED_USTRUCT_BODY()
+
+	FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f) {};
+
+	UPROPERTY()
+	AActor* CurrentInteractable;
+
+	UPROPERTY()
+	float LastInteractionCheckTime;
+};
+
+
+UCLASS()
+class IRON_HORIZON_API AIronHorizonPlayerPawn : public APawn, public IInteractionInterface{
     GENERATED_BODY()
 public:
     AIronHorizonPlayerPawn();
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-private:
+protected:
     virtual void SetupPlayerInputComponent(
         class UInputComponent *PlayerInputComponent
     ) override;
@@ -78,5 +97,39 @@ private:
     void UpdateSpringArmLength(const struct FInputActionValue &ActionValue);
 
     void UpdateCameraPosition();
+
+    // INTERACTION INTERFACE & INVENTORY INTERFACE
+
+    UPROPERTY()
+	AIronHorizonHUD* HUD;
+	UPROPERTY(VisibleAnywhere, Category = "PlayerPawn | Interaction")
+	TScriptInterface<IInteractionInterface> TargetInteractable;
+	UPROPERTY(VisibleAnywhere, Category = "PlayerPawn | Inventory")
+	UInventoryComponent* PlayerInventory;
+    UPROPERTY(EditInstanceOnly, Category = "PlayerPawn")
+    FInteractableData InstanceInteractableData;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerPawn")
+    UStaticMeshComponent* Mesh;
+
+	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
+	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; }
+
+	float InteractionCheckFrequency;
+
+	FInteractionData InteractionData;
+    FTimerHandle TimerHandle_Interaction;
+
+	virtual void BeginPlay() override;
+
+	void UpdateInteractionWidget() const;
+
+    void ToggleMenu();
+
+    void PerformInteractionCheck();
+	void FoundInteractable(AActor* NewInteractable);
+	void NoInteractableFound();
+	void BeginInteract();
+	void EndInteract();
+	void Interact();
 
 };

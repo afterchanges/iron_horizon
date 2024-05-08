@@ -2,7 +2,7 @@
 
 
 #include "UserInterface/Interaction/InteractionWidget.h"
-#include "../HexTile.h"
+#include "../IronHorizonPlayerPawn.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Interfaces/InteractionInterface.h"
@@ -32,12 +32,12 @@ void UInteractionWidget::UpdateWidget(const FInteractableData* InteractableData)
 
             if (InteractableData->Quantity < 2)
             {
-                Quantity->SetVisibility(ESlateVisibility::Collapsed);
+                QuantityText->SetVisibility(ESlateVisibility::Collapsed);
             }
             else
             {
-                Quantity->SetText(FText::Format(NSLOCTEXT("InteractionWidget", "Quantity", "x{0}"), InteractableData->Quantity));
-                Quantity->SetVisibility(ESlateVisibility::Visible);
+                QuantityText->SetText(FText::Format(NSLOCTEXT("InteractionWidget", "QuantityText", "x{0}"), InteractableData->Quantity));
+                QuantityText->SetVisibility(ESlateVisibility::Visible);
             }
             break;
         case EInteractableType::NonPlayerCharacter:

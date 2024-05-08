@@ -4,16 +4,14 @@
 #include <Components/SceneComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <UObject/ConstructorHelpers.h> 
-#include "UserInterface/IronHorizonHUD.h"
-#include "Components/InventoryComponent.h"
-#include "DrawDebugHelpers.h"
 
 // Sets default values
 AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     RootComponent =
         CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
     TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
-    TileMesh->SetupAttachment(RootComponent);
+
+     TileMesh->SetupAttachment(RootComponent);
 
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> HighlightMaterialAsset(TEXT("/Game/Static/Materials/HighlightMaterial"));
     // UE_LOG(LogTemp, Warning, TEXT("HighlightMaterialAsset.Succeeded() = %d"), HighlightMaterialAsset.Succeeded());
@@ -30,36 +28,10 @@ AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
     TileMesh->SetNotifyRigidBodyCollision(true);
     TileMesh->OnBeginCursorOver.AddDynamic(this, &AHexTile::OnBeginCursorOver);
     TileMesh->OnEndCursorOver.AddDynamic(this, &AHexTile::OnEndCursorOver);
-
-    PrimaryActorTick.bCanEverTick = true;
-	SetRootComponent(TileMesh);
-
-    InteractionCheckFrequency = 0.1f;
-
-    PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
-    PlayerInventory->SetSlotsCapacity(20);
-    PlayerInventory->SetWeightCapacity(100.0f);
 }
 
 AHexTile* AHexTile::StartTile = nullptr;
 AHexTile* AHexTile::EndTile = nullptr;
-
-void AHexTile::BeginPlay() {
-    Super::BeginPlay();
-
-    HUD = Cast<AIronHorizonHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-
-    InteractableData = InstanceInteractableData;
-
-    APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-
-    if (PlayerController) {
-        EnableInput(PlayerController);
-        PlayerController->bShowMouseCursor = true; 
-        PlayerController->bEnableClickEvents = true; 
-        PlayerController->bEnableMouseOverEvents = true;
-    }
-}
 
 void AHexTile::OnBeginCursorOver(UPrimitiveComponent* TouchedComponent) {
     UE_LOG(LogTemp, Warning, TEXT("Highlighted tile: %s"), GridPositionIndex.ToString().GetCharArray().GetData());
@@ -105,104 +77,5 @@ void AHexTile::ChangeToRailway() {
         }
     } else {
         UE_LOG(LogTemp, Warning, TEXT("RailwayMaterial is not set"));
-    }
-}
-
-void AHexTile::Tick(float DeltaTime) {
-    Super::Tick(DeltaTime);
-
-    if (IsInteracting()) {
-        PerformInteractionCheck();
-    }
-}
-
-void AHexTile::Interact() {
-    Interact(this);
-}
-
-void AHexTile::BeginInteract() {
-    // Verify nothing has changed with the interactable state since beginning interaction
-    PerformInteractionCheck();
-    if (InteractionData.CurrentInteractable) {
-        if (IsValid(TargetInteractable.GetObject())) {
-            TargetInteractable->BeginInteract();
-        }
-        if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f)) {
-            Interact();
-        } else {
-            GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AHexTile::Interact, TargetInteractable->InteractableData.InteractionDuration, false);
-        }
-    }
-}
-
-void AHexTile::EndInteract() {
-    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-    if (IsValid(TargetInteractable.GetObject())) {
-        TargetInteractable->EndInteract();
-    }
-}
-
-void AHexTile::Interact(AHexTile* HexTile) {
-    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-    if (IsValid(TargetInteractable.GetObject())) {
-        TargetInteractable->Interact(this);
-    }
-}
-
-void AHexTile::FoundInteractable(AHexTile* NewInteractable) {
-    if (IsInteracting()) {
-        EndInteract();
-    }
-    if (InteractionData.CurrentInteractable) {
-        TargetInteractable = InteractionData.CurrentInteractable;
-        TargetInteractable->EndFocus();
-    }
-    InteractionData.CurrentInteractable = NewInteractable;
-    TargetInteractable = NewInteractable;
-
-    HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
-    TargetInteractable->BeginFocus();
-}
-
-void AHexTile::NoInteractableFound() {
-    if (IsInteracting()) {
-        GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-    }
-    if (InteractionData.CurrentInteractable) {
-        if (IsValid(TargetInteractable.GetObject())) {
-            TargetInteractable->EndFocus();
-        }
-        HUD->HideInteractionWidget();
-
-        InteractionData.CurrentInteractable = nullptr;
-        TargetInteractable = nullptr;
-    }
-}
-
-void AHexTile::PerformInteractionCheck() {
-    FVector2D MousePosition;
-    APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-    PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y);
-
-    FHitResult TraceHitResult;
-    PlayerController->GetHitResultAtScreenPosition(MousePosition, ECC_Visibility, true, TraceHitResult);
-
-    AHexTile* HitTile = Cast<AHexTile>(TraceHitResult.GetActor());
-    if (HitTile) {
-        if (HitTile->InteractableData.bIsInteractable) {
-            if (HitTile != InteractionData.CurrentInteractable) {
-                FoundInteractable(HitTile);
-            }
-        } else {
-            NoInteractableFound();
-        }
-    } else {
-        NoInteractableFound();
-    }
-}
-
-void AHexTile::UpdateInteractionWidget() const {
-    if (IsValid(TargetInteractable.GetObject())) {
-        HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
     }
 }

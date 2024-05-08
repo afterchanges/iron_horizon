@@ -16,32 +16,40 @@ class IRON_HORIZON_API UInventoryComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
-	UInventoryComponent();
 
 	FOnInventoryUpdated OnInventoryUpdated;
 
-	UFUNCTION(Category = "Inventory")
-	UItemBase* RemoveSingleInstanceOfItem(UItemBase* ItemIn);
+	UInventoryComponent();
 
+	UFUNCTION(Category = "Inventory")
+	UItemBase* FindMatchingItem(UItemBase* ItemIn) const;
+	UFUNCTION(Category = "Inventory")
+	UItemBase* FindNextItemByID(UItemBase* ItemIn) const;
+	UFUNCTION(Category = "Inventory")
+	UItemBase* FindNextPartialStack(UItemBase* ItemIn) const;
+
+	UFUNCTION(Category = "Inventory")
+	void RemoveSingleInstanceOfItem(UItemBase* ItemIn);
 	UFUNCTION(Category = "Inventory")
 	int32 RemoveAmountOfItem(UItemBase* ItemIn, int32 DesiredAmountToRemove);
 
 	UFUNCTION(Category = "Inventory")
-	FORCEINLINE float GetInventoryTotalWeight() const { return InventoryTotalWeight; }
+	void SplitExistingStack(UItemBase* ItemIn, const int32 AmountToSplit);
 
+	UFUNCTION(Category = "Inventory")
+	void AddNewItem(UItemBase* Item, const int32 AmountToAdd);
+
+	UFUNCTION(Category = "Inventory")
+	FORCEINLINE float GetInventoryTotalWeight() const { return InventoryTotalWeight; }
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE int32 GetSlotsCapacity() const { return InventorySlotsCapacity; }
-
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE float GetWeightCapacity() const { return InventoryWeightCapacity; }
-
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE TArray<UItemBase*> GetInventoryContents() const { return InventoryContents; }
 
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE void SetSlotsCapacity(int32 NewSlotsCapacity) { InventorySlotsCapacity = NewSlotsCapacity; }
-
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE void SetWeightCapacity(float NewWeightCapacity) { InventoryWeightCapacity = NewWeightCapacity; }
 

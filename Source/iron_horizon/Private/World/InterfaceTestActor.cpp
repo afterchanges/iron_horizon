@@ -3,9 +3,9 @@
 AInterfaceTestActor::AInterfaceTestActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	TileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("TileMesh"));
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 
-	SetRootComponent(TileMesh);
+	SetRootComponent(Mesh);
 }
 
 void AInterfaceTestActor::BeginPlay()
@@ -22,17 +22,17 @@ void AInterfaceTestActor::Tick(float DeltaTime)
 
 void AInterfaceTestActor::BeginFocus()
 {
-	if (TileMesh)
+	if (Mesh)
 	{
-		TileMesh->SetRenderCustomDepth(true);
+		Mesh->SetRenderCustomDepth(true);
 	}
 }
 
 void AInterfaceTestActor::EndFocus()
 {
-	if (TileMesh)
+	if (Mesh)
 	{
-		TileMesh->SetRenderCustomDepth(false);
+		Mesh->SetRenderCustomDepth(false);
 	}
 }
 
@@ -46,7 +46,7 @@ void AInterfaceTestActor::EndInteract()
 	UE_LOG(LogTemp, Warning, TEXT("End Interact"));
 }
 
-void AInterfaceTestActor::Interact(AHexTile* HexTile)
+void AInterfaceTestActor::Interact()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Interact"));
 }

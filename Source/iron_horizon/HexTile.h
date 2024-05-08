@@ -3,12 +3,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/InteractionInterface.h"
-#include "Components/InventoryComponent.h"
 #include "HexTile.generated.h"
 
-class UStaticMeshComponent;
-class AIronHorizonHUD;
 
 UENUM()
 enum class HexTileType : uint8
@@ -24,21 +20,9 @@ enum class HexTileType : uint8
 	MAX UMETA(Hidden)
 };
 
-USTRUCT()
-struct FInteractionData {
-	GENERATED_USTRUCT_BODY()
-
-	FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f) {};
-
-	UPROPERTY()
-	AHexTile* CurrentInteractable;
-
-	UPROPERTY()
-	float LastInteractionCheckTime;
-};
 
 UCLASS()
-class IRON_HORIZON_API AHexTile : public AActor, public IInteractionInterface
+class IRON_HORIZON_API AHexTile : public AActor
 {
 	GENERATED_BODY()
 
@@ -64,17 +48,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Materials")
 	UMaterialInterface* RailwayMaterial;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HexTile")
-    UStaticMeshComponent* TileMesh;
-    
-    UPROPERTY(EditInstanceOnly, Category = "HexTile")
-    FInteractableData InstanceInteractableData;
-
-	FORCEINLINE bool IsInteracting() const { return GetWorldTimerManager().IsTimerActive(TimerHandle_Interaction); }
-
-	FORCEINLINE UInventoryComponent* GetInventory() const { return PlayerInventory; }
-
-	void UpdateInteractionWidget() const;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HexTile")
+	UStaticMeshComponent* TileMesh;
 
 	UFUNCTION()
 	void OnBeginCursorOver(UPrimitiveComponent* TouchedComponent);
@@ -86,16 +61,7 @@ public:
 
 	FString HexTileTypeToString(HexTileType Type);
 
-	void PerformInteractionCheck();
-	void FoundInteractable(AHexTile* InteractableTile);
-	void NoInteractableFound();
-	void BeginInteract();
-	void EndInteract();
-	void Interact();
-	void Interact(AHexTile* HexTile);
-
 protected:
-	FTimerHandle TimerHandle_Interaction;
 
 	bool hasForest = false;
 	bool isRiverStart = false;
@@ -112,22 +78,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	HexTileType TileType;
 
-	UPROPERTY()
-	AIronHorizonHUD* HUD;
-
-	UPROPERTY(VisibleAnywhere, Category = "HexTile | Interaction")
-	TScriptInterface<IInteractionInterface> TargetInteractable;
-
-	UPROPERTY(VisibleAnywhere, Category = "HexTile | Inventory")
-	UInventoryComponent* PlayerInventory;
-
-	float InteractionCheckFrequency;
-
-	FInteractionData InteractionData;
-
-	virtual void Tick(float DeltaSeconds) override;
-
-	virtual void BeginPlay() override;
 	
 public:    
 	AHexTile();

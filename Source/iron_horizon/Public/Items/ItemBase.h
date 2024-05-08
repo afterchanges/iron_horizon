@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Items/ItemDataStructs.h"
+#include "../IronHorizonPlayerPawn.h"
 #include "ItemBase.generated.h"
 
 class UInventoryComponent;
@@ -17,20 +18,23 @@ public:
     UPROPERTY(VisibleAnywhere, Category = "Item")
 	int32 Quantity;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FName ID;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item")
+    UPROPERTY(EditAnywhere, Category = "Item")
     EItemType ItemType;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FItemTextData TextData;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FItemAssetData AssetData;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FItemNumericData NumericData;
+
+    UPROPERTY(EditAnywhere, Category = "Item")
+    FItemStatistics ItemStatistics;
 
 
     UItemBase();
@@ -51,7 +55,7 @@ public:
     FORCEINLINE bool IsFullItemStack() const {return Quantity == NumericData.MaxStackSize;}
 
     UFUNCTION(Category = "Item")
-    virtual void Use(AHexTile* HexTile);
+    virtual void Use(AIronHorizonPlayerPawn* PlayerPawn);
 
     bool bIsPickup;
     bool bIsCopy;

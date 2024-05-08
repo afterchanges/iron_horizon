@@ -4,18 +4,12 @@
 #include "Components/InventoryComponent.h"
 #include "Items/ItemBase.h"
 
-// Sets default values for this component's properties
 UInventoryComponent::UInventoryComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
 
 
-// Called when the game starts
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -33,12 +27,46 @@ void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-UItemBase* UInventoryComponent::RemoveSingleInstanceOfItem(UItemBase* ItemIn)
+UItemBase* UInventoryComponent::FindMatchingItem(UItemBase* ItemIn) const
+{
+	if (ItemIn)
+	{
+		for (UItemBase* Item : InventoryContents)
+		{
+			if (Item->ID == ItemIn->ID)
+			{
+				return Item;
+			}
+		}
+	}
+	return nullptr;
+}
+
+UItemBase* UInventoryComponent::FindNextItemByID(UItemBase* ItemIn) const
+{
+	if (ItemIn)
+	{
+		if (const TArray<TObjectPtr<UItemBase>>::ElementType* Result = InventoryContents.FindByKey(ItemIn))
+		{
+			return *Result;
+		}
+	}
+	return nullptr;
+}
+
+UItemBase* UInventoryComponent::FindNextPartialStack(UItemBase* ItemIn) const
+{
+	if (const TArray<TObjectPtr<UItemBase>>::ElementType* Result = InventoryContents.FindByPredicate([&ItemIn](const TObjectPtr<UItemBase>& InventoryItem) { return InventoryItem->ID == ItemIn->ID && !InventoryItem->IsFullItemStack(); }))
+	{
+		return *Result;
+	}
+	return nullptr;
+}
+
+void UInventoryComponent::RemoveSingleInstanceOfItem(UItemBase* ItemIn)
 {
 	InventoryContents.RemoveSingle(ItemIn);
 	OnInventoryUpdated.Broadcast();
-
-	return ItemIn;
 }
 
 int32 UInventoryComponent::RemoveAmountOfItem(UItemBase* ItemIn, int32 DesiredAmountToRemove)
@@ -52,6 +80,39 @@ int32 UInventoryComponent::RemoveAmountOfItem(UItemBase* ItemIn, int32 DesiredAm
 	OnInventoryUpdated.Broadcast();
 
 	return ActualAmountToRemove;
+}
+
+void UInventoryComponent::SplitExistingStack(UItemBase* ItemIn, const int32 AmountToSplit)
+{
+	if (!(InventoryContents.Num() + 1 > InventorySlotsCapacity))
+	{
+		RemoveAmountOfItem(ItemIn, AmountToSplit);
+		AddNewItem(ItemIn, AmountToSplit);
+	}
+}
+
+void UInventoryComponent::AddNewItem(UItemBase* Item, const int32 AmountToAdd)
+{
+	UItemBase* NewItem;
+
+	if (Item->bIsCopy || Item->bIsPickup)
+	{
+		// If the item is a copy or a pickup, we can just add it directly
+		NewItem = Item;
+		Item->ResetItemFlags();
+	}
+	else
+	{
+		// Used when splitting or dragging items from one inventory to another
+		NewItem = Item->CreateItemCopy();
+	}
+
+	NewItem->OwningInventory = this;
+	NewItem->SetQuantity(AmountToAdd);
+
+	InventoryContents.Add(NewItem);
+	InventoryTotalWeight += NewItem->GetItemStackWeight();
+	OnInventoryUpdated.Broadcast();
 }
 
 

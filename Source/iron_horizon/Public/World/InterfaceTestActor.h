@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../HexTile.h"
+#include "../IronHorizonPlayerPawn.h"
 #include "Interfaces/InteractionInterface.h"
 #include "InterfaceTestActor.generated.h"
 
@@ -18,7 +18,7 @@ public:
 protected:
     
     UPROPERTY(EditAnywhere, Category = "Test Actor")
-    UStaticMeshComponent* TileMesh;
+    UStaticMeshComponent* Mesh;
 
     UPROPERTY(EditInstanceOnly, Category = "Test Actor")
     FInteractableData InstanceInteractableData;
@@ -31,6 +31,6 @@ protected:
 	virtual void EndFocus() override;
 	virtual void BeginInteract() override;
 	virtual void EndInteract() override;
-	virtual void Interact(AHexTile* HexTile) override;
+	virtual void Interact(AIronHorizonPlayerPawn* PlayerPawn) override;
 
 };

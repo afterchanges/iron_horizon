@@ -7,6 +7,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "UserInterface/IronHorizonHUD.h"
+#include "Components/InventoryComponent.h"
+#include "DrawDebugHelpers.h"
 #include "PlayerCameraController.h"
 
 // Sets default values
@@ -34,6 +37,17 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerIn
     check(EIController);
     check(FPController);
 
+    // Bind the input mapping context to the player controller
+
+    PrimaryActorTick.bCanEverTick = true;
+	SetRootComponent(Mesh);
+
+    InteractionCheckFrequency = 0.1f;
+
+    PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+    PlayerInventory->SetSlotsCapacity(20);
+    PlayerInventory->SetWeightCapacity(100.0f);
+
     EIController->BindAction(
         FPController->MoveAction, ETriggerEvent::Triggered, this, &AIronHorizonPlayerPawn::Move
     );
@@ -44,6 +58,8 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerIn
         FPController->SpringArmLengthAction, ETriggerEvent::Triggered, this,
         &AIronHorizonPlayerPawn::UpdateSpringArmLength
     );
+
+    InputComponent->BindAction("ToggleMenu", IE_Pressed, this, &APlayerCameraController::ToggleMenu);
 
     ULocalPlayer *LocalPlayer = Cast<ULocalPlayer>(FPController->Player);
     check(LocalPlayer);
@@ -115,6 +131,10 @@ void AIronHorizonPlayerPawn::Tick(float DeltaTime) {
     Super::Tick(DeltaTime);
 
     UpdateCameraPosition();
+
+    if (IsInteracting()) {
+        PerformInteractionCheck();
+    }
 }
 
 void AIronHorizonPlayerPawn::Move(const FInputActionValue &ActionValue) {
@@ -145,4 +165,122 @@ void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &Acti
     //     LogTemp, Warning, TEXT("SpringArmComponent->TargetArmLength: %f"),
     //     SpringArmComponent->TargetArmLength
     // );
+}
+
+void AIronHorizonPlayerPawn::BeginPlay() {
+    Super::BeginPlay();
+    
+    HUD = Cast<AIronHorizonHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+
+    InteractableData = InstanceInteractableData;
+
+    APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+    if (PlayerController) {
+        EnableInput(PlayerController);
+        PlayerController->bShowMouseCursor = true; 
+        PlayerController->bEnableClickEvents = true; 
+        PlayerController->bEnableMouseOverEvents = true;
+    }
+}
+
+void AIronHorizonPlayerPawn::Interact() {
+    Interact(this);
+}
+
+void AIronHorizonPlayerPawn::BeginInteract() {
+    // Verify nothing has changed with the interactable state since beginning interaction
+    PerformInteractionCheck();
+    if (InteractionData.CurrentInteractable) {
+        if (IsValid(TargetInteractable.GetObject())) {
+            TargetInteractable->BeginInteract();
+        }
+        if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f)) {
+            Interact();
+        } else {
+            GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AIronHorizonPlayerPawn::Interact, TargetInteractable->InteractableData.InteractionDuration, false);
+        }
+    }
+}
+
+void AIronHorizonPlayerPawn::EndInteract() {
+    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+    if (IsValid(TargetInteractable.GetObject())) {
+        TargetInteractable->EndInteract();
+    }
+}
+
+void AIronHorizonPlayerPawn::Interact(AIronHorizonPlayerPawn* PlayerPawn) {
+    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+    if (IsValid(TargetInteractable.GetObject())) {
+        TargetInteractable->Interact(this);
+    }
+}
+
+void AIronHorizonPlayerPawn::FoundInteractable(AIronHorizonPlayerPawn* NewInteractable) {
+    if (IsInteracting()) {
+        EndInteract();
+    }
+    if (InteractionData.CurrentInteractable) {
+        TargetInteractable = InteractionData.CurrentInteractable;
+        TargetInteractable->EndFocus();
+    }
+    InteractionData.CurrentInteractable = NewInteractable;
+    TargetInteractable = NewInteractable;
+
+    HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
+    TargetInteractable->BeginFocus();
+}
+
+void AIronHorizonPlayerPawn::NoInteractableFound() {
+    if (IsInteracting()) {
+        GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
+    }
+    if (InteractionData.CurrentInteractable) {
+        if (IsValid(TargetInteractable.GetObject())) {
+            TargetInteractable->EndFocus();
+        }
+        HUD->HideInteractionWidget();
+
+        InteractionData.CurrentInteractable = nullptr;
+        TargetInteractable = nullptr;
+    }
+}
+
+void AIronHorizonPlayerPawn::PerformInteractionCheck() {
+    if (IsValid(InteractionData.CurrentInteractable)) {
+        if (InteractionData.CurrentInteractable->IsInteractable()) {
+            if (InteractionData.CurrentInteractable->IsInInteractionRange(this)) {
+                return;
+            }
+        }
+    }
+
+    TArray<AActor*> OverlappingActors;
+    SphereComponent->GetOverlappingActors(OverlappingActors, AInteractableActor::StaticClass());
+
+    AInteractableActor* NewInteractable = nullptr;
+    for (AActor* Actor : OverlappingActors) {
+        AInteractableActor* Interactable = Cast<AInteractableActor>(Actor);
+        if (Interactable && Interactable->IsInteractable() && Interactable->IsInInteractionRange(this)) {
+            NewInteractable = Interactable;
+            break;
+        }
+    }
+
+    if (NewInteractable) {
+        FoundInteractable(NewInteractable);
+    } else {
+        NoInteractableFound();
+    }
+}
+
+void AIronHorizonPlayerPawn::UpdateInteractionWidget() const {
+    if (IsValid(TargetInteractable.GetObject())) {
+        HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
+    }
+}
+
+void AIronHorizonPlayerPawn::ToggleMenu() {
+    HUD->ToggleMenu();
 }

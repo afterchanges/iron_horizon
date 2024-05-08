@@ -2,7 +2,6 @@
 
 
 #include "Items/ItemBase.h"
-#include "Items/ItemDataStructs.h"
 #include "Components/InventoryComponent.h"
 
 UItemBase::UItemBase() : bIsPickup(false), bIsCopy(false) {
@@ -22,12 +21,13 @@ UItemBase* UItemBase::CreateItemCopy() const {
     NewItem->TextData = this->TextData;
     NewItem->AssetData = this->AssetData;
     NewItem->NumericData = this->NumericData;
+    NewItem->ItemStatistics = this->ItemStatistics;
     NewItem->bIsCopy = true;
 
     return NewItem;
 }
 
-void UItemBase::Use(AHexTile* HexTile) {
+void UItemBase::Use(AIronHorizonPlayerPawn* PlayerPawn) {
     // Placeholder for use function
 }
 

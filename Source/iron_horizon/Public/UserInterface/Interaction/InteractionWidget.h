@@ -8,7 +8,7 @@
 #include "Components/ProgressBar.h"
 #include "InteractionWidget.generated.h"
 
-class AHexTile;
+class AIronHorizonPlayerPawn;
 struct FInteractableData;
 class UTextBlock;
 class UProgressBar;
@@ -19,28 +19,28 @@ class IRON_HORIZON_API UInteractionWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "Interaction Widget | Player Reference")
+	UPROPERTY(VisibleAnywhere, Category = "Interaction Widget | Player Reference")
 	AHexTile* PlayerReference;
 
 	void UpdateWidget(const FInteractableData* InteractableData) const;
 
 protected:	
-	UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
 	UTextBlock* NameText;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
 	UTextBlock* ActionText;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
-	UTextBlock* Quantity;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UTextBlock* QuantityText;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
 	UTextBlock* KeyPressText;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
 	UProgressBar* InteractionProgressBar;
 
-	UPROPERTY(EditAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
 	float CurrentInteractionDuration;
 
 	UFUNCTION(Category = "Interaction Widget | Interactable Data")

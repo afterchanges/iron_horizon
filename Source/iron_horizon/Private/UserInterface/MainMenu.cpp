@@ -1,14 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "../HexTile.h"
 #include "UserInterface/MainMenu.h"
-#include "../HexTile.h"
+#include "../IronHorizonPlayerPawn.h"
 
 void UMainMenu::NativeConstruct()
 {
     Super::NativeConstruct();
 
-    PlayerPawn = Cast<AHexTile>(GetOwningPlayerPawn());
+    PlayerPawn = Cast<AIronHorizonPlayerPawn>(GetOwningPlayer());
 }
 
 void UMainMenu::NativeOnInitialized()
@@ -18,7 +17,8 @@ void UMainMenu::NativeOnInitialized()
 
 bool UMainMenu::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-    Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-    return true;
+    return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+
+    // cast operation to item drag drop, ensure player is valid, call drop item
 }
 

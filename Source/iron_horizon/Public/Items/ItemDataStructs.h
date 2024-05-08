@@ -11,6 +11,20 @@ enum class EItemType : uint8 {
 };
 
 USTRUCT()
+struct FItemStatistics {
+    GENERATED_USTRUCT_BODY()
+
+    UPROPERTY(EditAnywhere)
+    float SpeedFactor;
+
+    UPROPERTY(EditAnywhere)
+    float ProfitRatio;
+
+    UPROPERTY(EditAnywhere)
+    float Cost;
+};
+
+USTRUCT()
 struct FItemTextData {
     GENERATED_USTRUCT_BODY()
 
@@ -24,7 +38,7 @@ struct FItemTextData {
     FText InteractionText;
 
     UPROPERTY(EditAnywhere)
-    FText UseText;
+    FText UsageText;
 };
 
 USTRUCT()
@@ -62,19 +76,19 @@ USTRUCT()
 struct FItemData : public FTableRowBase {
     GENERATED_USTRUCT_BODY()
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FName ID;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(EditAnywhere, Category = "Item")
     EItemType ItemType;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FItemTextData TextData;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FItemAssetData AssetData;
 
-    UPROPERTY(EditAnywhere, Category = "Item Data")
+    UPROPERTY(EditAnywhere, Category = "Item")
     FItemNumericData NumericData;
 
 };

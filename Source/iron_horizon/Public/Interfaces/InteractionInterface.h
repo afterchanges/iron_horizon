@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
 
-class AHexTile;
+class AIronHorizonPlayerPawn;
 
 UENUM()
 enum class EInteractableType : uint8 {
@@ -70,7 +70,7 @@ public:
 	// that receives the action
     virtual void BeginFocus();
     virtual void EndFocus();
-    virtual void Interact(AHexTile* HexTile);
+    virtual void Interact(AIronHorizonPlayerPawn* PlayerPawn);
     virtual void BeginInteract();
     virtual void EndInteract();
 

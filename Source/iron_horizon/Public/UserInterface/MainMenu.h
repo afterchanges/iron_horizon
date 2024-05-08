@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "../IronHorizonPlayerPawn.h"
 #include "MainMenu.generated.h"
 
-class AHexTile;
+class AIronHorizonPlayerPawn;
 
 UCLASS()
 class IRON_HORIZON_API UMainMenu : public UUserWidget
@@ -14,7 +15,7 @@ class IRON_HORIZON_API UMainMenu : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY()
-	AHexTile* PlayerPawn;
+	AIronHorizonPlayerPawn* PlayerPawn;
 
 protected:
 	virtual void NativeConstruct() override;

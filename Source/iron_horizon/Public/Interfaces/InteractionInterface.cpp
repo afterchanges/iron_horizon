@@ -1,5 +1,5 @@
 #include "InteractionInterface.h"
-#include "../HexTile.h"
+#include "../IronHorizonPlayerPawn.h"
 
 void IInteractionInterface::BeginFocus()
 {
@@ -21,7 +21,7 @@ void IInteractionInterface::EndInteract()
 
 }
 
-void IInteractionInterface::Interact(AHexTile* HexTile)
+void IInteractionInterface::Interact(AIronHorizonPlayerPawn* PlayerPawn)
 {
 
 }

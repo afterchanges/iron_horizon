@@ -6,11 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "PlayerCameraController.generated.h"
 
-/**
- *
- */
 UCLASS()
-
 class IRON_HORIZON_API APlayerCameraController : public APlayerController {
     GENERATED_BODY()
 

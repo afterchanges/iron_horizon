@@ -44,6 +44,24 @@ void AIronHorizonHUD::HideMenu()
     }
 }
 
+void AIronHorizonHUD::ToggleMenu()
+{
+    if (bIsMenuVisible)
+    {
+        HideMenu();
+        const FInputModeGameOnly InputMode;
+        GetOwningPlayerController()->SetInputMode(InputMode);
+        GetOwningPlayerController()->bShowMouseCursor = false;
+    }
+    else
+    {
+        DisplayMenu();
+        const FInputModeGameAndUI InputMode;
+        GetOwningPlayerController()->SetInputMode(InputMode);
+        GetOwningPlayerController()->bShowMouseCursor = true;
+    }
+}
+
 void AIronHorizonHUD::ShowInteractionWidget() const
 {
     if (InteractionWidget)
@@ -60,7 +78,7 @@ void AIronHorizonHUD::HideInteractionWidget() const
     }
 }
 
-void AIronHorizonHUD::UpdateInteractionWidget(const FInteractableData& InteractableData) const
+void AIronHorizonHUD::UpdateInteractionWidget(const FInteractableData* InteractableData) const
 {
     if (InteractionWidget)
     {
@@ -68,7 +86,7 @@ void AIronHorizonHUD::UpdateInteractionWidget(const FInteractableData& Interacta
         {
             InteractionWidget->SetVisibility(ESlateVisibility::Visible);
         }
-        InteractionWidget->UpdateWidget(&InteractableData);
+        InteractionWidget->UpdateWidget(InteractableData);
     }
 }
 
