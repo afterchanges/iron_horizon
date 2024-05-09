@@ -11,11 +11,16 @@
 #include "Components/InventoryComponent.h"
 #include "DrawDebugHelpers.h"
 #include "PlayerCameraController.h"
+#include "Items/ItemBase.h"
+
 
 // Sets default values
 AIronHorizonPlayerPawn::AIronHorizonPlayerPawn() {
     // Set this pawn to call Tick() every frame.  You can turn this off to
     // improve performance if you don't need it.
+    PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
+    PlayerInventory->SetSlotsCapacity(20);
+    PlayerInventory->SetWeightCapacity(100.0f);
 
     SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
     SetRootComponent(SphereComponent);
@@ -44,10 +49,6 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerIn
 
     InteractionCheckFrequency = 0.1f;
 
-    PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
-    PlayerInventory->SetSlotsCapacity(20);
-    PlayerInventory->SetWeightCapacity(100.0f);
-
     EIController->BindAction(
         FPController->MoveAction, ETriggerEvent::Triggered, this, &AIronHorizonPlayerPawn::Move
     );
@@ -59,7 +60,7 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerIn
         &AIronHorizonPlayerPawn::UpdateSpringArmLength
     );
 
-    InputComponent->BindAction("ToggleMenu", IE_Pressed, this, &APlayerCameraController::ToggleMenu);
+    InputComponent->BindAction("ToggleMenu", IE_Pressed, this, &AIronHorizonPlayerPawn::ToggleMenu);
 
     ULocalPlayer *LocalPlayer = Cast<ULocalPlayer>(FPController->Player);
     check(LocalPlayer);
@@ -131,10 +132,6 @@ void AIronHorizonPlayerPawn::Tick(float DeltaTime) {
     Super::Tick(DeltaTime);
 
     UpdateCameraPosition();
-
-    if (IsInteracting()) {
-        PerformInteractionCheck();
-    }
 }
 
 void AIronHorizonPlayerPawn::Move(const FInputActionValue &ActionValue) {
@@ -169,6 +166,23 @@ void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &Acti
 
 void AIronHorizonPlayerPawn::BeginPlay() {
     Super::BeginPlay();
+
+    PlayerInventory->ItemDataTable = LoadObject<UDataTable>(
+    nullptr, TEXT("DataTable'/Game/ItemData/TestItems.TestItems'")
+);
+
+
+    UItemBase* SurfaceItem = NewObject<UItemBase>(UItemBase::StaticClass());
+    SurfaceItem->ItemType = EItemType::Surface_Railway;
+    SurfaceItem->ID = "1";
+    PlayerInventory->DesiredItemID = "1";
+    PlayerInventory->AddNewItem(SurfaceItem, 1);
+
+    UItemBase* TunnelItem = NewObject<UItemBase>(UItemBase::StaticClass());
+    TunnelItem->ItemType = EItemType::Tunnel_Railway;
+    TunnelItem->ID = "2";
+    PlayerInventory->DesiredItemID = "2";
+    PlayerInventory->AddNewItem(TunnelItem, 2);
     
     HUD = Cast<AIronHorizonHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
@@ -184,100 +198,9 @@ void AIronHorizonPlayerPawn::BeginPlay() {
     }
 }
 
-void AIronHorizonPlayerPawn::Interact() {
-    Interact(this);
-}
-
-void AIronHorizonPlayerPawn::BeginInteract() {
-    // Verify nothing has changed with the interactable state since beginning interaction
-    PerformInteractionCheck();
-    if (InteractionData.CurrentInteractable) {
-        if (IsValid(TargetInteractable.GetObject())) {
-            TargetInteractable->BeginInteract();
-        }
-        if (FMath::IsNearlyZero(TargetInteractable->InteractableData.InteractionDuration, 0.1f)) {
-            Interact();
-        } else {
-            GetWorldTimerManager().SetTimer(TimerHandle_Interaction, this, &AIronHorizonPlayerPawn::Interact, TargetInteractable->InteractableData.InteractionDuration, false);
-        }
-    }
-}
-
-void AIronHorizonPlayerPawn::EndInteract() {
-    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-    if (IsValid(TargetInteractable.GetObject())) {
-        TargetInteractable->EndInteract();
-    }
-}
-
-void AIronHorizonPlayerPawn::Interact(AIronHorizonPlayerPawn* PlayerPawn) {
-    GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-    if (IsValid(TargetInteractable.GetObject())) {
-        TargetInteractable->Interact(this);
-    }
-}
-
-void AIronHorizonPlayerPawn::FoundInteractable(AIronHorizonPlayerPawn* NewInteractable) {
-    if (IsInteracting()) {
-        EndInteract();
-    }
-    if (InteractionData.CurrentInteractable) {
-        TargetInteractable = InteractionData.CurrentInteractable;
-        TargetInteractable->EndFocus();
-    }
-    InteractionData.CurrentInteractable = NewInteractable;
-    TargetInteractable = NewInteractable;
-
-    HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
-    TargetInteractable->BeginFocus();
-}
-
-void AIronHorizonPlayerPawn::NoInteractableFound() {
-    if (IsInteracting()) {
-        GetWorldTimerManager().ClearTimer(TimerHandle_Interaction);
-    }
-    if (InteractionData.CurrentInteractable) {
-        if (IsValid(TargetInteractable.GetObject())) {
-            TargetInteractable->EndFocus();
-        }
-        HUD->HideInteractionWidget();
-
-        InteractionData.CurrentInteractable = nullptr;
-        TargetInteractable = nullptr;
-    }
-}
-
-void AIronHorizonPlayerPawn::PerformInteractionCheck() {
-    if (IsValid(InteractionData.CurrentInteractable)) {
-        if (InteractionData.CurrentInteractable->IsInteractable()) {
-            if (InteractionData.CurrentInteractable->IsInInteractionRange(this)) {
-                return;
-            }
-        }
-    }
-
-    TArray<AActor*> OverlappingActors;
-    SphereComponent->GetOverlappingActors(OverlappingActors, AInteractableActor::StaticClass());
-
-    AInteractableActor* NewInteractable = nullptr;
-    for (AActor* Actor : OverlappingActors) {
-        AInteractableActor* Interactable = Cast<AInteractableActor>(Actor);
-        if (Interactable && Interactable->IsInteractable() && Interactable->IsInInteractionRange(this)) {
-            NewInteractable = Interactable;
-            break;
-        }
-    }
-
-    if (NewInteractable) {
-        FoundInteractable(NewInteractable);
-    } else {
-        NoInteractableFound();
-    }
-}
-
 void AIronHorizonPlayerPawn::UpdateInteractionWidget() const {
     if (IsValid(TargetInteractable.GetObject())) {
-        HUD->UpdateInteractionWidget(TargetInteractable->InteractableData);
+        HUD->UpdateInteractionWidget(&TargetInteractable->InteractableData);
     }
 }
 

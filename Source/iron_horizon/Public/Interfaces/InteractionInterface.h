@@ -67,12 +67,6 @@ class IRON_HORIZON_API IInteractionInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	// that receives the action
-    virtual void BeginFocus();
-    virtual void EndFocus();
-    virtual void Interact(AIronHorizonPlayerPawn* PlayerPawn);
-    virtual void BeginInteract();
-    virtual void EndInteract();
 
     FInteractableData InteractableData;
 	

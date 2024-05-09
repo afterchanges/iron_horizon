@@ -4,14 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/InteractionInterface.h"
 #include "InventoryComponent.generated.h"
+
 
 DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 class UItemBase;
+class UDataTable;
+
+USTRUCT(BlueprintType)
+struct FItemAddResult
+{
+	GENERATED_BODY()
+
+	FItemAddResult() : ActualAmountAdded(0) {}
+
+	int32 ActualAmountAdded;
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class IRON_HORIZON_API UInventoryComponent : public UActorComponent
+class IRON_HORIZON_API UInventoryComponent : public UActorComponent, public IInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -47,11 +60,37 @@ public:
 	FORCEINLINE float GetWeightCapacity() const { return InventoryWeightCapacity; }
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE TArray<UItemBase*> GetInventoryContents() const { return InventoryContents; }
+	UFUNCTION(Category = "Inventory")
+	FORCEINLINE UItemBase* GetItemData() const { return ItemReference; }
 
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE void SetSlotsCapacity(int32 NewSlotsCapacity) { InventorySlotsCapacity = NewSlotsCapacity; }
 	UFUNCTION(Category = "Inventory")
 	FORCEINLINE void SetWeightCapacity(float NewWeightCapacity) { InventoryWeightCapacity = NewWeightCapacity; }
+
+	UPROPERTY(EditInstanceOnly, Category = "Item Initialization")
+	UDataTable* ItemDataTable;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item Initialization")
+	FName DesiredItemID;
+
+	UPROPERTY(VisibleAnywhere, Category = "Item Reference") 
+	UItemBase* ItemReference;
+
+	UPROPERTY(VisibleAnywhere, Category = "Interaction")
+	FInteractableData InstanceInteractableData;
+
+	UPROPERTY(EditInstanceOnly, Category = "Item Initialization")
+	int32 ItemQuantity;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UStaticMeshComponent* AddMesh;
+
+	void InitializeAdd(const TSubclassOf<UItemBase> BaseClass, const int32 InQuantity);
+
+	void InitializeDrop(UItemBase* ItemToDrop, const int32 InQuantity);
+
+	void UpdateInteractableData();
 
 	// UFUNCTION(Category = "Inventory")
 	// bool CanAffordTile(UItemBase* Tile, int32 Quantity);

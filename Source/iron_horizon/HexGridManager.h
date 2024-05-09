@@ -5,7 +5,6 @@
 #include <map>
 
 #include "CoreMinimal.h"
-#include "Interfaces/InteractionInterface.h"
 #include "GameFramework/Actor.h"
 #include "HexGridManager.generated.h"
 

@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Actor.h"
-#include "Interfaces/InteractionInterface.h"
 #include "Components/InventoryComponent.h"
+#include "Interfaces/InteractionInterface.h"
 #include "IronHorizonPlayerPawn.generated.h"
 
 class UStaticMeshComponent;
@@ -33,8 +33,7 @@ public:
     AIronHorizonPlayerPawn();
     // Called every frame
     virtual void Tick(float DeltaTime) override;
-
-protected:
+    
     virtual void SetupPlayerInputComponent(
         class UInputComponent *PlayerInputComponent
     ) override;
@@ -102,7 +101,7 @@ protected:
 
     UPROPERTY()
 	AIronHorizonHUD* HUD;
-	UPROPERTY(VisibleAnywhere, Category = "PlayerPawn | Interaction")
+    UPROPERTY(VisibleAnywhere, Category = "PlayerPawn | Interaction")
 	TScriptInterface<IInteractionInterface> TargetInteractable;
 	UPROPERTY(VisibleAnywhere, Category = "PlayerPawn | Inventory")
 	UInventoryComponent* PlayerInventory;
@@ -125,11 +124,6 @@ protected:
 
     void ToggleMenu();
 
-    void PerformInteractionCheck();
-	void FoundInteractable(AActor* NewInteractable);
-	void NoInteractableFound();
-	void BeginInteract();
-	void EndInteract();
-	void Interact();
+
 
 };

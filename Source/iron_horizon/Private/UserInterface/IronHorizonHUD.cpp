@@ -26,6 +26,7 @@ void AIronHorizonHUD::BeginPlay()
     }
 }
 
+
 void AIronHorizonHUD::DisplayMenu()
 {
     if (MainMenuWidget)
@@ -49,16 +50,16 @@ void AIronHorizonHUD::ToggleMenu()
     if (bIsMenuVisible)
     {
         HideMenu();
-        const FInputModeGameOnly InputMode;
+        FInputModeGameAndUI InputMode;
+        InputMode.SetWidgetToFocus(TSharedPtr<SWidget>());
         GetOwningPlayerController()->SetInputMode(InputMode);
-        GetOwningPlayerController()->bShowMouseCursor = false;
     }
     else
     {
         DisplayMenu();
-        const FInputModeGameAndUI InputMode;
+        FInputModeGameAndUI InputMode;
+        InputMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
         GetOwningPlayerController()->SetInputMode(InputMode);
-        GetOwningPlayerController()->bShowMouseCursor = true;
     }
 }
 

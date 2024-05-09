@@ -3,18 +3,66 @@
 
 #include "Components/InventoryComponent.h"
 #include "Items/ItemBase.h"
+#include "Engine/DataTable.h"
 
 UInventoryComponent::UInventoryComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
+
+	AddMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AddMesh"));
+	AddMesh->SetSimulatePhysics(true);
+	if (AActor* Owner = GetOwner())
+{
+    Owner->SetRootComponent(AddMesh);
+}
 }
 
+void UInventoryComponent::InitializeAdd(const TSubclassOf<UItemBase> BaseClass, const int32 InQuantity)
+{
+	if (ItemDataTable && !DesiredItemID.IsNone())
+	{
+		const FItemData* ItemData = ItemDataTable->FindRow<FItemData>(DesiredItemID, DesiredItemID.ToString());
+
+		ItemReference = NewObject<UItemBase>(this, BaseClass);
+
+		ItemReference->ID = ItemData->ID;
+		ItemReference->Quantity = InQuantity;
+		ItemReference->ItemType = ItemData->ItemType;
+		ItemReference->TextData = ItemData->TextData;
+		ItemReference->AssetData = ItemData->AssetData;
+		ItemReference->NumericData = ItemData->NumericData;
+
+		InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
+
+		AddMesh->SetStaticMesh(ItemData->AssetData.Mesh);
+
+		UpdateInteractableData();
+	}
+}
+
+void UInventoryComponent::InitializeDrop(UItemBase*ItemToDrop, const int32 InQuantity)
+{
+	ItemReference = ItemToDrop;
+	InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
+	ItemReference->NumericData.Weight = ItemToDrop->GetItemSingleWeight();
+	AddMesh->SetStaticMesh(ItemToDrop->AssetData.Mesh);
+
+	UpdateInteractableData();
+}
+
+void UInventoryComponent::UpdateInteractableData()
+{
+	InstanceInteractableData.Name = ItemReference->TextData.Name;
+	InstanceInteractableData.Quantity = ItemReference->Quantity;
+
+	InteractableData = InstanceInteractableData;
+}
 
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	InitializeAdd(UItemBase::StaticClass(), ItemQuantity);
 	
 }
 
@@ -91,6 +139,7 @@ void UInventoryComponent::SplitExistingStack(UItemBase* ItemIn, const int32 Amou
 	}
 }
 
+
 void UInventoryComponent::AddNewItem(UItemBase* Item, const int32 AmountToAdd)
 {
 	UItemBase* NewItem;
@@ -106,6 +155,15 @@ void UInventoryComponent::AddNewItem(UItemBase* Item, const int32 AmountToAdd)
 		// Used when splitting or dragging items from one inventory to another
 		NewItem = Item->CreateItemCopy();
 	}
+
+	if (ItemDataTable && !NewItem->ID.IsNone())
+    {
+        const FItemData* ItemData = ItemDataTable->FindRow<FItemData>(NewItem->ID, NewItem->ID.ToString());
+
+        NewItem->ItemType = ItemData->ItemType;
+		NewItem->TextData = ItemData->TextData;
+		NewItem->NumericData = ItemData->NumericData;
+    }
 
 	NewItem->OwningInventory = this;
 	NewItem->SetQuantity(AmountToAdd);

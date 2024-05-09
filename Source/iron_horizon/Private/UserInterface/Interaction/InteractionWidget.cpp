@@ -3,9 +3,9 @@
 
 #include "UserInterface/Interaction/InteractionWidget.h"
 #include "../IronHorizonPlayerPawn.h"
+#include "Interfaces/InteractionInterface.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "Interfaces/InteractionInterface.h"
 
 void UInteractionWidget::NativeConstruct()
 {

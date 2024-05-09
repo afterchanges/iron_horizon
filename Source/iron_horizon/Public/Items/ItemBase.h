@@ -7,6 +7,12 @@
 
 class UInventoryComponent;
 
+UENUM()
+enum class EItemQuality : uint8 {
+    Common,
+    Quality
+};
+
 UCLASS()
 class IRON_HORIZON_API UItemBase : public UObject {
     GENERATED_BODY()
@@ -15,27 +21,29 @@ public:
     UPROPERTY()
     UInventoryComponent* OwningInventory;
 
-    UPROPERTY(VisibleAnywhere, Category = "Item")
+    UPROPERTY(VisibleAnywhere, Category = "Item ")
 	int32 Quantity;
 
-    UPROPERTY(EditAnywhere, Category = "Item")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FName ID;
 
-    UPROPERTY(EditAnywhere, Category = "Item")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     EItemType ItemType;
 
-    UPROPERTY(EditAnywhere, Category = "Item")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FItemTextData TextData;
 
-    UPROPERTY(EditAnywhere, Category = "Item")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FItemAssetData AssetData;
 
-    UPROPERTY(EditAnywhere, Category = "Item")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FItemNumericData NumericData;
 
-    UPROPERTY(EditAnywhere, Category = "Item")
+    UPROPERTY(VisibleAnywhere, Category = "Item")
     FItemStatistics ItemStatistics;
 
+    UPROPERTY(VisibleAnywhere, Category = "Item")
+    EItemQuality ItemQuality;
 
     UItemBase();
 

@@ -57,7 +57,7 @@ struct FItemNumericData {
     GENERATED_USTRUCT_BODY()
 
     UPROPERTY(EditAnywhere)
-    float SpeedCoefficient;
+    float SpeedFactor;
 
     UPROPERTY(EditAnywhere)
     float Cost;

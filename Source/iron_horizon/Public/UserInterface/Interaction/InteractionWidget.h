@@ -20,7 +20,7 @@ class IRON_HORIZON_API UInteractionWidget : public UUserWidget
 	GENERATED_BODY()
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Interaction Widget | Player Reference")
-	AHexTile* PlayerReference;
+	AIronHorizonPlayerPawn* PlayerReference;
 
 	void UpdateWidget(const FInteractableData* InteractableData) const;
 
