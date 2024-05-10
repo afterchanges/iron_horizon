@@ -2,24 +2,24 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
 #include "../IronHorizonPlayerPawn.h"
+#include "Blueprint/UserWidget.h"
+#include "CoreMinimal.h"
 #include "MainMenu.generated.h"
 
 class AIronHorizonPlayerPawn;
 
 UCLASS()
-class IRON_HORIZON_API UMainMenu : public UUserWidget
-{
-	GENERATED_BODY()
+class IRON_HORIZON_API UMainMenu : public UUserWidget {
+  GENERATED_BODY()
 public:
-	UPROPERTY()
-	AIronHorizonPlayerPawn* PlayerPawn;
+  UPROPERTY()
+  AIronHorizonPlayerPawn *PlayerPawn;
 
 protected:
-	virtual void NativeConstruct() override;
-	virtual void NativeOnInitialized() override;
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	
+  virtual void NativeConstruct() override;
+  virtual void NativeOnInitialized() override;
+  virtual bool NativeOnDrop(const FGeometry &InGeometry,
+                            const FDragDropEvent &InDragDropEvent,
+                            UDragDropOperation *InOperation) override;
 };

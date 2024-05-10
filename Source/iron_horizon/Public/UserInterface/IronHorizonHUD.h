@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "Interaction/InteractionWidget.h"
-#include "MainMenu.h"
 #include "IronHorizonHUD.generated.h"
+#include "MainMenu.h"
 
 struct FInteractableData;
 class UInteractionWidget;
@@ -14,36 +14,33 @@ class UMainMenu;
 
 UCLASS()
 
-class IRON_HORIZON_API AIronHorizonHUD : public AHUD
-{
-	GENERATED_BODY()
+class IRON_HORIZON_API AIronHorizonHUD : public AHUD {
+  GENERATED_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<class UMainMenu> MainMenuClass;
+  UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+  TSubclassOf<class UMainMenu> MainMenuClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<class UInteractionWidget> InteractionWidgetClass;
+  UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+  TSubclassOf<class UInteractionWidget> InteractionWidgetClass;
 
-	bool bIsMenuVisible;
+  bool bIsMenuVisible;
 
-	AIronHorizonHUD();
+  AIronHorizonHUD();
 
-	void DisplayMenu();
-	void HideMenu();
-	void ToggleMenu();
+  void DisplayMenu();
+  void HideMenu();
+  void ToggleMenu();
 
-	void ShowInteractionWidget() const;
-	void HideInteractionWidget() const;
-	void UpdateInteractionWidget(const FInteractableData* InteractableData) const;
+  void ShowInteractionWidget() const;
+  void HideInteractionWidget() const;
+  void UpdateInteractionWidget(const FInteractableData *InteractableData) const;
 
 protected:
+  UPROPERTY()
+  UMainMenu *MainMenuWidget;
 
-	UPROPERTY()
-	UMainMenu* MainMenuWidget;
+  UPROPERTY()
+  UInteractionWidget *InteractionWidget;
 
-	UPROPERTY()
-	UInteractionWidget* InteractionWidget;
-
-	virtual void BeginPlay() override;
-
+  virtual void BeginPlay() override;
 };
