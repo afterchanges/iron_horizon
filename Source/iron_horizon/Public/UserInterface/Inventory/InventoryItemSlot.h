@@ -12,6 +12,7 @@ class UTextBlock;
 class UInventoryTooltip;
 class UDragItemVisual;
 class UItemBase;
+
 UCLASS()
 class IRON_HORIZON_API UInventoryItemSlot : public UUserWidget
 {
@@ -20,6 +21,7 @@ class IRON_HORIZON_API UInventoryItemSlot : public UUserWidget
 public:
 	FORCEINLINE void SetItemReference(UItemBase* ItemIn) { ItemReference = ItemIn; }
 	FORCEINLINE UItemBase* GetItemReference() const { return ItemReference; }
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Inventory Slot")
 	UItemBase* ItemReference;

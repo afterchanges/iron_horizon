@@ -11,6 +11,7 @@
 
 class UStaticMeshComponent;
 class AIronHorizonHUD;
+class UItemBase;
 
 USTRUCT()
 struct FInteractionData {
@@ -33,7 +34,7 @@ public:
     AIronHorizonPlayerPawn();
     // Called every frame
     virtual void Tick(float DeltaTime) override;
-    
+
     virtual void SetupPlayerInputComponent(
         class UInputComponent *PlayerInputComponent
     ) override;
@@ -124,6 +125,6 @@ public:
 
     void ToggleMenu();
 
-
+    void DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop);
 
 };

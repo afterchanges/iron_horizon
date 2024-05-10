@@ -47,8 +47,13 @@ void UInventoryTooltip::NativeConstruct()
         StackWeight->SetText(FText::AsNumber(ItemBeingHovered->GetItemStackWeight()));
         SpeedFactor->SetText(FText::AsNumber(ItemBeingHovered->ItemStatistics.SpeedFactor));
 
+        const FString WeightInfo = { "Weight: " + FString::SanitizeFloat(ItemBeingHovered->GetItemStackWeight()) };
+
+        StackWeight->SetText(FText::FromString(WeightInfo));
+
         if (ItemBeingHovered->NumericData.bIsStackable) {
-            MaxStackSize->SetText(FText::AsNumber(ItemBeingHovered->NumericData.MaxStackSize));
+            const FString StackInfo = { "Max stack size: " + FString::FromInt(ItemBeingHovered->NumericData.MaxStackSize) };
+            MaxStackSize->SetText(FText::FromString(StackInfo));
         } else {
             MaxStackSize->SetVisibility(ESlateVisibility::Collapsed);
         }

@@ -42,12 +42,14 @@ void UInventoryComponent::InitializeAdd(const TSubclassOf<UItemBase> BaseClass, 
 
 void UInventoryComponent::InitializeDrop(UItemBase*ItemToDrop, const int32 InQuantity)
 {
-	ItemReference = ItemToDrop;
-	InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
-	ItemReference->NumericData.Weight = ItemToDrop->GetItemSingleWeight();
-	AddMesh->SetStaticMesh(ItemToDrop->AssetData.Mesh);
+	if(ItemToDrop != nullptr) {
+        ItemReference = ItemToDrop;
+        InQuantity <= 0 ? ItemReference->SetQuantity(1) : ItemReference->SetQuantity(InQuantity);
+        ItemReference->NumericData.Weight = ItemToDrop->GetItemSingleWeight();
+        AddMesh->SetStaticMesh(ItemToDrop->AssetData.Mesh);
 
-	UpdateInteractableData();
+        UpdateInteractableData();
+    }
 }
 
 void UInventoryComponent::UpdateInteractableData()

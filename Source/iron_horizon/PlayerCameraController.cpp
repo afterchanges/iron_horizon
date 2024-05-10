@@ -7,6 +7,7 @@
 #include "InputModifiers.h"
 #include "HexTile.h"
 #include "IronHorizonPlayerPawn.h"
+#include "Engine/Engine.h"
 #include "HexGridManager.h"
 
 static void MapKey(
@@ -106,12 +107,12 @@ void APlayerCameraController::OnJKeyPressed() {
             AHexTile* HexTile = Cast<AHexTile>(HitResult.GetActor());
             if (HexTile) {
                 // Change the tile color and type
+                UE_LOG(LogTemp, Warning, TEXT("J MOUSE POSITION: %s"), *HitResult.ImpactPoint.ToString());
                 HexTile->ChangeToRailway();
             }
         }
     }
 }
-
 
 void APlayerCameraController::OnPKeyPressed() {
     UE_LOG(LogTemp, Warning, TEXT("P key pressed"));
@@ -178,6 +179,16 @@ void APlayerCameraController::OnPKeyPressed() {
             UE_LOG(LogTemp, Warning, TEXT("No hit result at screen position"));
         }
     } else {
+
         UE_LOG(LogTemp, Warning, TEXT("Failed to get mouse position"));
     }
+}
+
+void APlayerCameraController::BeginPlay() {
+    Super::BeginPlay();
+
+    // Enable the mouse for the player controller
+    this->bShowMouseCursor = true;
+    this->bEnableClickEvents = true;
+    this->bEnableMouseOverEvents = true;
 }

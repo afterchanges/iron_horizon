@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "PlayerCameraController.generated.h"
 
+class UInventoryItemSlot;
+class UItemBase;
 UCLASS()
 class IRON_HORIZON_API APlayerCameraController : public APlayerController {
     GENERATED_BODY()
@@ -42,9 +44,16 @@ public:
     UPROPERTY(EditAnywhere, Category = "Camera movement")
     class UInputAction *SpringArmLengthAction;
 
+    UPROPERTY()
+    UInventoryItemSlot* InventoryItemSlot;
+
     virtual void SetupInputComponent() override;
 
     void OnJKeyPressed();
 
     void OnPKeyPressed();
+
+    virtual void BeginPlay() override;
+
+    bool GetCursorPosition(FVector2D& CursorPosition) const;
 };

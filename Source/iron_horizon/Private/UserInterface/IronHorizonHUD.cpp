@@ -2,6 +2,7 @@
 #include "UserInterface/IronHorizonHUD.h"
 #include "UserInterface/MainMenu.h"
 #include "UserInterface/Interaction/InteractionWidget.h"
+#include "../IronHorizonPlayerPawn.h"
 
 AIronHorizonHUD::AIronHorizonHUD()
 {
@@ -33,6 +34,10 @@ void AIronHorizonHUD::DisplayMenu()
     {
         bIsMenuVisible = true;
         MainMenuWidget->SetVisibility(ESlateVisibility::Visible);
+
+        FInputModeGameAndUI InputMode;
+        GetOwningPlayerController()->SetInputMode(InputMode);
+        GetOwningPlayerController()->bShowMouseCursor = true;
     }
 }
 
@@ -42,6 +47,9 @@ void AIronHorizonHUD::HideMenu()
     {
         bIsMenuVisible = false;
         MainMenuWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+        FInputModeGameAndUI InputMode;
+        GetOwningPlayerController()->SetInputMode(InputMode);
     }
 }
 
@@ -51,15 +59,15 @@ void AIronHorizonHUD::ToggleMenu()
     {
         HideMenu();
         FInputModeGameAndUI InputMode;
-        InputMode.SetWidgetToFocus(TSharedPtr<SWidget>());
         GetOwningPlayerController()->SetInputMode(InputMode);
+        GetOwningPlayerController()->bShowMouseCursor = true;
     }
     else
     {
         DisplayMenu();
         FInputModeGameAndUI InputMode;
-        InputMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
         GetOwningPlayerController()->SetInputMode(InputMode);
+        GetOwningPlayerController()->bShowMouseCursor = true;
     }
 }
 

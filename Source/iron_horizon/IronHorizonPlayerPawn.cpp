@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "PlayerCameraController.h"
 #include "Items/ItemBase.h"
+#include "HexTile.h"
 
 
 // Sets default values
@@ -172,17 +173,21 @@ void AIronHorizonPlayerPawn::BeginPlay() {
 );
 
 
-    UItemBase* SurfaceItem = NewObject<UItemBase>(UItemBase::StaticClass());
-    SurfaceItem->ItemType = EItemType::Surface_Railway;
-    SurfaceItem->ID = "1";
-    PlayerInventory->DesiredItemID = "1";
-    PlayerInventory->AddNewItem(SurfaceItem, 1);
+    for (int i = 0; i < 5; ++i) {
+        UItemBase* SurfaceItem = NewObject<UItemBase>(UItemBase::StaticClass());
+        SurfaceItem->ItemType = EItemType::Surface_Railway;
+        SurfaceItem->ID = "1";
+        PlayerInventory->DesiredItemID = "1";
+        PlayerInventory->AddNewItem(SurfaceItem, 1);
+    }
 
-    UItemBase* TunnelItem = NewObject<UItemBase>(UItemBase::StaticClass());
-    TunnelItem->ItemType = EItemType::Tunnel_Railway;
-    TunnelItem->ID = "2";
-    PlayerInventory->DesiredItemID = "2";
-    PlayerInventory->AddNewItem(TunnelItem, 2);
+    for (int i = 0; i < 5; ++i) {
+        UItemBase* TunnelItem = NewObject<UItemBase>(UItemBase::StaticClass());
+        TunnelItem->ItemType = EItemType::Tunnel_Railway;
+        TunnelItem->ID = "2";
+        PlayerInventory->DesiredItemID = "2";
+        PlayerInventory->AddNewItem(TunnelItem, 2);
+    }
     
     HUD = Cast<AIronHorizonHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
@@ -195,6 +200,7 @@ void AIronHorizonPlayerPawn::BeginPlay() {
         PlayerController->bShowMouseCursor = true; 
         PlayerController->bEnableClickEvents = true; 
         PlayerController->bEnableMouseOverEvents = true;
+        PlayerController->SetIgnoreLookInput(true);
     }
 }
 
@@ -206,4 +212,20 @@ void AIronHorizonPlayerPawn::UpdateInteractionWidget() const {
 
 void AIronHorizonPlayerPawn::ToggleMenu() {
     HUD->ToggleMenu();
+}
+
+void AIronHorizonPlayerPawn::DropItem(UItemBase *ItemToDrop, const int32 QuantityToDrop) {
+    if (ItemToDrop) {
+        // Create a new InventoryComponent to hold the dropped item
+        UInventoryComponent* DroppedItem = NewObject<UInventoryComponent>(this, UInventoryComponent::StaticClass());
+
+        // Initialize the dropped item with the item to drop and the quantity to drop
+        DroppedItem->InitializeDrop(ItemToDrop, QuantityToDrop);
+
+        // Remove the item from the player's inventory
+        PlayerInventory->RemoveAmountOfItem(ItemToDrop, QuantityToDrop);
+
+        // Add the dropped item to the world
+        DroppedItem->RegisterComponent();
+    }
 }

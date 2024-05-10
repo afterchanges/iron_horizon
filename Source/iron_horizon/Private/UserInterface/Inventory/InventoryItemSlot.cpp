@@ -7,6 +7,10 @@
 #include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "UserInterface/Inventory/DragItemVisual.h"
+#include "UserInterface/Inventory/ItemDragDropOperation.h"
+#include "../PlayerCameraController.h"
+#include "../HexTile.h"
 
 void UInventoryItemSlot::NativeConstruct()
 {
@@ -48,7 +52,13 @@ void UInventoryItemSlot::NativeOnInitialized()
 
 FReply UInventoryItemSlot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-    return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+    FReply Reply =  Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    {
+        return Reply.Handled().DetectDrag(TakeWidget(), EKeys::LeftMouseButton);
+    }
+    return Reply.Unhandled();
 }
 
 void UInventoryItemSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
@@ -59,9 +69,42 @@ void UInventoryItemSlot::NativeOnMouseLeave(const FPointerEvent& InMouseEvent)
 void UInventoryItemSlot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
     Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+    if (DragItemVisualClass) {
+        UWorld* World = GetWorld();
+        if (World) {
+            const TObjectPtr<UDragItemVisual> DragVisual = CreateWidget<UDragItemVisual>(this, TSubclassOf<UUserWidget>(DragItemVisualClass));
+            DragVisual->ItemIcon->SetBrushFromTexture(ItemReference->AssetData.Icon);
+            DragVisual->ItemBorder->SetBrushColor(ItemBorder->GetBrushColor());
+            DragVisual->ItemQuantity->SetText(FText::AsNumber(ItemReference->Quantity));
+
+            UItemDragDropOperation* DragItemOperation = NewObject<UItemDragDropOperation>();
+            DragItemOperation->SourceItem = ItemReference;
+            DragItemOperation->SourceInventory = ItemReference->OwningInventory;
+
+            DragItemOperation->DefaultDragVisual = DragVisual;
+            DragItemOperation->Pivot = EDragPivot::TopLeft;
+
+            OutOperation = DragItemOperation;
+        }
+    }
 }
 
 bool UInventoryItemSlot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
-    return Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+    Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+
+     APlayerController* PC = GetWorld()->GetFirstPlayerController();
+    if (PC)
+    {
+        // Cast to APlayerCameraController
+        APlayerCameraController* PCC = Cast<APlayerCameraController>(PC);
+        if (PCC)
+        {
+            // Call the function
+            PCC->OnJKeyPressed();
+        }
+    }
+
+    return true;
 }
