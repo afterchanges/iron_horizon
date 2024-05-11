@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InteractionInterface.generated.h"
 #include "UObject/Interface.h"
+#include "InteractionInterface.generated.h"
 
 class AIronHorizonPlayerPawn;
 

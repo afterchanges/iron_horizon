@@ -2,8 +2,8 @@
 
 #include "../IronHorizonPlayerPawn.h"
 #include "CoreMinimal.h"
-#include "ItemBase.generated.h"
 #include "Items/ItemDataStructs.h"
+#include "ItemBase.generated.h"
 
 class UInventoryComponent;
 

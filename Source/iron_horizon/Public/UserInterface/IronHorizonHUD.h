@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "Interaction/InteractionWidget.h"
-#include "IronHorizonHUD.generated.h"
 #include "MainMenu.h"
+#include "IronHorizonHUD.generated.h"
 
 struct FInteractableData;
 class UInteractionWidget;
