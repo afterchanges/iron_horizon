@@ -80,7 +80,7 @@ struct HexTileNodeScoreComparator {
     }
 };
 
-TArray<FIntPoint> AHexGridManager::HexGridAStar(AHexTile* StartTile, AHexTile* EndTile, AHexGridManager* hexGridManagerInstance) {
+TArray<FIntPoint> AHexGridManager::HexGridAStar(AHexTile* StartTile, AHexTile* EndTile) {
     TArray<HexTileNode *> OpenSet;
     TMap<FIntPoint, HexTileNode *> OpenSetMap;
     TSet<FIntPoint> ClosedSet;
@@ -111,8 +111,7 @@ TArray<FIntPoint> AHexGridManager::HexGridAStar(AHexTile* StartTile, AHexTile* E
         }
 
         ClosedSet.Add(CurrentNode->GridPositionIndex);
-        TArray<AHexTile *> Neighbors =
-            hexGridManagerInstance->GetNeighbors(CurrentNode->GridPositionIndex);
+        TArray<AHexTile *> Neighbors = GetNeighbors(CurrentNode->GridPositionIndex);
         for (AHexTile *Neighbor : Neighbors) {
             if (ClosedSet.Contains(Neighbor->GridPositionIndex)) {
                 continue;

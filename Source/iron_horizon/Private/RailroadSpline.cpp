@@ -51,6 +51,10 @@ void ARailroadSpline::OnEndMovementTimeline() {
 	// Set the actor location to the end of the spline
 	FVector Location = ThisRailroadSpline->GetLocationAtSplinePoint(ThisSplinePoints.Num() - 1, ESplineCoordinateSpace::World);
 	SetActorLocation(Location);
+	ThisRailroadSpline->ClearSplinePoints();
+	ThisSplinePoints.Reverse();
+	ThisRailroadSpline->SetSplinePoints(ThisSplinePoints);
+	ThisRailroadSpline->UpdateSpline();
 }
 
 void ARailroadSpline::BeginMovement() {

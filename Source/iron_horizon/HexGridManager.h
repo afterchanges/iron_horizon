@@ -28,8 +28,7 @@ public:
         void generateCities(int numCities);
         TArray<FIntPoint> determineCities();
         bool allCitiesConnected();
-        TArray<FIntPoint> HexGridAStar(AHexTile *StartTile, AHexTile *EndTile,
-                                 AHexGridManager *hexGridManagerInstance);
+        TArray<FIntPoint> HexGridAStar(AHexTile *StartTile, AHexTile *EndTile);
 
         void generateHexGrid();
         AHexTile* GetTileAtPosition(const FIntPoint &GridPositionIndex);
