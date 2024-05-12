@@ -1,25 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "RailroadSpline.h"
+#include "Algo/Reverse.h"
 
 // Sets default values
 ARailroadSpline::ARailroadSpline()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ThisRailroadSpline = CreateDefaultSubobject<SplineComponent>(TEXT("RailroadSpline"));
-	SplineComponent->SetAttachment(GetRootComponent());
+	ThisRailroadSpline = CreateDefaultSubobject<USplineComponent>(TEXT("RailroadSpline"));
+	ThisRailroadSpline->SetupAttachment(GetRootComponent());
 
 	ThisRailroadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RailroadMesh"));
-	ThisRailroadMesh->SetAttachment(ThisRailroadSpline);
+	ThisRailroadMesh->SetupAttachment(ThisRailroadSpline);
 }
 
 void ARailroadSpline::SetRailroadSplinePoints(TArray<FVector3d> SplinePoints) {
 	ThisSplinePoints = SplinePoints;
-	ThisRailroadSpline->SetSplinePoints(ThisSplinePoints);
+	ThisRailroadSpline->SetSplinePoints(ThisSplinePoints, ESplineCoordinateSpace::World, true);
 	ThisRailroadSpline->SetClosedLoop(false);
-	ThisRailroadSpline->UpdateSpline();
 	ThisSplineLength = ThisRailroadSpline->GetSplineLength();
 }
 // Called when the game starts or when spawned
@@ -44,7 +41,7 @@ void ARailroadSpline::ProcessMovementTimeline(float Value) {
 	FVector CurrentSplineLocation = ThisRailroadSpline->GetLocationAtDistanceAlongSpline(ThisSplineLength * Value, ESplineCoordinateSpace::World);
 	FRotator CurrentSplineRotation = ThisRailroadSpline->GetRotationAtDistanceAlongSpline(ThisSplineLength * Value, ESplineCoordinateSpace::World);
 
-	MeshComponent->SetWorldLocationAndRotation(CurrentSplineLocation, CurrentSplineRotation);
+	ThisRailroadMesh->SetWorldLocationAndRotation(CurrentSplineLocation, CurrentSplineRotation);
 }
 
 void ARailroadSpline::OnEndMovementTimeline() {
@@ -52,23 +49,18 @@ void ARailroadSpline::OnEndMovementTimeline() {
 	FVector Location = ThisRailroadSpline->GetLocationAtSplinePoint(ThisSplinePoints.Num() - 1, ESplineCoordinateSpace::World);
 	SetActorLocation(Location);
 	ThisRailroadSpline->ClearSplinePoints();
-	ThisSplinePoints.Reverse();
-	ThisRailroadSpline->SetSplinePoints(ThisSplinePoints);
-	ThisRailroadSpline->UpdateSpline();
+	Algo::Reverse(ThisSplinePoints);
+	ThisRailroadSpline->SetSplinePoints(ThisSplinePoints, ESplineCoordinateSpace::World, true);
 }
 
 void ARailroadSpline::BeginMovement() {
-	MovementTimeline = NewObject<UTimelineComponent>(this, FName("MovementTimeline"));
-	MovementTimeline->CreationMethod = EComponentCreationMethod::UserConstructionScript;
-	this->BlueprintCreatedComponents.Add(MovementTimeline);
-	MovementTimeline->SetNetAddressable();
-	MovementTimeline->SetPropertySetObject(this);
-
-	MovementTimeline->AddInterpFloat(MovementCurve, FOnTimelineFloat(), FName("ProcessMovementTimeline"));
-	MovementTimeline->SetTimelineFinishedFunc(FOnTimelineEvent(), FName("OnEndMovementTimeline"));
-
-	MovementTimeline->SetTimelineLength(ThisSplineLength);
-	MovementTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_LastKeyFrame);
-
+	MovementTimeline = new FTimeline();
+	FOnTimelineFloat ProcessFunction;
+	ProcessFunction.BindUFunction(this, FName("ProcessMovementTimeline"));
+	FOnTimelineEvent EndFunction;
+	EndFunction.BindUFunction(this, FName("OnEndMovementTimeline"));
+	MovementTimeline->AddInterpFloat(MovementCurve, ProcessFunction);
+	MovementTimeline->SetTimelineFinishedFunc(EndFunction);
+	MovementTimeline->SetLooping(false);
 	MovementTimeline->PlayFromStart();
 }

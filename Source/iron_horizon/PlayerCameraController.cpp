@@ -150,7 +150,7 @@ void APlayerCameraController::OnPKeyPressed() {
 
                         // Call the A* algorithm function
                         TArray<FIntPoint> Path = HexGridManager->HexGridAStar(
-                            AHexTile::StartTile, AHexTile::EndTile, HexGridManager
+                            AHexTile::StartTile, AHexTile::EndTile
                         );
                         UE_LOG(LogTemp, Warning, TEXT("Shortest path length: %d"), Path.Num());
                         // Iterate over the tiles in the path and change their type
