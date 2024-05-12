@@ -5,32 +5,29 @@
 #include "GameFramework/Actor.h"
 #include "HexTile.generated.h"
 
-class UStaticMeshComponent;
-
 UENUM()
-enum class HexTileType : uint8
-{
-	DEFAULT,
-	GRASS,
-	FOREST,
-	MOUNTAIN,
-	WATER,
-	DESERT,
-	CITY,
-	MAX UMETA(Hidden)
+enum class HexTileType : uint8 {
+  DEFAULT,
+  GRASS,
+  FOREST,
+  MOUNTAIN,
+  WATER,
+  DESERT,
+  CITY,
+  RAILWAY,
+  MAX UMETA(Hidden)
 };
 
 UCLASS()
-class IRON_HORIZON_API AHexTile : public AActor
-{
-	GENERATED_BODY()
+class IRON_HORIZON_API AHexTile : public AActor {
+  GENERATED_BODY()
 
 public:
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
-	FIntPoint GridPositionIndex;
+  UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
+  FIntPoint GridPositionIndex;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
-    FIntPoint NormalizedGridPositionIndex;
+  UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
+  FIntPoint NormalizedGridPositionIndex;
 
 	FIntVector CubeCoordinates; // first one is bottom-right to top-left, second is top-bottom (same as y), third is bottom-left to top-right (optional for axial coordinates)
 	// top-left coordinate in cube coordinates is (0, 0, 0) 
@@ -40,7 +37,29 @@ public:
 	void SetTileType(HexTileType NewType);
 	void AddPrestige(int prestige_value);
 
-	HexTileType GetTileType() const;
+  HexTileType GetTileType() const;
+
+  UPROPERTY(EditAnywhere, Category = "Materials")
+  UMaterialInterface *DefaultMaterial;
+
+  UPROPERTY(EditAnywhere, Category = "Materials")
+  UMaterialInterface *HighlightMaterial;
+
+  UPROPERTY(EditAnywhere, Category = "Materials")
+  UMaterialInterface *RailwayMaterial;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HexTile")
+  UStaticMeshComponent *TileMesh;
+
+  UFUNCTION()
+  void OnBeginCursorOver(UPrimitiveComponent *TouchedComponent);
+
+  UFUNCTION()
+  void OnEndCursorOver(UPrimitiveComponent *TouchedComponent);
+
+  void ChangeToRailway();
+
+  FString HexTileTypeToString(HexTileType Type);
 
 public:
 	bool hasForest = false;
@@ -52,17 +71,14 @@ public:
 	bool isWater = false;
 	bool isBuildable = false;
 
-	int prestige = 0;
+  int prestige = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
 	HexTileType TileType;
-
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
-	UStaticMeshComponent* TileMesh;
 	
 public:    
 	AHexTile();
 
+  static AHexTile *StartTile;
+  static AHexTile *EndTile;
 };
