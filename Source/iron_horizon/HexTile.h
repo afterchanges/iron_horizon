@@ -5,76 +5,84 @@
 #include "GameFramework/Actor.h"
 #include "HexTile.generated.h"
 
+
 UENUM()
-enum class HexTileType : uint8 {
-  DEFAULT,
-  GRASS,
-  FOREST,
-  MOUNTAIN,
-  WATER,
-  DESERT,
-  CITY,
-  RAILWAY,
-  MAX UMETA(Hidden)
+enum class HexTileType : uint8
+{
+	DEFAULT,
+	GRASS,
+	FOREST,
+	MOUNTAIN,
+	WATER,
+	DESERT,
+	CITY,
+	RAILWAY,
+	MAX UMETA(Hidden)
 };
 
+
 UCLASS()
-class IRON_HORIZON_API AHexTile : public AActor {
-  GENERATED_BODY()
+class IRON_HORIZON_API AHexTile : public AActor
+{
+	GENERATED_BODY()
 
 public:
-  UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
-  FIntPoint GridPositionIndex;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
+	FIntPoint GridPositionIndex;
 
-  UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
-  FIntPoint NormalizedGridPositionIndex;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "HexTile")
+    FIntPoint NormalizedGridPositionIndex;
 
-  void SetColor(FLinearColor NewColor);
+	void SetColor(FLinearColor NewColor);
 
-  void SetTileType(HexTileType NewType);
+	void SetTileType(HexTileType NewType);
 
-  HexTileType GetTileType() const;
+	HexTileType GetTileType() const;
 
-  UPROPERTY(EditAnywhere, Category = "Materials")
-  UMaterialInterface *DefaultMaterial;
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* DefaultMaterial;
 
-  UPROPERTY(EditAnywhere, Category = "Materials")
-  UMaterialInterface *HighlightMaterial;
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* HighlightMaterial;
 
-  UPROPERTY(EditAnywhere, Category = "Materials")
-  UMaterialInterface *RailwayMaterial;
+	UPROPERTY(EditAnywhere, Category = "Materials")
+	UMaterialInterface* RailwayMaterial;
 
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HexTile")
-  UStaticMeshComponent *TileMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HexTile")
+	UStaticMeshComponent* TileMesh;
 
-  UFUNCTION()
-  void OnBeginCursorOver(UPrimitiveComponent *TouchedComponent);
+	UFUNCTION()
+	void OnBeginCursorOver(UPrimitiveComponent* TouchedComponent);
 
-  UFUNCTION()
-  void OnEndCursorOver(UPrimitiveComponent *TouchedComponent);
+	UFUNCTION()
+	void OnEndCursorOver(UPrimitiveComponent* TouchedComponent);
 
-  void ChangeToRailway();
+	void ChangeToRailway();
 
-  FString HexTileTypeToString(HexTileType Type);
+	FString HexTileTypeToString(HexTileType Type);
 
 protected:
-  bool hasForest = false;
-  bool isRiverStart = false;
-  bool isRiverEnd = false;
-  bool isRiverSegment = false;
-  bool isRailroad = false;
-  bool isCity = false;
-  bool isWater = false;
-  bool isBuildable = false;
 
-  int prestige = 0;
+	bool hasForest = false;
+	bool isRiverStart = false;
+	bool isRiverEnd = false;
+	bool isRiverSegment = false;
+	bool isRailroad = false;
+	bool isCity = false;
+	bool isWater = false;
+	bool isBuildable = false;
 
-  UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
-  HexTileType TileType;
+	int prestige = 0;
 
-public:
-  AHexTile();
 
-  static AHexTile *StartTile;
-  static AHexTile *EndTile;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HexTile")
+	HexTileType TileType;
+
+	
+public:    
+	AHexTile();
+
+	static AHexTile* StartTile;
+    static AHexTile* EndTile;
+
 };
