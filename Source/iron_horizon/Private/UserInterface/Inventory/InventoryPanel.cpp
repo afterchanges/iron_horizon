@@ -40,10 +40,10 @@ void UInventoryPanel::RefreshInventory() {
   if (InventoryReference && InventorySlotClass) {
     InventoryPanel->ClearChildren();
     for (UItemBase *const &Item : InventoryReference->GetInventoryContents()) {
-      UInventoryItemSlot *CurrentSlot =
+      UInventoryItemSlot *Slot =
           CreateWidget<UInventoryItemSlot>(this, InventorySlotClass);
-      CurrentSlot->SetItemReference(Item);
-      InventoryPanel->AddChildToWrapBox(CurrentSlot);
+      Slot->SetItemReference(Item);
+      InventoryPanel->AddChildToWrapBox(Slot);
     }
     UE_LOG(LogTemp, Warning, TEXT("Inventory refreshed"));
     SetInfoText();
