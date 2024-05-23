@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "HexTile.h"
+#include "HexGridManager.h"
 #include <Components/SceneComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <UObject/ConstructorHelpers.h>
@@ -38,12 +39,12 @@ AHexTile *AHexTile::StartTile = nullptr;
 AHexTile *AHexTile::EndTile = nullptr;
 
 void AHexTile::OnBeginCursorOver(UPrimitiveComponent *TouchedComponent) {
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT("Highlighted tile: %s"),
-        GridPositionIndex.ToString().GetCharArray().GetData()
-    );
+    // UE_LOG(
+    //     LogTemp,
+    //     Warning,
+    //     TEXT("Highlighted tile: %s"),
+    //     GridPositionIndex.ToString().GetCharArray().GetData()
+    // );
     DefaultMaterial = TileMesh->GetMaterial(0);
 
     TileMesh->SetMaterial(0, HighlightMaterial);

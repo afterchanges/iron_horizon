@@ -127,7 +127,7 @@ void AIronHorizonPlayerPawn::UpdateCameraPosition() {
         } else {
             // Add this line to print a debug message when the mouse position cannot
             // be obtained
-            UE_LOG(LogTemp, Warning, TEXT("Could not get mouse position"));
+            // UE_LOG(LogTemp, Warning, TEXT("Could not get mouse position"));
         }
     }
 }

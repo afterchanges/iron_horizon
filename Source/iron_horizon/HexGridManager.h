@@ -2,61 +2,83 @@
 #pragma once
 
 #include "HexTile.h"
+#include "Public/RailroadSpline.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "HexGridManager.generated.h"
 
+class IronHorizonCity {
+public:
+    int city_id;
+    TSet<IronHorizonCity *> connected_cities;
+    AHexTile *this_tile;
+};
+
+class IronHorizonRailroadTile {
+public:
+    TSet<IronHorizonCity *> connected_cities;
+    AHexTile *this_tile;
+};
+
 UCLASS()
+
 class IRON_HORIZON_API AHexGridManager : public AActor {
-  GENERATED_BODY()
+    GENERATED_BODY()
 
 protected:
-	TArray<TArray<AHexTile*>> HexGridLayout;
-    TMap<FIntVector, AHexTile*> HexGridLayoutAxial;
-    
+    TArray<TArray<AHexTile *>> HexGridLayout;
+    TMap<FIntVector, AHexTile *> HexGridLayoutAxial;
+    TMap<FIntVector, IronHorizonRailroadTile *> RailroadTiles;
+    TMap<FIntVector, IronHorizonCity *> Cities;
+    TArray<ARailroadSpline *> RailroadSplines;
+
     UPROPERTY(EditAnywhere, Category = "HexGridLayout")
-	int32 GridWidth;
-	UPROPERTY(EditAnywhere, Category = "HexGridLayout")
-	int32 GridHeight;
-	UPROPERTY(EditAnywhere, Category = "HexGridManager")
-	float HexTileSize;
-
-public: 
-        AHexGridManager();
-
-        void generateCities(int numCities);
-        TArray<FIntPoint> determineCities();
-        bool allCitiesConnected();
-        TArray<FIntPoint> HexGridAStar(AHexTile *StartTile, AHexTile *EndTile);
-
-        void generateHexGrid();
-        AHexTile* GetTileAtPosition(const FIntPoint &GridPositionIndex);
-        TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
-        TArray<AHexTile *> GetNeighborsOnRingOfRadius(AHexTile*, int32 radius);
-
-        float GetTilePrestige(const FIntVector &GridPositionIndex);
-        void SetTilesPrestige();
+    int32 GridWidth;
+    UPROPERTY(EditAnywhere, Category = "HexGridLayout")
+    int32 GridHeight;
+    UPROPERTY(EditAnywhere, Category = "HexGridManager")
+    float HexTileSize;
 
 public:
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> GrassHexTile;
+    AHexGridManager();
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> WaterHexTile;
+    TArray<AHexTile*> generateCities(int numCities);
+    TArray<FIntPoint> determineCities();
+    bool allCitiesConnected();
+    TArray<AHexTile *> HexGridAStar(AHexTile *StartTile, AHexTile *EndTile);
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> ForestHexTile;
+    void generateHexGrid();
+    AHexTile *GetTileAtPosition(const FIntPoint &GridPositionIndex);
+    TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
+    TArray<AHexTile *> GetNeighborsOnRingOfRadius(AHexTile *, int32 radius);
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> MountainHexTile;
+    float GetTilePrestige(const FIntVector &GridPositionIndex);
+    void SetTilesPrestige();
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> DesertHexTile;
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> CityHexTile;
+    void AddNewRailroadTile(AHexTile *NewTile);
+    void AdjustCityConnections(AHexTile *NewTile);
+    void AddNewCityConnection(AHexTile *city_1, AHexTile *city_2);
+
+public:
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> GrassHexTile;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> WaterHexTile;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> ForestHexTile;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> MountainHexTile;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> DesertHexTile;
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> CityHexTile;
 
 protected:
-  // Called when the game starts or when spawned
-  virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 };

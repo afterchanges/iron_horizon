@@ -149,13 +149,11 @@ void APlayerCameraController::OnPKeyPressed() {
                         UE_LOG(LogTemp, Warning, TEXT("HexGridManager instance obtained"));
 
                         // Call the A* algorithm function
-                        TArray<FIntPoint> Path = HexGridManager->HexGridAStar(
-                            AHexTile::StartTile, AHexTile::EndTile
-                        );
+                        TArray<AHexTile*> Path =
+                            HexGridManager->HexGridAStar(AHexTile::StartTile, AHexTile::EndTile);
                         UE_LOG(LogTemp, Warning, TEXT("Shortest path length: %d"), Path.Num());
                         // Iterate over the tiles in the path and change their type
-                        for (FIntPoint Point : Path) {
-                            AHexTile *Tile = HexGridManager->GetTileAtPosition(Point);
+                        for (auto Tile : Path) {
                             if (Tile) { Tile->ChangeToRailway(); }
                         }
 

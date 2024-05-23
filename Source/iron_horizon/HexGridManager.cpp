@@ -2,6 +2,7 @@
 #include "Containers/Map.h"
 #include "Math/UnrealMathUtility.h"
 #include "PerlinNoise.hpp"
+#include "Public/RailroadSpline.h"
 #include "TIntPointHash.h"
 #include "astar.hpp"
 
@@ -164,7 +165,8 @@ AHexTile *AHexGridManager::GetTileAtPosition(const FIntPoint &GridPositionIndex)
     return HexGridLayout[GridPositionIndex.X][GridPositionIndex.Y];
 }
 
-void AHexGridManager::generateCities(int numCities) {
+TArray<AHexTile*> AHexGridManager::generateCities(int numCities) {
+    TArray<AHexTile*> cities;
     for (int i = 0; i < numCities; ++i) {
         int x, y;
         do {
@@ -173,8 +175,9 @@ void AHexGridManager::generateCities(int numCities) {
         } while (x >= HexGridLayout.Num() || y >= HexGridLayout[x].Num() || !HexGridLayout[x][y] ||
                  HexGridLayout[x][y]->GetTileType() == HexTileType::CITY);
 
-        if (HexGridLayout[x][y]) { HexGridLayout[x][y]->SetTileType(HexTileType::CITY); }
+        if (HexGridLayout[x][y]) { cities.Add(HexGridLayout[x][y]); }
     }
+    return cities;
 }
 
 TArray<FIntPoint> AHexGridManager::determineCities() {
@@ -206,27 +209,27 @@ void AHexGridManager::SetTilesPrestige() {
                         current_tile->CubeCoordinates.Z - neighbor.X - neighbor.Y
                     );
                     if (HexGridLayoutAxial.Contains(neighbor_cube_coords)) {
-                        UE_LOG(
-                            LogTemp,
-                            Warning,
-                            TEXT("Neighbor at (%d, %d) has prestige value of (%f)"),
-                            neighbor_cube_coords.X,
-                            neighbor_cube_coords.Y,
-                            GetTilePrestige(neighbor_cube_coords)
-                        );
+                        // UE_LOG(
+                        //     LogTemp,
+                        //     Warning,
+                        //     TEXT("Neighbor at (%d, %d) has prestige value of (%f)"),
+                        //     neighbor_cube_coords.X,
+                        //     neighbor_cube_coords.Y,
+                        //     GetTilePrestige(neighbor_cube_coords)
+                        // );
                         current_tile->prestige += GetTilePrestige(neighbor_cube_coords) *
                                                   PrestigeRangeInfluenceModifier[radius];
                     }
                 }
             }
-            UE_LOG(
-                LogTemp,
-                Warning,
-                TEXT("Tile at (%d, %d) has prestige %f"),
-                x,
-                y,
-                current_tile->prestige
-            );
+            // UE_LOG(
+            //     LogTemp,
+            //     Warning,
+            //     TEXT("Tile at (%d, %d) has prestige %f"),
+            //     x,
+            //     y,
+            //     current_tile->prestige
+            // );
         }
     }
 }
@@ -243,6 +246,54 @@ float redistributeHeights(float x) {
     // - 217.915 * x * x + 52.8798 * x - 5);
     return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x -
            217.915 * x * x + 52.8798 * x - 5;
+}
+
+void AHexGridManager::AddNewRailroadTile(AHexTile *NewTile) {
+    IronHorizonRailroadTile *NewRailroadTile = new IronHorizonRailroadTile();
+    NewRailroadTile->this_tile = NewTile;
+    for (auto neighbor : GetNeighbors(NewTile->GridPositionIndex)) {
+        if (neighbor->GetTileType() == HexTileType::CITY) {
+            NewRailroadTile->connected_cities.Add(Cities[neighbor->CubeCoordinates]);
+        }
+        if (neighbor->GetTileType() == HexTileType::RAILWAY) {
+            NewRailroadTile->connected_cities.Append(
+                RailroadTiles[neighbor->CubeCoordinates]->connected_cities
+            );
+        }
+    }
+    RailroadTiles.Add(NewTile->CubeCoordinates, NewRailroadTile);
+    for (auto city_1 : NewRailroadTile->connected_cities) {
+        for (auto city_2 : NewRailroadTile->connected_cities) {
+            if (city_1 != city_2 && !city_1->connected_cities.Contains(city_2)) {
+                city_1->connected_cities.Add(city_2);
+                city_2->connected_cities.Add(city_1);
+                UE_LOG(
+                    LogTemp,
+                    Warning,
+                    TEXT("Connecting city %d to city %d"),
+                    city_1->this_tile->GridPositionIndex.X,
+                    city_2->this_tile->GridPositionIndex.X
+                );
+                AddNewCityConnection(
+                    HexGridLayoutAxial[city_1->this_tile->CubeCoordinates],
+                    HexGridLayoutAxial[city_2->this_tile->CubeCoordinates]
+                );
+            }
+        }
+    }
+}
+
+void AHexGridManager::AddNewCityConnection(AHexTile *city_1, AHexTile *city_2) {
+    if (city_1->GetTileType() != HexTileType::CITY || city_2->GetTileType() != HexTileType::CITY) {
+        return;
+    }
+    TArray<AHexTile *> path = HexGridAStar(city_1, city_2);
+    ARailroadSpline *NewSpline =
+        GetWorld()->SpawnActor<ARailroadSpline>(ARailroadSpline::StaticClass());
+    TArray<FVector3d> path_central_points;
+    for (auto point : path) { path_central_points.Add(point->GetActorLocation()); }
+    NewSpline->SetRailroadSplinePoints(path_central_points);
+    RailroadSplines.Add(NewSpline);
 }
 
 // Called when the game starts or when spawned
@@ -321,11 +372,11 @@ void AHexGridManager::BeginPlay() {
 
     SetTilesPrestige();
 
-    TArray<FIntPoint> cities;
+    TArray<AHexTile*> cities;
     bool allCitiesConnected = false;
     while (!allCitiesConnected) {
-        // generateCities(5);  // Generate 5 cities
-        cities = determineCities();
+        cities = generateCities(5);  // Generate 5 cities
+        // cities = determineCities();
         allCitiesConnected = true;
 
         for (size_t i = 0; i < cities.Num(); ++i) {
@@ -344,26 +395,35 @@ void AHexGridManager::BeginPlay() {
         }
 
         if (allCitiesConnected) {
-            for (FIntPoint city : cities) {
-                AHexTile *tile = HexGridLayout[city.X][city.Y];
-                if (tile) {
-                    tile->Destroy();  // Despawn the current tile
+            for (AHexTile* city : cities) {
+                UE_LOG(LogTemp, Warning, TEXT("Trying to spawn a city at (%d, %d)"), city->GridPositionIndex.X, city->GridPositionIndex.Y);
+                if (city) {
+                    city->Destroy();  // Despawn the current tile
 
                     // Spawn a new tile of CITY class
-                    FVector Location = tile->GetActorLocation();
+                    FVector Location = city->GetActorLocation();
                     UWorld *World = GetWorld();
                     if (World) {
                         AHexTile *NewTile = World->SpawnActor<AHexTile>(
                             CityHexTile, Location, FRotator::ZeroRotator
                         );
                         if (NewTile) {
-                            NewTile->GridPositionIndex = FIntPoint(city.X, city.Y);
-                            HexGridLayout[city.X][city.Y] = NewTile;
-                            UE_LOG(LogTemp, Warning, TEXT("City at (%d, %d)"), city.X, city.Y);
+                            NewTile->GridPositionIndex = FIntPoint(city->GridPositionIndex.X, city->GridPositionIndex.Y);
+                            NewTile->CubeCoordinates = city->CubeCoordinates;
+                            HexGridLayout[city->GridPositionIndex.X][city->GridPositionIndex.Y] = NewTile;
+                            UE_LOG(LogTemp, Warning, TEXT("City at (%d, %d)"), city->GridPositionIndex.X, city->GridPositionIndex.Y);
                         }
+                        IronHorizonCity *NewCity = new IronHorizonCity();
+                        NewCity->this_tile = NewTile;
+                        NewCity->connected_cities = TSet<IronHorizonCity *>();
+                        NewCity->connected_cities.Add(NewCity);
+                        Cities.Add(NewTile->CubeCoordinates, NewCity);
+                        UE_LOG(LogTemp, Warning, TEXT("Added city to map"));
                     }
                 }
             }
         }
+        
+        UE_LOG(LogTemp, Warning, TEXT("Number of cities: %d"), Cities.Num());
     }
 }
