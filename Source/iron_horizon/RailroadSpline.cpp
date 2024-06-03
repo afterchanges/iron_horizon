@@ -4,6 +4,7 @@
 // Sets default values
 ARailroadSpline::ARailroadSpline()
 {
+	UE_LOG(LogTemp, Warning, TEXT("RailroadSpline Constructor called"));
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	ThisRailroadSpline = CreateDefaultSubobject<USplineComponent>(TEXT("RailroadSpline"));

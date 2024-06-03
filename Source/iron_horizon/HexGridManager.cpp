@@ -2,7 +2,7 @@
 #include "Containers/Map.h"
 #include "Math/UnrealMathUtility.h"
 #include "PerlinNoise.hpp"
-#include "Public/RailroadSpline.h"
+#include "RailroadSpline.h"
 #include "TIntPointHash.h"
 #include "astar.hpp"
 
@@ -261,6 +261,7 @@ void AHexGridManager::AddNewRailroadTile(AHexTile *NewTile) {
             );
         }
     }
+
     RailroadTiles.Add(NewTile->CubeCoordinates, NewRailroadTile);
     for (auto city_1 : NewRailroadTile->connected_cities) {
         for (auto city_2 : NewRailroadTile->connected_cities) {
@@ -281,9 +282,24 @@ void AHexGridManager::AddNewRailroadTile(AHexTile *NewTile) {
             }
         }
     }
+
+    UE_LOG(
+        LogTemp,
+        Warning,
+        TEXT("New railroad tile at (%d, %d) has %d connected cities"),
+        NewTile->GridPositionIndex.X,
+        NewTile->GridPositionIndex.Y,
+        NewRailroadTile->connected_cities.Num()
+    );
 }
 
 void AHexGridManager::AddNewCityConnection(AHexTile *city_1, AHexTile *city_2) {
+    UE_LOG(
+        LogTemp,
+        Warning,
+        TEXT("Adding connection between city %d and city %d"),
+        city_1->GridPositionIndex.X,
+        city_2->GridPositionIndex.X);
     if (city_1->GetTileType() != HexTileType::CITY || city_2->GetTileType() != HexTileType::CITY) {
         return;
     }

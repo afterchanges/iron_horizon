@@ -9,6 +9,7 @@
 #include "InputMappingContext.h"
 #include "InputModifiers.h"
 #include "IronHorizonPlayerPawn.h"
+#include "Kismet/GameplayStatics.h"
 
 static void MapKey(
     UInputMappingContext *InputMappingContext,
@@ -102,6 +103,14 @@ void APlayerCameraController::OnJKeyPressed() {
                     *HitResult.ImpactPoint.ToString()
                 );
                 HexTile->ChangeToRailway();
+                TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
+                AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
+                    UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
+                );
+
+                if (HexGridManagerInstance) {
+                    HexGridManagerInstance->AddNewRailroadTile(HexTile);
+                }
             }
         }
     }

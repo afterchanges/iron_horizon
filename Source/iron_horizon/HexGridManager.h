@@ -2,7 +2,7 @@
 #pragma once
 
 #include "HexTile.h"
-#include "Public/RailroadSpline.h"
+#include "RailroadSpline.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
