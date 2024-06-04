@@ -2,9 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/SplineComponent.h"
-#include "Components/SplineMeshComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
+#include "Curves/CurveFloat.h"
+#include "UObject/ConstructorHelpers.h"
 #include "RailroadSpline.generated.h"
 
 UCLASS()
@@ -24,10 +25,13 @@ public:
     UPROPERTY(EditAnywhere, Category = "Spline")
     UStaticMesh* ThisRailroadMesh;
 
+    UPROPERTY(VisibleAnywhere, Category = "Spline")
+    UStaticMeshComponent* MovingMesh;
+
     UPROPERTY(EditAnywhere, Category = "Movement")
     UCurveFloat* MovementCurve;
 
-    FTimeline* MovementTimeline;
+    FTimeline MovementTimeline;
 
 protected:
     virtual void BeginPlay() override;
@@ -35,17 +39,21 @@ protected:
 public:    
     virtual void Tick(float DeltaTime) override;
 
+    void CreateMovementCurve();
+
     UFUNCTION()
     void ProcessMovementTimeline(float Value);
 
     UFUNCTION()
     void OnEndMovementTimeline();
 
-    UFUNCTION()
-    void BeginMovement();
-
     void SetRailroadSplinePoints(TArray<FVector3d> SplinePoints);
 
+    void BeginMovement();
+
 private:
+    UPROPERTY(EditAnywhere, Category = "Movement")
+    float MovementSpeed = 20.0f;
+    bool bMovingForward = true;
     void CreateSplineMesh();
 };

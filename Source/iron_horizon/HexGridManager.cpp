@@ -317,11 +317,13 @@ void AHexGridManager::AddNewCityConnection(AHexTile *city_1, AHexTile *city_2) {
     TArray<FVector3d> path_central_points;
     for (auto point : path) { 
         path_central_points.Add(point->GetActorLocation()); 
+        path_central_points.Last().Z += 500.0f;
     }
     
     ARailroadSpline *NewSpline =
         GetWorld()->SpawnActor<ARailroadSpline>(ARailroadSpline::StaticClass());
     NewSpline->SetRailroadSplinePoints(path_central_points);
+    NewSpline->BeginMovement();
     RailroadSplines.Add(NewSpline);
 }
 
