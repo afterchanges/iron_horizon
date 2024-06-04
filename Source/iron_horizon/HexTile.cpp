@@ -69,6 +69,10 @@ FString AHexTile::HexTileTypeToString(HexTileType Type) {
     }
 }
 
+void AHexTile::SetTileType(HexTileType NewType) {
+    TileType = NewType;
+}
+
 void AHexTile::ChangeToRailway() {
     if (TileType == HexTileType::RAILWAY) { return; }
     // Change the tile type to railway

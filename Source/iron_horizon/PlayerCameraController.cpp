@@ -74,6 +74,12 @@ void APlayerCameraController::SetupInputComponent() {
 
     // Bind the action to the OnPKeyPressed function
     InputComponent->BindKey(EKeys::P, IE_Pressed, this, &APlayerCameraController::OnPKeyPressed);
+
+    UInputAction *TKeyPressAction = NewObject<UInputAction>(this);
+    TKeyPressAction->ValueType = EInputActionValueType::Axis1D;
+    MapKey(PawnMappingContext, TKeyPressAction, EKeys::T);
+
+    InputComponent->BindKey(EKeys::T, IE_Pressed, this, &APlayerCameraController::OnTKeyPressed);
 }
 
 APlayerCameraController::APlayerCameraController() {
@@ -181,6 +187,31 @@ void APlayerCameraController::OnPKeyPressed() {
         }
     } else {
         UE_LOG(LogTemp, Warning, TEXT("Failed to get mouse position"));
+    }
+}
+
+void APlayerCameraController::OnTKeyPressed() {
+    float MouseX, MouseY;
+    if (GetMousePosition(MouseX, MouseY)) {
+        // Convert the mouse screen position to a world space ray
+        FCollisionQueryParams TraceParams;
+        FHitResult HitResult;
+        if (GetHitResultAtScreenPosition(
+                FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult
+            )) {
+            // Check if the hit actor is a hex tile
+            AHexTile *HexTile = Cast<AHexTile>(HitResult.GetActor());
+            if (HexTile) {
+                TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
+                AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
+                    UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
+                );
+
+                if (HexGridManagerInstance) {
+                    HexGridManagerInstance->AddRouteEndpoint(HexTile);
+                }
+            }
+        }
     }
 }
 

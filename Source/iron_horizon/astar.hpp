@@ -5,113 +5,110 @@
 #include "HexTile.h"
 
 struct HexTileNode {
-    FIntPoint GridPositionIndex;
+    FIntVector CubeCoordinates;
     float GScore;
     float FScore;
-    HexTileNode *Parent;
+    HexTileNode* Parent;
 
-    HexTileNode(const FIntPoint &GridPositionIndex, float GScore, float FScore, HexTileNode *Parent)
-        : GridPositionIndex(GridPositionIndex), GScore(GScore), FScore(FScore), Parent(Parent) {
-    }
+    HexTileNode(const FIntVector& InCubeCoordinates, float InGScore, float InFScore, HexTileNode* InParent)
+        : CubeCoordinates(InCubeCoordinates), GScore(InGScore), FScore(InFScore), Parent(InParent) {}
 };
 
-TArray<AHexTile *> AHexGridManager::GetNeighbors(const FIntPoint &GridPositionIndex) {
-    TArray<AHexTile *> Neighbors;
-    FIntPoint Neighbor1(GridPositionIndex.X + 1, GridPositionIndex.Y);
-    AHexTile *NeighborTile1 = GetTileAtPosition(Neighbor1);
-    if (NeighborTile1 != nullptr) { Neighbors.Add(NeighborTile1); }
-    FIntPoint Neighbor2(GridPositionIndex.X - 1, GridPositionIndex.Y);
-    AHexTile *NeighborTile2 = GetTileAtPosition(Neighbor2);
-    if (NeighborTile2 != nullptr) { Neighbors.Add(NeighborTile2); }
-    FIntPoint Neighbor3(GridPositionIndex.X, GridPositionIndex.Y + 1);
-    AHexTile *NeighborTile3 = GetTileAtPosition(Neighbor3);
-    if (NeighborTile3 != nullptr) { Neighbors.Add(NeighborTile3); }
-    FIntPoint Neighbor4(GridPositionIndex.X, GridPositionIndex.Y - 1);
-    AHexTile *NeighborTile4 = GetTileAtPosition(Neighbor4);
-    if (NeighborTile4 != nullptr) { Neighbors.Add(NeighborTile4); }
-    FIntPoint Neighbor5(GridPositionIndex.X + 1, GridPositionIndex.Y - 1);
-    AHexTile *NeighborTile5 = GetTileAtPosition(Neighbor5);
-    if (NeighborTile5 != nullptr) { Neighbors.Add(NeighborTile5); }
-    FIntPoint Neighbor6(GridPositionIndex.X - 1, GridPositionIndex.Y + 1);
-    AHexTile *NeighborTile6 = GetTileAtPosition(Neighbor6);
-    if (NeighborTile6 != nullptr) { Neighbors.Add(NeighborTile6); }
-    return Neighbors;
-}
-
-int HexDistance(FIntPoint start, FIntPoint end) {
-    int dx = std::abs(start.X - end.X);
-    int dy = std::abs(start.Y - end.Y);
-    int dz = std::abs(-start.X - start.Y - (-end.X - end.Y));
-
-    return std::max(dx, (std::max(dy, dz)));
-}
-
-struct FIntPointHash {
-    std::size_t operator()(const FIntPoint &point) const {
-        return std::hash<int>()(point.X) ^ std::hash<int>()(point.Y);
-    }
-};
-
-struct HexTileNodeScoreComparator {
-    bool operator()(HexTileNode &A, HexTileNode &B) const {
+struct HexTileNodeComparator {
+    bool operator()(const HexTileNode& A, const HexTileNode& B) const {
         return A.FScore > B.FScore;
     }
 };
 
-TArray<AHexTile *> AHexGridManager::HexGridAStar(AHexTile *StartTile, AHexTile *EndTile) {
-    TArray<HexTileNode *> OpenSet;
-    TMap<FIntPoint, HexTileNode *> OpenSetMap;
-    TSet<FIntPoint> ClosedSet;
+TArray<AHexTile*> AHexGridManager::GetPassableNeighbors(const FIntVector& CubeCoordinates) {
+    TArray<AHexTile*> Neighbors;
+    TArray<FIntVector> NeighborOffsets = {
+        FIntVector(1, -1, 0), FIntVector(1, 0, -1), FIntVector(0, 1, -1),
+        FIntVector(-1, 1, 0), FIntVector(-1, 0, 1), FIntVector(0, -1, 1)
+    };
 
-    HexTileNodeScoreComparator comparator;
+    UE_LOG(LogTemp, Warning, TEXT("Cube coordinates are %d %d %d"), CubeCoordinates.X, CubeCoordinates.Y, CubeCoordinates.Z);
+    UE_LOG(LogTemp, Warning, TEXT("Grid coordinates are %d %d"), GetTileAtCubeCoordinates(CubeCoordinates)->GridPositionIndex.X, GetTileAtCubeCoordinates(CubeCoordinates)->GridPositionIndex.Y);
+    UE_LOG(LogTemp, Warning, TEXT("Tile type is %d"), GetTileAtCubeCoordinates(CubeCoordinates)->GetTileType());
+    for (const FIntVector& Offset : NeighborOffsets) {
+        FIntVector NeighborPosition = CubeCoordinates + Offset;
+        AHexTile* NeighborTile = GetTileAtCubeCoordinates(NeighborPosition);
+        if (NeighborTile != nullptr) {
+            UE_LOG(LogTemp, Warning, TEXT("Neighbor position is %d %d %d"), NeighborPosition.X, NeighborPosition.Y, NeighborPosition.Z);
+            UE_LOG(LogTemp, Warning, TEXT("Neighbor grid position is %d %d"), GetTileAtCubeCoordinates(NeighborPosition)->GridPositionIndex.X, GetTileAtCubeCoordinates(NeighborPosition)->GridPositionIndex.Y);
+            UE_LOG(LogTemp, Warning, TEXT("Neighbor type is %d"), NeighborTile->GetTileType());
+        }
+        if (NeighborTile != nullptr && (NeighborTile->GetTileType() == HexTileType::RAILWAY || NeighborTile->GetTileType() == HexTileType::CITY)) {
+            Neighbors.Add(NeighborTile);
+        }
+    }
 
-    HexTileNode *StartNode = new HexTileNode(StartTile->GridPositionIndex, 0.0f, 0.0f, nullptr);
-    OpenSet.Add(StartNode);
-    OpenSet.Heapify(comparator);
-    OpenSetMap.Add(StartTile->GridPositionIndex, StartNode);
+    return Neighbors;
+}
+
+int HexDistance(FIntVector start, FIntVector end) {
+    return (FMath::Abs(start.X - end.X) + FMath::Abs(start.Y - end.Y) + FMath::Abs(start.Z - end.Z)) / 2;
+}
+
+TArray<AHexTile*> AHexGridManager::HexGridAStar(AHexTile* StartTile, AHexTile* EndTile) {
+    TArray<HexTileNode*> OpenSet;
+    TMap<FIntVector, HexTileNode*> OpenSetMap;
+    TSet<FIntVector> ClosedSet;
+
+    HexTileNodeComparator Comparator;
+    HexTileNode* StartNode = new HexTileNode(StartTile->CubeCoordinates, 0.0f, HexDistance(StartTile->CubeCoordinates, EndTile->CubeCoordinates), nullptr);
+    OpenSet.HeapPush(StartNode, Comparator);
+    OpenSetMap.Add(StartTile->CubeCoordinates, StartNode);
 
     while (OpenSet.Num() > 0) {
-        HexTileNode *CurrentNode = OpenSet[0];
-        OpenSet.Heapify(comparator);
-        OpenSet.HeapPop(CurrentNode, comparator, false);
+        HexTileNode* CurrentNode = nullptr;
+        OpenSet.HeapPop(CurrentNode, Comparator);
 
-        if (CurrentNode->GridPositionIndex == EndTile->GridPositionIndex) {
-            TArray<FIntPoint> Path;
-            HexTileNode *PathNode = CurrentNode;
+        if (CurrentNode->CubeCoordinates == EndTile->CubeCoordinates) {
+            TArray<FIntVector> Path;
+            HexTileNode* PathNode = CurrentNode;
             while (PathNode != nullptr) {
-                Path.Insert(PathNode->GridPositionIndex, 0);
+                Path.Insert(PathNode->CubeCoordinates, 0);
                 PathNode = PathNode->Parent;
             }
-            TArray<AHexTile *> PathTiles;
-            for (auto Node : Path) {
-                AHexTile *Tile = GetTileAtPosition(Node);
-                if (Tile) { PathTiles.Add(Tile); }
+            TArray<AHexTile*> PathTiles;
+            for (const FIntVector& Node : Path) {
+                AHexTile* Tile = GetTileAtCubeCoordinates(Node);
+                if (Tile) {
+                    PathTiles.Add(Tile);
+                }
             }
             return PathTiles;
         }
 
-        ClosedSet.Add(CurrentNode->GridPositionIndex);
-        TArray<AHexTile *> Neighbors = GetNeighbors(CurrentNode->GridPositionIndex);
-        for (AHexTile *Neighbor : Neighbors) {
-            if (ClosedSet.Contains(Neighbor->GridPositionIndex)) { continue; }
+        ClosedSet.Add(CurrentNode->CubeCoordinates);
+        TArray<AHexTile*> Neighbors = GetPassableNeighbors(CurrentNode->CubeCoordinates);
 
-            float GScore = CurrentNode->GScore + 1;  // assuming all edges have a weight of 1
-            float HScore = HexDistance(Neighbor->GridPositionIndex, EndTile->GridPositionIndex);
+        for (AHexTile* Neighbor : Neighbors) {
+            if (ClosedSet.Contains(Neighbor->CubeCoordinates)) {
+                continue;
+            }
+
+            float GScore = CurrentNode->GScore + 1; // Update this if different tile types have different movement costs
+            float HScore = HexDistance(Neighbor->CubeCoordinates, EndTile->CubeCoordinates);
             float FScore = GScore + HScore;
 
-            HexTileNode *NeighborNode = OpenSetMap.FindRef(Neighbor->GridPositionIndex);
-            if (NeighborNode == nullptr) {
-                NeighborNode =
-                    new HexTileNode(Neighbor->GridPositionIndex, GScore, FScore, CurrentNode);
-                OpenSet.Add(NeighborNode);
-                OpenSetMap.Add(Neighbor->GridPositionIndex, NeighborNode);
-            } else if (GScore < NeighborNode->GScore) {
-                NeighborNode->GScore = GScore;
-                NeighborNode->FScore = FScore;
-                NeighborNode->Parent = CurrentNode;
+            HexTileNode** NeighborNodePtr = OpenSetMap.Find(Neighbor->CubeCoordinates);
+            if (NeighborNodePtr == nullptr) {
+                HexTileNode* NeighborNode = new HexTileNode(Neighbor->CubeCoordinates, GScore, FScore, CurrentNode);
+                OpenSet.HeapPush(NeighborNode, Comparator);
+                OpenSetMap.Add(Neighbor->CubeCoordinates, NeighborNode);
+            } else {
+                HexTileNode* NeighborNode = *NeighborNodePtr;
+                if (GScore < NeighborNode->GScore) {
+                    NeighborNode->GScore = GScore;
+                    NeighborNode->FScore = FScore;
+                    NeighborNode->Parent = CurrentNode;
+                    OpenSet.Heapify(Comparator); // Reorder the heap as FScore has been updated
+                }
             }
         }
     }
 
-    return TArray<AHexTile *>();
+    return TArray<AHexTile*>();
 }

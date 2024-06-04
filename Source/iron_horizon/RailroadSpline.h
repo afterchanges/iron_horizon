@@ -1,55 +1,51 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/SplineComponent.h"
+#include "Components/SplineMeshComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
-
-
 #include "RailroadSpline.generated.h"
 
 UCLASS()
 class IRON_HORIZON_API ARailroadSpline : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	UPROPERTY(EditAnywhere, Category = "Spline")
-	TArray<FVector> ThisSplinePoints;
+    GENERATED_BODY()
+    
+public:    
+    ARailroadSpline();
 
-	UPROPERTY(EditAnywhere, Category = "Spline")
-	USplineComponent* ThisRailroadSpline;
-	float ThisSplineLength;
+    UPROPERTY(EditAnywhere, Category = "Spline")
+    TArray<FVector> ThisSplinePoints;
 
-	UPROPERTY(EditAnywhere, Category = "Spline")
-	UStaticMeshComponent* ThisRailroadMesh;
+    UPROPERTY(EditAnywhere, Category = "Spline")
+    USplineComponent* ThisRailroadSpline;
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
-	UCurveFloat* MovementCurve;
+    UPROPERTY(EditAnywhere, Category = "Spline")
+    UStaticMesh* ThisRailroadMesh;
 
-	FTimeline* MovementTimeline;
+    UPROPERTY(EditAnywhere, Category = "Movement")
+    UCurveFloat* MovementCurve;
 
-	ARailroadSpline();
+    FTimeline* MovementTimeline;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:    
+    virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION()
-	void ProcessMovementTimeline(float Value);
+    UFUNCTION()
+    void ProcessMovementTimeline(float Value);
 
-	UFUNCTION()
-	void OnEndMovementTimeline();
+    UFUNCTION()
+    void OnEndMovementTimeline();
 
-	UFUNCTION()
-	void BeginMovement();
+    UFUNCTION()
+    void BeginMovement();
 
-	void SetRailroadSplinePoints(TArray<FVector3d> SplinePoints);
+    void SetRailroadSplinePoints(TArray<FVector3d> SplinePoints);
 
+private:
+    void CreateSplineMesh();
 };

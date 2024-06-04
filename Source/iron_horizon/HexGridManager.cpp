@@ -123,10 +123,6 @@ HexTileType tileTypeDecider(float h) {
     }
 }
 
-void AHexTile::SetTileType(HexTileType NewType) {
-    TileType = NewType;
-}
-
 HexTileType AHexTile::GetTileType() const {
     if (TileType < HexTileType::DEFAULT || TileType >= HexTileType::MAX) {
         UE_LOG(LogTemp, Error, TEXT("Invalid TileType"));
@@ -164,6 +160,12 @@ AHexTile *AHexGridManager::GetTileAtPosition(const FIntPoint &GridPositionIndex)
     }
     return HexGridLayout[GridPositionIndex.X][GridPositionIndex.Y];
 }
+
+AHexTile* AHexGridManager::GetTileAtCubeCoordinates(const FIntVector& CubeCoordinates) {
+    AHexTile** TilePtr = HexGridLayoutAxial.Find(CubeCoordinates);
+    return TilePtr ? *TilePtr : nullptr;
+}
+
 
 TArray<AHexTile*> AHexGridManager::generateCities(int numCities) {
     TArray<AHexTile*> cities;
@@ -301,15 +303,43 @@ void AHexGridManager::AddNewCityConnection(AHexTile *city_1, AHexTile *city_2) {
         city_1->GridPositionIndex.X,
         city_2->GridPositionIndex.X);
     if (city_1->GetTileType() != HexTileType::CITY || city_2->GetTileType() != HexTileType::CITY) {
+        UE_LOG(LogTemp, Warning, TEXT("type of city_1: %d"), (int32)city_1->GetTileType());
+        UE_LOG(LogTemp, Warning, TEXT("type of city_2: %d"), (int32)city_2->GetTileType());
+        UE_LOG(LogTemp, Warning, TEXT("Not a city"));
         return;
     }
     TArray<AHexTile *> path = HexGridAStar(city_1, city_2);
+    if (path.Num() == 0) {
+        UE_LOG(LogTemp, Warning, TEXT("No path found"));
+        return;
+    }
+
+    TArray<FVector3d> path_central_points;
+    for (auto point : path) { 
+        path_central_points.Add(point->GetActorLocation()); 
+    }
+    
     ARailroadSpline *NewSpline =
         GetWorld()->SpawnActor<ARailroadSpline>(ARailroadSpline::StaticClass());
-    TArray<FVector3d> path_central_points;
-    for (auto point : path) { path_central_points.Add(point->GetActorLocation()); }
     NewSpline->SetRailroadSplinePoints(path_central_points);
     RailroadSplines.Add(NewSpline);
+}
+
+void AHexGridManager::AddRouteEndpoint(AHexTile *city_1) {
+    if (city_1->GetTileType() != HexTileType::CITY) {
+        UE_LOG(LogTemp, Warning, TEXT("Not a city"));
+        return;
+    }
+    if (current_city_1 == nullptr) {
+        current_city_1 = city_1;
+        UE_LOG(LogTemp, Warning, TEXT("City 1 set"));
+    } else if (current_city_2 == nullptr) {
+        current_city_2 = city_1;
+        UE_LOG(LogTemp, Warning, TEXT("City 2 set"));
+        AddNewCityConnection(current_city_1, current_city_2);
+        current_city_1 = nullptr;
+        current_city_2 = nullptr;
+    }
 }
 
 // Called when the game starts or when spawned
@@ -426,8 +456,13 @@ void AHexGridManager::BeginPlay() {
                         if (NewTile) {
                             NewTile->GridPositionIndex = FIntPoint(city->GridPositionIndex.X, city->GridPositionIndex.Y);
                             NewTile->CubeCoordinates = city->CubeCoordinates;
+                            UE_LOG(LogTemp, Warning, TEXT("Tile type is %d"), (int32)NewTile->GetTileType());
+                            NewTile->SetTileType(HexTileType::CITY);
+                            UE_LOG(LogTemp, Warning, TEXT("New tile type is %d"), (int32)NewTile->GetTileType());
                             HexGridLayout[city->GridPositionIndex.X][city->GridPositionIndex.Y] = NewTile;
                             UE_LOG(LogTemp, Warning, TEXT("City at (%d, %d)"), city->GridPositionIndex.X, city->GridPositionIndex.Y);
+                            HexGridLayoutAxial.Remove(city->CubeCoordinates);
+                            HexGridLayoutAxial.Add(NewTile->CubeCoordinates, NewTile);
                         }
                         IronHorizonCity *NewCity = new IronHorizonCity();
                         NewCity->this_tile = NewTile;

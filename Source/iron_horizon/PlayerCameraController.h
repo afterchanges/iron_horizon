@@ -51,8 +51,8 @@ public:
     virtual void SetupInputComponent() override;
 
     void OnJKeyPressed();
-
     void OnPKeyPressed();
+    void OnTKeyPressed();
 
     virtual void BeginPlay() override;
 

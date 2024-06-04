@@ -51,14 +51,19 @@ public:
     void generateHexGrid();
     AHexTile *GetTileAtPosition(const FIntPoint &GridPositionIndex);
     TArray<AHexTile *> GetNeighbors(const FIntPoint &GridPositionIndex);
+    TArray<AHexTile *> GetPassableNeighbors(const FIntVector& CubeCoordinates);
     TArray<AHexTile *> GetNeighborsOnRingOfRadius(AHexTile *, int32 radius);
+    AHexTile* GetTileAtCubeCoordinates(const FIntVector& CubeCoordinates);
 
     float GetTilePrestige(const FIntVector &GridPositionIndex);
     void SetTilesPrestige();
 
     void AddNewRailroadTile(AHexTile *NewTile);
-    void AdjustCityConnections(AHexTile *NewTile);
     void AddNewCityConnection(AHexTile *city_1, AHexTile *city_2);
+    void AddRouteEndpoint(AHexTile *city_1);
+
+    AHexTile *current_city_1 = nullptr;
+    AHexTile *current_city_2 = nullptr;
 
 public:
     UPROPERTY(EditAnywhere, Category = "HexGridSetup")
