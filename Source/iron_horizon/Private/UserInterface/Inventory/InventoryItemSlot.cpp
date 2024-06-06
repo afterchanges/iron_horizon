@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Items/ItemBase.h"
 #include "UserInterface/Inventory/InventoryTooltip.h"
-#include "UserInterface/Inventory/InventoryItemSlot.h"
 #include "Items/ItemDataStructs.h"
 #include "Components/Border.h"
 #include "Components/Image.h"

@@ -250,50 +250,50 @@ float redistributeHeights(float x) {
            217.915 * x * x + 52.8798 * x - 5;
 }
 
-void AHexGridManager::AddNewRailroadTile(AHexTile *NewTile) {
-    IronHorizonRailroadTile *NewRailroadTile = new IronHorizonRailroadTile();
-    NewRailroadTile->this_tile = NewTile;
-    for (auto neighbor : GetNeighbors(NewTile->GridPositionIndex)) {
-        if (neighbor->GetTileType() == HexTileType::CITY) {
-            NewRailroadTile->connected_cities.Add(Cities[neighbor->CubeCoordinates]);
-        }
-        if (neighbor->GetTileType() == HexTileType::RAILWAY) {
-            NewRailroadTile->connected_cities.Append(
-                RailroadTiles[neighbor->CubeCoordinates]->connected_cities
-            );
-        }
-    }
+// void AHexGridManager::AddNewRailroadTile(AHexTile *NewTile) {
+//     IronHorizonRailroadTile *NewRailroadTile = new IronHorizonRailroadTile();
+//     NewRailroadTile->this_tile = NewTile;
+//     for (auto neighbor : GetNeighbors(NewTile->GridPositionIndex)) {
+//         if (neighbor->GetTileType() == HexTileType::CITY) {
+//             NewRailroadTile->connected_cities.Add(Cities[neighbor->CubeCoordinates]);
+//         }
+//         if (neighbor->GetTileType() == HexTileType::RAILWAY) {
+//             NewRailroadTile->connected_cities.Append(
+//                 RailroadTiles[neighbor->CubeCoordinates]->connected_cities
+//             );
+//         }
+//     }
 
-    RailroadTiles.Add(NewTile->CubeCoordinates, NewRailroadTile);
-    for (auto city_1 : NewRailroadTile->connected_cities) {
-        for (auto city_2 : NewRailroadTile->connected_cities) {
-            if (city_1 != city_2 && !city_1->connected_cities.Contains(city_2)) {
-                city_1->connected_cities.Add(city_2);
-                city_2->connected_cities.Add(city_1);
-                UE_LOG(
-                    LogTemp,
-                    Warning,
-                    TEXT("Connecting city %d to city %d"),
-                    city_1->this_tile->GridPositionIndex.X,
-                    city_2->this_tile->GridPositionIndex.X
-                );
-                AddNewCityConnection(
-                    HexGridLayoutAxial[city_1->this_tile->CubeCoordinates],
-                    HexGridLayoutAxial[city_2->this_tile->CubeCoordinates]
-                );
-            }
-        }
-    }
+//     RailroadTiles.Add(NewTile->CubeCoordinates, NewRailroadTile);
+//     for (auto city_1 : NewRailroadTile->connected_cities) {
+//         for (auto city_2 : NewRailroadTile->connected_cities) {
+//             if (city_1 != city_2 && !city_1->connected_cities.Contains(city_2)) {
+//                 city_1->connected_cities.Add(city_2);
+//                 city_2->connected_cities.Add(city_1);
+//                 UE_LOG(
+//                     LogTemp,
+//                     Warning,
+//                     TEXT("Connecting city %d to city %d"),
+//                     city_1->this_tile->GridPositionIndex.X,
+//                     city_2->this_tile->GridPositionIndex.X
+//                 );
+//                 AddNewCityConnection(
+//                     HexGridLayoutAxial[city_1->this_tile->CubeCoordinates],
+//                     HexGridLayoutAxial[city_2->this_tile->CubeCoordinates]
+//                 );
+//             }
+//         }
+//     }
 
-    UE_LOG(
-        LogTemp,
-        Warning,
-        TEXT("New railroad tile at (%d, %d) has %d connected cities"),
-        NewTile->GridPositionIndex.X,
-        NewTile->GridPositionIndex.Y,
-        NewRailroadTile->connected_cities.Num()
-    );
-}
+//     UE_LOG(
+//         LogTemp,
+//         Warning,
+//         TEXT("New railroad tile at (%d, %d) has %d connected cities"),
+//         NewTile->GridPositionIndex.X,
+//         NewTile->GridPositionIndex.Y,
+//         NewRailroadTile->connected_cities.Num()
+//     );
+// }
 
 void AHexGridManager::AddNewCityConnection(AHexTile *city_1, AHexTile *city_2) {
     UE_LOG(
