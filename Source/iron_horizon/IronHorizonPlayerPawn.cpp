@@ -46,7 +46,7 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerIn
     // Bind the input mapping context to the player controller
 
     PrimaryActorTick.bCanEverTick = true;
-	SetRootComponent(Mesh);
+    SetRootComponent(Mesh);
 
     InteractionCheckFrequency = 0.1f;
 
@@ -57,7 +57,9 @@ void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerIn
         FPController->RotateAction, ETriggerEvent::Triggered, this, &AIronHorizonPlayerPawn::Rotate
     );
     EIController->BindAction(
-        FPController->SpringArmLengthAction, ETriggerEvent::Triggered, this,
+        FPController->SpringArmLengthAction,
+        ETriggerEvent::Triggered,
+        this,
         &AIronHorizonPlayerPawn::UpdateSpringArmLength
     );
 
@@ -117,14 +119,14 @@ void AIronHorizonPlayerPawn::UpdateCameraPosition() {
 
         if (PlayerController->GetMousePosition(MousePosition.X, MousePosition.Y)) {
             FVector NewLocation = GetActorLocation();
-            NewLocation.Y -= GetWorld()->GetDeltaSeconds() * determineMouseMovementSpeedOnAxis(
-                MousePosition.X, ViewportSize.X
-            );
-            NewLocation.X += GetWorld()->GetDeltaSeconds() * determineMouseMovementSpeedOnAxis(
-                MousePosition.Y, ViewportSize.Y
-            );
+            NewLocation.Y -= GetWorld()->GetDeltaSeconds() *
+                             determineMouseMovementSpeedOnAxis(MousePosition.X, ViewportSize.X);
+            NewLocation.X += GetWorld()->GetDeltaSeconds() *
+                             determineMouseMovementSpeedOnAxis(MousePosition.Y, ViewportSize.Y);
 
             SetActorLocation(NewLocation);
+        } else {
+            // UE_LOG(LogTemp, Warning, TEXT("Could not get mouse position"));
         }
     }
 }
@@ -145,7 +147,8 @@ void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
     // UE_LOG(LogTemp, Warning, TEXT("Rotate called"));
     FRotator Input(ActionValue[0], ActionValue[1], ActionValue[2]);
     // UE_LOG(
-    //     LogTemp, Warning, TEXT("Input: %f, %f, %f"), ActionValue[0], ActionValue[1], ActionValue[2]
+    //     LogTemp, Warning, TEXT("Input: %f, %f, %f"), ActionValue[0],
+    //     ActionValue[1], ActionValue[2]
     // );
     Input *= GetWorld()->GetDeltaSeconds() * RotateScale;
     Input += GetActorRotation();
@@ -153,7 +156,8 @@ void AIronHorizonPlayerPawn::Rotate(const FInputActionValue &ActionValue) {
 }
 
 void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &ActionValue) {
-    // UE_LOG(LogTemp, Warning, TEXT("UpdateSpringArmLength called %f"), ActionValue[0]);
+    // UE_LOG(LogTemp, Warning, TEXT("UpdateSpringArmLength called %f"),
+    // ActionValue[0]);
     SpringArmComponent->TargetArmLength +=
         ActionValue[0] * GetWorld()->GetDeltaSeconds() * SpringArmLengthScale * -1.0f;
     SpringArmComponent->TargetArmLength =
@@ -168,13 +172,11 @@ void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &Acti
 void AIronHorizonPlayerPawn::BeginPlay() {
     Super::BeginPlay();
 
-    PlayerInventory->ItemDataTable = LoadObject<UDataTable>(
-    nullptr, TEXT("DataTable'/Game/ItemData/TestItems.TestItems'")
-);
-
+    PlayerInventory->ItemDataTable =
+        LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/ItemData/TestItems.TestItems'"));
 
     for (int i = 0; i < 5; ++i) {
-        UItemBase* SurfaceItem = NewObject<UItemBase>(UItemBase::StaticClass());
+        UItemBase *SurfaceItem = NewObject<UItemBase>(UItemBase::StaticClass());
         SurfaceItem->ItemType = EItemType::Surface_Railway;
         SurfaceItem->ID = "1";
         PlayerInventory->DesiredItemID = "1";
@@ -182,13 +184,13 @@ void AIronHorizonPlayerPawn::BeginPlay() {
     }
 
     for (int i = 0; i < 5; ++i) {
-        UItemBase* TunnelItem = NewObject<UItemBase>(UItemBase::StaticClass());
+        UItemBase *TunnelItem = NewObject<UItemBase>(UItemBase::StaticClass());
         TunnelItem->ItemType = EItemType::Tunnel_Railway;
         TunnelItem->ID = "2";
         PlayerInventory->DesiredItemID = "2";
         PlayerInventory->AddNewItem(TunnelItem, 2);
     }
-    
+
     HUD = Cast<AIronHorizonHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 
     InteractableData = InstanceInteractableData;

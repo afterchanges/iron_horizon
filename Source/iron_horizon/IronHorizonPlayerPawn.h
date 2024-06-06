@@ -14,30 +14,30 @@ class AIronHorizonHUD;
 class UItemBase;
 
 USTRUCT()
+
 struct FInteractionData {
-	GENERATED_USTRUCT_BODY()
+    GENERATED_USTRUCT_BODY()
 
-	FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f) {};
+    FInteractionData() : CurrentInteractable(nullptr), LastInteractionCheckTime(0.0f){};
 
-	UPROPERTY()
-	AActor* CurrentInteractable;
+    UPROPERTY()
+    AActor *CurrentInteractable;
 
-	UPROPERTY()
-	float LastInteractionCheckTime;
+    UPROPERTY()
+    float LastInteractionCheckTime;
 };
 
 
 UCLASS()
-class IRON_HORIZON_API AIronHorizonPlayerPawn : public APawn, public IInteractionInterface{
+
+class IRON_HORIZON_API AIronHorizonPlayerPawn : public APawn, public IInteractionInterface {
     GENERATED_BODY()
 public:
     AIronHorizonPlayerPawn();
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-    virtual void SetupPlayerInputComponent(
-        class UInputComponent *PlayerInputComponent
-    ) override;
+    virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
     UPROPERTY(EditAnywhere)
     class USphereComponent *SphereComponent;

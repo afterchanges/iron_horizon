@@ -9,6 +9,7 @@
 #include "IronHorizonPlayerPawn.h"
 #include "Engine/Engine.h"
 #include "HexGridManager.h"
+#include "Kismet/GameplayStatics.h"
 
 static void MapKey(
     UInputMappingContext *InputMappingContext,
@@ -18,8 +19,7 @@ static void MapKey(
     bool bSwizzle = false,
     EInputAxisSwizzle SwizzleOrder = EInputAxisSwizzle::YXZ
 ) {
-    FEnhancedActionKeyMapping &MoveActionMapping =
-        InputMappingContext->MapKey(InputAction, Key);
+    FEnhancedActionKeyMapping &MoveActionMapping = InputMappingContext->MapKey(InputAction, Key);
     UObject *Outer = InputMappingContext->GetOuter();
 
     if (bNegate) {
@@ -28,8 +28,7 @@ static void MapKey(
     }
 
     if (bSwizzle) {
-        UInputModifierSwizzleAxis *Swizzle =
-            NewObject<UInputModifierSwizzleAxis>(Outer);
+        UInputModifierSwizzleAxis *Swizzle = NewObject<UInputModifierSwizzleAxis>(Outer);
         Swizzle->Order = SwizzleOrder;
         MoveActionMapping.Modifiers.Add(Swizzle);
     }
@@ -73,7 +72,7 @@ void APlayerCameraController::SetupInputComponent() {
     MapKey(PawnMappingContext, SpringArmLengthAction, EKeys::MouseWheelAxis);
 
     // Create a new action for the J key press
-    UInputAction* JKeyPressAction = NewObject<UInputAction>(this);
+    UInputAction *JKeyPressAction = NewObject<UInputAction>(this);
     JKeyPressAction->ValueType = EInputActionValueType::Axis1D;
     MapKey(PawnMappingContext, JKeyPressAction, EKeys::J);
 
@@ -81,12 +80,18 @@ void APlayerCameraController::SetupInputComponent() {
     InputComponent->BindKey(EKeys::J, IE_Pressed, this, &APlayerCameraController::OnJKeyPressed);
 
     // Create a new action for the P key press
-    UInputAction* PKeyPressAction = NewObject<UInputAction>(this);
+    UInputAction *PKeyPressAction = NewObject<UInputAction>(this);
     PKeyPressAction->ValueType = EInputActionValueType::Axis1D;
     MapKey(PawnMappingContext, PKeyPressAction, EKeys::P);
 
     // Bind the action to the OnPKeyPressed function
     InputComponent->BindKey(EKeys::P, IE_Pressed, this, &APlayerCameraController::OnPKeyPressed);
+
+    UInputAction *TKeyPressAction = NewObject<UInputAction>(this);
+    TKeyPressAction->ValueType = EInputActionValueType::Axis1D;
+    MapKey(PawnMappingContext, TKeyPressAction, EKeys::T);
+
+    InputComponent->BindKey(EKeys::T, IE_Pressed, this, &APlayerCameraController::OnTKeyPressed);
 }
 
 APlayerCameraController::APlayerCameraController() {
@@ -102,13 +107,28 @@ void APlayerCameraController::OnJKeyPressed() {
         // Convert the mouse screen position to a world space ray
         FCollisionQueryParams TraceParams;
         FHitResult HitResult;
-        if (GetHitResultAtScreenPosition(FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult)) {
+        if (GetHitResultAtScreenPosition(
+                FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult
+            )) {
             // Check if the hit actor is a hex tile
-            AHexTile* HexTile = Cast<AHexTile>(HitResult.GetActor());
+            AHexTile *HexTile = Cast<AHexTile>(HitResult.GetActor());
             if (HexTile) {
                 // Change the tile color and type
-                UE_LOG(LogTemp, Warning, TEXT("J MOUSE POSITION: %s"), *HitResult.ImpactPoint.ToString());
+                UE_LOG(
+                    LogTemp,
+                    Warning,
+                    TEXT("J MOUSE POSITION: %s"),
+                    *HitResult.ImpactPoint.ToString()
+                );
                 HexTile->ChangeToRailway();
+                TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
+                AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
+                    UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
+                );
+
+                if (HexGridManagerInstance) {
+                    HexGridManagerInstance->AddNewRailroadTile(HexTile);
+                }
             }
         }
     }
@@ -123,9 +143,11 @@ void APlayerCameraController::OnPKeyPressed() {
         // Convert the mouse screen position to a world space ray
         FCollisionQueryParams TraceParams;
         FHitResult HitResult;
-        if (GetHitResultAtScreenPosition(FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult)) {
+        if (GetHitResultAtScreenPosition(
+                FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult
+            )) {
             // Check if the hit actor is a hex tile
-            AHexTile* HexTile = Cast<AHexTile>(HitResult.GetActor());
+            AHexTile *HexTile = Cast<AHexTile>(HitResult.GetActor());
             if (HexTile) {
                 UE_LOG(LogTemp, Warning, TEXT("HexTile hit"));
 
@@ -138,9 +160,8 @@ void APlayerCameraController::OnPKeyPressed() {
                     UE_LOG(LogTemp, Warning, TEXT("EndTile set"));
 
                     // Get the hex grid manager instance
-                    AHexGridManager* HexGridManager = nullptr;
-                    for (TActorIterator<AHexGridManager> It(GetWorld()); It; ++It)
-                    {
+                    AHexGridManager *HexGridManager = nullptr;
+                    for (TActorIterator<AHexGridManager> It(GetWorld()); It; ++It) {
                         HexGridManager = *It;
                         break;
                     }
@@ -155,14 +176,12 @@ void APlayerCameraController::OnPKeyPressed() {
                         UE_LOG(LogTemp, Warning, TEXT("HexGridManager instance obtained"));
 
                         // Call the A* algorithm function
-                        TArray<FIntPoint> Path = HexGridManager->HexGridAStar(AHexTile::StartTile, AHexTile::EndTile, HexGridManager);
+                        TArray<AHexTile*> Path =
+                            HexGridManager->HexGridAStar(AHexTile::StartTile, AHexTile::EndTile);
                         UE_LOG(LogTemp, Warning, TEXT("Shortest path length: %d"), Path.Num());
                         // Iterate over the tiles in the path and change their type
-                        for (FIntPoint Point : Path) {
-                            AHexTile* Tile = HexGridManager->GetTileAtPosition(Point);
-                            if (Tile) {
-                                Tile->ChangeToRailway();
-                            }
+                        for (auto Tile : Path) {
+                            if (Tile) { Tile->ChangeToRailway(); }
                         }
 
                         // Reset the start and end tiles
@@ -179,8 +198,32 @@ void APlayerCameraController::OnPKeyPressed() {
             UE_LOG(LogTemp, Warning, TEXT("No hit result at screen position"));
         }
     } else {
-
         UE_LOG(LogTemp, Warning, TEXT("Failed to get mouse position"));
+    }
+}
+
+void APlayerCameraController::OnTKeyPressed() {
+    float MouseX, MouseY;
+    if (GetMousePosition(MouseX, MouseY)) {
+        // Convert the mouse screen position to a world space ray
+        FCollisionQueryParams TraceParams;
+        FHitResult HitResult;
+        if (GetHitResultAtScreenPosition(
+                FVector2D(MouseX, MouseY), ECC_Visibility, TraceParams, HitResult
+            )) {
+            // Check if the hit actor is a hex tile
+            AHexTile *HexTile = Cast<AHexTile>(HitResult.GetActor());
+            if (HexTile) {
+                TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
+                AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
+                    UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
+                );
+
+                if (HexGridManagerInstance) {
+                    HexGridManagerInstance->AddRouteEndpoint(HexTile);
+                }
+            }
+        }
     }
 }
 

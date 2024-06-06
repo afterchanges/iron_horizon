@@ -50,10 +50,10 @@ public:
     virtual void SetupInputComponent() override;
 
     void OnJKeyPressed();
-
     void OnPKeyPressed();
+    void OnTKeyPressed();
 
     virtual void BeginPlay() override;
 
-    bool GetCursorPosition(FVector2D& CursorPosition) const;
+    bool GetCursorPosition(FVector2D &CursorPosition) const;
 };
