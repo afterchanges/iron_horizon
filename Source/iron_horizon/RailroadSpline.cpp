@@ -14,7 +14,7 @@ ARailroadSpline::ARailroadSpline()
     MovingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MovingMesh"));
     MovingMesh->SetupAttachment(RootComponent);
 
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("Game/Static/3D_objects/RailroadStuff/train.train"));
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshAsset(TEXT("/Game/Static/3D_objects/RailroadStuff/train.train"));
     if (MeshAsset.Succeeded())
     {
         ThisRailroadMesh = MeshAsset.Object;

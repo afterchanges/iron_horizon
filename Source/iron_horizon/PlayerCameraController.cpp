@@ -121,14 +121,14 @@ void APlayerCameraController::OnJKeyPressed() {
                     *HitResult.ImpactPoint.ToString()
                 );
                 HexTile->ChangeToRailway();
-                TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
-                AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
-                    UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
-                );
+                // TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
+                // AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
+                //     UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
+                // );
 
-                if (HexGridManagerInstance) {
-                    HexGridManagerInstance->AddNewRailroadTile(HexTile);
-                }
+                // if (HexGridManagerInstance) {
+                //     HexGridManagerInstance->AddNewRailroadTile(HexTile);
+                // }
             }
         }
     }
