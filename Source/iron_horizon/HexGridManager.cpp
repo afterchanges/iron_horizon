@@ -1,12 +1,13 @@
 #include "HexGridManager.h"
-#include "Containers/Map.h"
 #include "Math/UnrealMathUtility.h"
 #include "PerlinNoise.hpp"
 #include "TIntPointHash.h"
+#include "Containers/Map.h"
 #include "astar.hpp"
 
 // Sets default values
-AHexGridManager::AHexGridManager() {}
+AHexGridManager::AHexGridManager() {
+}
 
 TMap<HexTileType, TArray<float>> TileHeightRanges = {
     {HexTileType::WATER, {0.0f, 0.0f}},
@@ -41,152 +42,173 @@ enum class heightTerrainGroup : uint8 {
   mouninousHeightGroup
 };
 
-TMap<heightTerrainGroup, TArray<float>> heightFeaturesThresholds = {
-    {heightTerrainGroup::waterHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
-    {heightTerrainGroup::shorelineHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
-    {heightTerrainGroup::plainsHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
-    {heightTerrainGroup::hillsHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
-    {heightTerrainGroup::mouninousHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}}};
+enum class heightTerrainGroup : uint8 {
+    waterHeightGroup,
+    shorelineHeightGroup,
+    plainsHeightGroup,
+    hillsHeightGroup,
+    mouninousHeightGroup
+};
+
+TMap<heightTerrainGroup, TArray<float>>
+    heightFeaturesThresholds = {
+        {heightTerrainGroup::waterHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
+        {heightTerrainGroup::shorelineHeightGroup,
+         {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
+        {heightTerrainGroup::plainsHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
+        {heightTerrainGroup::hillsHeightGroup, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}},
+        {heightTerrainGroup::mouninousHeightGroup,
+         {0.0f, 0.0f, 0.0f, 0.0f, 0.0f}}};
 
 heightTerrainGroup heightTileGroupDecider(float h) {
-  if (h < 0) {
-    return heightTerrainGroup::waterHeightGroup;
-  } else if (h < 0.1) {
-    return heightTerrainGroup::shorelineHeightGroup;
-  } else if (h < 1.5) {
-    return heightTerrainGroup::plainsHeightGroup;
-  } else if (h < 2.5) {
-    return heightTerrainGroup::hillsHeightGroup;
-  } else {
-    return heightTerrainGroup::mouninousHeightGroup;
-  }
+    if (h < 0) {
+        return heightTerrainGroup::waterHeightGroup;
+    } else if (h < 0.1) {
+        return heightTerrainGroup::shorelineHeightGroup;
+    } else if (h < 1.5) {
+        return heightTerrainGroup::plainsHeightGroup;
+    } else if (h < 2.5) {
+        return heightTerrainGroup::hillsHeightGroup;
+    } else {
+        return heightTerrainGroup::mouninousHeightGroup;
+    }
 }
 
-TMap<heightTerrainGroup, std::pair<float, float>> heightFeaturesRanges = {
-    {heightTerrainGroup::waterHeightGroup, {0.0f, 0.0f}},
-    {heightTerrainGroup::shorelineHeightGroup, {0.0f, 0.1f}},
-    {heightTerrainGroup::plainsHeightGroup, {0.1f, 1.5f}},
-    {heightTerrainGroup::hillsHeightGroup, {1.5f, 2.5f}},
-    {heightTerrainGroup::mouninousHeightGroup, {2.5f, 3.0f}}};
+TMap<heightTerrainGroup, std::pair<float, float>>
+    heightFeaturesRanges = {
+        {heightTerrainGroup::waterHeightGroup, {0.0f, 0.0f}},
+        {heightTerrainGroup::shorelineHeightGroup, {0.0f, 0.1f}},
+        {heightTerrainGroup::plainsHeightGroup, {0.1f, 1.5f}},
+        {heightTerrainGroup::hillsHeightGroup, {1.5f, 2.5f}},
+        {heightTerrainGroup::mouninousHeightGroup, {2.5f, 3.0f}}};
 
-TMap<heightTerrainGroup, TArray<HexTileType>> terrainTilesByHeight = {
-    {heightTerrainGroup::waterHeightGroup,
-     {
-         HexTileType::WATER,
-     }},
-    {heightTerrainGroup::shorelineHeightGroup,
-     {
-         HexTileType::DESERT,
-     }},
-    {heightTerrainGroup::plainsHeightGroup,
-     {
-         HexTileType::GRASS,
-     }},
-    {heightTerrainGroup::hillsHeightGroup,
-     {
-         HexTileType::FOREST,
-     }},
-    {heightTerrainGroup::mouninousHeightGroup,
-     {
-         HexTileType::MOUNTAIN,
-     }}};
+
+
+TMap<heightTerrainGroup, TArray<HexTileType>>
+    terrainTilesByHeight = {
+        {heightTerrainGroup::waterHeightGroup,
+         {
+             HexTileType::WATER,
+         }},
+        {heightTerrainGroup::shorelineHeightGroup,
+         {
+             HexTileType::DESERT,
+         }},
+        {heightTerrainGroup::plainsHeightGroup,
+         {
+             HexTileType::GRASS,
+         }},
+        {heightTerrainGroup::hillsHeightGroup,
+         {
+             HexTileType::FOREST,
+         }},
+        {heightTerrainGroup::mouninousHeightGroup,
+         {
+             HexTileType::MOUNTAIN,
+         }}};
 
 enum class climateTerrainGroup : uint8 {
-  equatorialClimate,
-  tropicalClimate,
-  subtropicalClimate,
-  mediterranianClimate,
-  continentalClimate,
-  oceanicClimate,
-  polarClimate,
-  highlandClimate
+    equatorialClimate,
+    tropicalClimate,
+    subtropicalClimate,
+    mediterranianClimate,
+    continentalClimate,
+    oceanicClimate,
+    polarClimate,
+    highlandClimate
 };
 
 HexTileType tileTypeDecider(float h) {
-  if (h < 1.0f) {
-    return HexTileType::WATER;
-  } else if (h < 1.5f) {
-    return HexTileType::GRASS;
-  } else if (h < 2.0f) {
-    return HexTileType::FOREST;
-  } else if (h < 2.5f) {
-    return HexTileType::MOUNTAIN;
-  } else {
-    return HexTileType::DESERT;
-  }
+    if (h < 1.0f) {
+        return HexTileType::WATER;
+    } else if (h < 1.5f) {
+        return HexTileType::GRASS;
+    } else if (h < 2.0f) {
+        return HexTileType::FOREST;
+    } else if (h < 2.5f) {
+        return HexTileType::MOUNTAIN;
+    } else {
+        return HexTileType::DESERT;
+    }
 }
 
-void AHexTile::SetTileType(HexTileType NewType) { TileType = NewType; }
+
+void AHexTile::SetTileType(HexTileType NewType) {
+    TileType = NewType;
+}
 
 HexTileType AHexTile::GetTileType() const {
-  if (TileType < HexTileType::DEFAULT || TileType >= HexTileType::MAX) {
-    UE_LOG(LogTemp, Error, TEXT("Invalid TileType"));
-    return HexTileType::DEFAULT;
-  }
-  return TileType;
-}
-
-TArray<TArray<float>>
-generatePerlinNoise(int32 width, int32 height,
-                    TFunction<float(float x)> functionModifier) {
-  uint32_t random_uint = FMath::Rand();
-
-  const siv::PerlinNoise::seed_type seed = random_uint;
-  const siv::PerlinNoise perlin{seed};
-
-  TArray<TArray<float>> noise_map;
-  noise_map.Init(TArray<float>(), width);
-  for (int32 i = 0; i < width; i++) {
-    noise_map[i].Init(0.f, height);
-  }
-
-  for (int32 y = 0; y < height; y++) {
-    for (int32 x = 0; x < width; x++) {
-      noise_map[x][y] = functionModifier(perlin.octave2D_01(
-          (x * 0.05), (y * 0.05), std::sqrt(width * height)));
+    if (TileType < HexTileType::DEFAULT || TileType >= HexTileType::MAX) {
+        UE_LOG(LogTemp, Error, TEXT("Invalid TileType"));
+        return HexTileType::DEFAULT;
     }
-  }
-  return noise_map;
+    return TileType;
+}
+    
+TArray<TArray<float>> generatePerlinNoise(
+    int32 width,
+    int32 height,
+    TFunction<float(float x)> functionModifier
+) {
+    uint32_t random_uint = FMath::Rand();
+
+    const siv::PerlinNoise::seed_type seed = random_uint;
+    const siv::PerlinNoise perlin{seed};
+
+    TArray<TArray<float>> noise_map;
+    noise_map.Init(TArray<float>(), width);
+    for (int32 i = 0; i < width; i++) {
+        noise_map[i].Init(0.f, height);
+    }
+
+    for (int32 y = 0; y < height; y++) {
+        for (int32 x = 0; x < width; x++) {
+            noise_map[x][y] = functionModifier(perlin.octave2D_01(
+                    (x * 0.05), (y * 0.05), std::sqrt(width * height)
+                ));
+        }
+    }
+    return noise_map;
 }
 
-AHexTile *
-AHexGridManager::GetTileAtPosition(const FIntPoint &GridPositionIndex) {
-  if (GridPositionIndex.X < 0 || GridPositionIndex.X >= HexGridLayout.Num() ||
-      GridPositionIndex.Y < 0 ||
-      GridPositionIndex.Y >= HexGridLayout[GridPositionIndex.X].Num()) {
-    return nullptr;
-  }
-  return HexGridLayout[GridPositionIndex.X][GridPositionIndex.Y];
+AHexTile *AHexGridManager::GetTileAtPosition(const FIntPoint &GridPositionIndex
+) {
+    if (GridPositionIndex.X < 0 || GridPositionIndex.X >= HexGridLayout.Num() ||
+        GridPositionIndex.Y < 0 ||
+        GridPositionIndex.Y >= HexGridLayout[GridPositionIndex.X].Num()) {
+        return nullptr;
+    }
+    return HexGridLayout[GridPositionIndex.X][GridPositionIndex.Y];
 }
 
 void AHexGridManager::generateCities(int numCities) {
-  for (int i = 0; i < numCities; ++i) {
-    int x, y;
-    do {
-      x = FMath::RandRange(0, GridWidth - 1);
-      y = FMath::RandRange(0, GridHeight - 1);
-    } while (x >= HexGridLayout.Num() || y >= HexGridLayout[x].Num() ||
-             !HexGridLayout[x][y] ||
-             HexGridLayout[x][y]->GetTileType() == HexTileType::CITY);
+    for (int i = 0; i < numCities; ++i) {
+        int x, y;
+        do {
+            x = FMath::RandRange(0, GridWidth - 1);
+            y = FMath::RandRange(0, GridHeight - 1);
+        } while (x >= HexGridLayout.Num() || y >= HexGridLayout[x].Num() ||
+                 !HexGridLayout[x][y] ||
+                 HexGridLayout[x][y]->GetTileType() == HexTileType::CITY);
 
-    if (HexGridLayout[x][y]) {
-      HexGridLayout[x][y]->SetTileType(HexTileType::CITY);
+        if (HexGridLayout[x][y]) {
+            HexGridLayout[x][y]->SetTileType(HexTileType::CITY);
+        }
     }
-  }
 }
 
 TArray<FIntPoint> AHexGridManager::determineCities() {
-  TArray<FIntPoint> cities;
-  for (int32 x = 0; x < GridWidth; ++x) {
-    for (int32 y = 0; y < GridHeight; ++y) {
-      if (x < HexGridLayout.Num() && y < HexGridLayout[x].Num() &&
-          HexGridLayout[x][y] &&
-          HexGridLayout[x][y]->GetTileType() == HexTileType::CITY) {
-        cities.Add(FIntPoint(x, y));
-      }
+    TArray<FIntPoint> cities;
+    for (int32 x = 0; x < GridWidth; ++x) {
+        for (int32 y = 0; y < GridHeight; ++y) {
+            if (x < HexGridLayout.Num() && y < HexGridLayout[x].Num() &&
+                HexGridLayout[x][y] &&
+                HexGridLayout[x][y]->GetTileType() == HexTileType::CITY) {
+                cities.Add(FIntPoint(x, y));
+            }
+        }
     }
-  }
-  return cities;
+    return cities;
 }
 
 float AHexGridManager::GetTilePrestige(const FIntVector &GridPositionIndex) {
@@ -222,11 +244,9 @@ void setTlieCubeCoordinates(AHexTile *tile) {
 }
 
 float redistributeHeights(float x) {
-  // UE_LOG(LogTemp, Warning, TEXT("Redistributing height %f, got %f"), x,
-  // 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x
-  // - 217.915 * x * x + 52.8798 * x - 5);
-  return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x +
-         427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5;
+    // UE_LOG(LogTemp, Warning, TEXT("Redistributing height %f, got %f"), x, 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5);
+    return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x +
+           427.395 * x * x * x - 217.915 * x * x + 52.8798 * x - 5;
 }
 
 // Called when the game starts or when spawned
@@ -358,6 +378,7 @@ void AHexGridManager::BeginPlay() {
                     }
                 }
             }
-          }
         }
-      }
+    }
+}
+

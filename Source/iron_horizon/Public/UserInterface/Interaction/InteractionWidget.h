@@ -2,10 +2,10 @@
 
 #pragma once
 
-#include "Blueprint/UserWidget.h"
-#include "Components/ProgressBar.h"
-#include "Components/TextBlock.h"
 #include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
+#include "Components/ProgressBar.h"
 #include "InteractionWidget.generated.h"
 
 class AIronHorizonPlayerPawn;
@@ -13,43 +13,39 @@ struct FInteractableData;
 class UTextBlock;
 class UProgressBar;
 
+
 UCLASS()
-class IRON_HORIZON_API UInteractionWidget : public UUserWidget {
-  GENERATED_BODY()
+class IRON_HORIZON_API UInteractionWidget : public UUserWidget
+{
+	GENERATED_BODY()
 public:
-  UPROPERTY(VisibleAnywhere, Category = "Interaction Widget | Player Reference")
-  AIronHorizonPlayerPawn *PlayerReference;
+	UPROPERTY(VisibleAnywhere, Category = "Interaction Widget | Player Reference")
+	AIronHorizonPlayerPawn* PlayerReference;
 
-  void UpdateWidget(const FInteractableData *InteractableData) const;
+	void UpdateWidget(const FInteractableData* InteractableData) const;
 
-protected:
-  UPROPERTY(VisibleAnywhere, meta = (BindWidget),
-            Category = "Interaction Widget | Interactable Data")
-  UTextBlock *NameText;
+protected:	
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UTextBlock* NameText;
 
-  UPROPERTY(VisibleAnywhere, meta = (BindWidget),
-            Category = "Interaction Widget | Interactable Data")
-  UTextBlock *ActionText;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UTextBlock* ActionText;
 
-  UPROPERTY(VisibleAnywhere, meta = (BindWidget),
-            Category = "Interaction Widget | Interactable Data")
-  UTextBlock *QuantityText;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UTextBlock* QuantityText;
 
-  UPROPERTY(VisibleAnywhere, meta = (BindWidget),
-            Category = "Interaction Widget | Interactable Data")
-  UTextBlock *KeyPressText;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UTextBlock* KeyPressText;
 
-  UPROPERTY(VisibleAnywhere, meta = (BindWidget),
-            Category = "Interaction Widget | Interactable Data")
-  UProgressBar *InteractionProgressBar;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	UProgressBar* InteractionProgressBar;
 
-  UPROPERTY(VisibleAnywhere, meta = (BindWidget),
-            Category = "Interaction Widget | Interactable Data")
-  float CurrentInteractionDuration;
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget), Category = "Interaction Widget | Interactable Data")
+	float CurrentInteractionDuration;
 
-  UFUNCTION(Category = "Interaction Widget | Interactable Data")
-  float UpdateInteractionProgress();
+	UFUNCTION(Category = "Interaction Widget | Interactable Data")
+	float UpdateInteractionProgress();
 
-  virtual void NativeOnInitialized() override;
-  virtual void NativeConstruct() override;
+	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 };

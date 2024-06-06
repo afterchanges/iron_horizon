@@ -7,9 +7,11 @@
 #include "GameFramework/Actor.h"
 #include "HexGridManager.generated.h"
 
+
 UCLASS()
-class IRON_HORIZON_API AHexGridManager : public AActor {
-  GENERATED_BODY()
+class IRON_HORIZON_API AHexGridManager : public AActor
+{
+	GENERATED_BODY()
 
 protected:
 	TArray<TArray<AHexTile*>> HexGridLayout;
@@ -40,24 +42,27 @@ public:
         void SetTilesPrestige();
 
 public:
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> GrassHexTile;
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> GrassHexTile;
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> WaterHexTile;
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> WaterHexTile;
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> ForestHexTile;
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> ForestHexTile;
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> MountainHexTile;
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> MountainHexTile;
+        
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> DesertHexTile;
+        UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+        TSubclassOf<AHexTile> CityHexTile;
 
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> DesertHexTile;
-  UPROPERTY(EditAnywhere, Category = "HexGridSetup")
-  TSubclassOf<AHexTile> CityHexTile;
+        
 
 protected:
-  // Called when the game starts or when spawned
-  virtual void BeginPlay() override;
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 };
