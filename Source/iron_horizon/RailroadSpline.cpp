@@ -68,8 +68,23 @@ void ARailroadSpline::BeginPlay()
     Super::BeginPlay();
     UE_LOG(LogTemp, Warning, TEXT("BeginPlay called"));
 
-    UpdateMoney(10);
-
+    if (MoneyWidgetClass)
+    {
+        MoneyWidget = CreateWidget<UMoneyWidget>(GetWorld(), MoneyWidgetClass);
+        if (MoneyWidget)
+        {
+            MoneyWidget->AddToViewport();
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create MoneyWidget"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("MoneyWidgetClass is null"));
+    }
+    UE_LOG(LogTemp, Warning, TEXT("MoneyWidgetClass: %s"), *GetNameSafe(MoneyWidgetClass));
     if (MovementCurve)
     {
         FOnTimelineFloat ProgressFunction;
@@ -79,18 +94,6 @@ void ARailroadSpline::BeginPlay()
         FOnTimelineEventStatic TimelineFinishedCallback;
         TimelineFinishedCallback.BindUFunction(this, FName("OnEndMovementTimeline"));
         MovementTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
-    }
-}
-
-void ARailroadSpline::UpdateMoney(int32 PlayerMoney)
-{
-    if(MoneyWidget != nullptr)
-    {
-        MoneyWidget->CurrentCurrency->SetText(FText::FromString(FString::FromInt(PlayerMoney + MoneyWidget->CurrentMoneyAmount)));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
     }
 }
 
@@ -135,7 +138,7 @@ void ARailroadSpline::OnEndMovementTimeline()
 
     if (MoneyWidget)
     {
-        UpdateMoney(10);
+        MoneyWidget->UpdateMoney(10);
     }
     else
     {

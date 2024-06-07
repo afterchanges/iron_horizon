@@ -34,10 +34,11 @@ public:
 
     FTimeline MovementTimeline;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-    UMoneyWidget* MoneyWidget;
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<UMoneyWidget> MoneyWidgetClass;
 
-    void UpdateMoney(int32 PlayerMoney);
+    UPROPERTY()
+    UMoneyWidget* MoneyWidget;
 
 protected:
     virtual void BeginPlay() override;
