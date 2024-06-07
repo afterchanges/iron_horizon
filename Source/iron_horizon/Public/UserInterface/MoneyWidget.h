@@ -12,14 +12,9 @@ class IRON_HORIZON_API UMoneyWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
-    UFUNCTION(BlueprintCallable, Category = "Money")
-    void UpdateMoney(int32 NewMoneyAmount);
 
-protected:
-
-    UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     UTextBlock* CurrentCurrency;
 
-private:
-	int32 CurrentMoneyAmount = 0;
+    int32 CurrentMoneyAmount = 0;
 };

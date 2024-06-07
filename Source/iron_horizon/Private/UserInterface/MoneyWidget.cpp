@@ -2,9 +2,3 @@
 
 
 #include "UserInterface/MoneyWidget.h"
-
-void UMoneyWidget::UpdateMoney(int32 NewMoneyAmount)
-{
-    CurrentMoneyAmount += NewMoneyAmount;
-    CurrentCurrency->SetText(FText::AsNumber(CurrentMoneyAmount));
-}
