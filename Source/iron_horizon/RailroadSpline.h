@@ -35,7 +35,7 @@ public:
     FTimeline MovementTimeline;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-    UMoneyWidget* MoneyWidget;
+    TSubclassOf<UMoneyWidget> MoneyWidgetTemplate;
 
     void UpdateMoney(int32 PlayerMoney);
 
@@ -62,4 +62,7 @@ private:
     float MovementSpeed = 20.0f;
     bool bMovingForward = true;
     void CreateSplineMesh();
+
+    UPROPERTY()
+    UMoneyWidget* MoneyWidget;
 };

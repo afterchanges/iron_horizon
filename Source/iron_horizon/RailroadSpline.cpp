@@ -68,7 +68,23 @@ void ARailroadSpline::BeginPlay()
     Super::BeginPlay();
     UE_LOG(LogTemp, Warning, TEXT("BeginPlay called"));
 
-    UpdateMoney(10);
+    if (MoneyWidgetTemplate)
+    {
+        MoneyWidget = CreateWidget<UMoneyWidget>(GetWorld(), MoneyWidgetTemplate);
+        if (MoneyWidget)
+        {
+            MoneyWidget->AddToViewport();
+            UpdateMoney(0);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create MoneyWidget"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("MoneyWidgetTemplate is null"));
+    }
 
     if (MovementCurve)
     {
@@ -84,9 +100,9 @@ void ARailroadSpline::BeginPlay()
 
 void ARailroadSpline::UpdateMoney(int32 PlayerMoney)
 {
-    if(MoneyWidget != nullptr)
+    if (MoneyWidget)
     {
-        MoneyWidget->CurrentCurrency->SetText(FText::FromString(FString::FromInt(PlayerMoney + MoneyWidget->CurrentMoneyAmount)));
+        MoneyWidget->UpdateMoney(PlayerMoney);
     }
     else
     {
@@ -133,14 +149,8 @@ void ARailroadSpline::OnEndMovementTimeline()
         MovementTimeline.ReverseFromEnd();
     }
 
-    if (MoneyWidget)
-    {
-        UpdateMoney(10);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
-    }
+    // Update the money
+    UpdateMoney(10);
 }
 
 void ARailroadSpline::BeginMovement()

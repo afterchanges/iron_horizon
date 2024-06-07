@@ -17,4 +17,6 @@ public:
     UTextBlock* CurrentCurrency;
 
     int32 CurrentMoneyAmount = 0;
+
+    void UpdateMoney(int32 NewMoneyAmount);
 };
