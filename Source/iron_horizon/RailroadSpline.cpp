@@ -111,7 +111,7 @@ void ARailroadSpline::ProcessMovementTimeline(float Value)
     if (MovingMesh)
     {
         MovingMesh->SetWorldLocationAndRotation(CurrentSplineLocation, CurrentSplineRotation);
-        UE_LOG(LogTemp, Warning, TEXT("Moving Mesh to Location: %s Rotation: %s"), *CurrentSplineLocation.ToString(), *CurrentSplineRotation.ToString());
+        // UE_LOG(LogTemp, Warning, TEXT("Moving Mesh to Location: %s Rotation: %s"), *CurrentSplineLocation.ToString(), *CurrentSplineRotation.ToString());
     }
     else
     {

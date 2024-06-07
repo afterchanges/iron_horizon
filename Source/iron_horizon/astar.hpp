@@ -89,25 +89,29 @@ TArray<AHexTile*> AHexGridManager::HexGridAStar(AHexTile* StartTile, AHexTile* E
                 continue;
             }
 
-            float GScore = CurrentNode->GScore + 1; // Update this if different tile types have different movement costs
-            float HScore = HexDistance(Neighbor->CubeCoordinates, EndTile->CubeCoordinates);
-            float FScore = GScore + HScore;
+            float NewGScore = CurrentNode->GScore + 1;
+            float NewHScore = HexDistance(Neighbor->CubeCoordinates, EndTile->CubeCoordinates);
+            float NewFScore = NewGScore + NewHScore;
+            UE_LOG(LogTemp, Warning, TEXT("Current Node: %s GScore: %f, FScore: %f"), *CurrentNode->CubeCoordinates.ToString(), CurrentNode->GScore, CurrentNode->FScore);
+
 
             HexTileNode** NeighborNodePtr = OpenSetMap.Find(Neighbor->CubeCoordinates);
             if (NeighborNodePtr == nullptr) {
-                HexTileNode* NeighborNode = new HexTileNode(Neighbor->CubeCoordinates, GScore, FScore, CurrentNode);
+                HexTileNode* NeighborNode = new HexTileNode(Neighbor->CubeCoordinates, NewGScore, NewFScore, CurrentNode);
                 OpenSet.HeapPush(NeighborNode, Comparator);
                 OpenSetMap.Add(Neighbor->CubeCoordinates, NeighborNode);
             } else {
                 HexTileNode* NeighborNode = *NeighborNodePtr;
-                if (GScore < NeighborNode->GScore) {
-                    NeighborNode->GScore = GScore;
-                    NeighborNode->FScore = FScore;
+                if (NewGScore < NeighborNode->GScore) {
+                    NeighborNode->GScore = NewGScore;
+                    NeighborNode->FScore = NewFScore;
                     NeighborNode->Parent = CurrentNode;
-                    OpenSet.Heapify(Comparator); // Reorder the heap as FScore has been updated
+                    OpenSet.Heapify(Comparator);
                 }
             }
         }
+        UE_LOG(LogTemp, Warning, TEXT("Open set size: %d"), OpenSet.Num());
+        UE_LOG(LogTemp, Warning, TEXT("next astar step"));
     }
 
     return TArray<AHexTile*>();
