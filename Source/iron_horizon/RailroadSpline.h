@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Curves/CurveFloat.h"
 #include "UObject/ConstructorHelpers.h"
+#include "UserInterface/MoneyWidget.h"
 #include "RailroadSpline.generated.h"
 
 UCLASS()
@@ -32,6 +33,12 @@ public:
     UCurveFloat* MovementCurve;
 
     FTimeline MovementTimeline;
+
+    UPROPERTY(EditAnywhere, Category = "UI")
+    TSubclassOf<UMoneyWidget> MoneyWidgetClass;
+
+    UPROPERTY()
+    UMoneyWidget* MoneyWidget;
 
 protected:
     virtual void BeginPlay() override;
