@@ -442,6 +442,10 @@ void AHexGridManager::BeginPlay() {
                         TileToSpawn = ForestHexTile;
                         break;
                 }
+            } else if (spawnTileType == HexTileType::MOUNTAIN) {
+                if (newTileHeightAdjusted > 2.8f) {
+                    TileToSpawn = MountainHexTileHigh;
+                }
             }
 
             if (TileToSpawn) {

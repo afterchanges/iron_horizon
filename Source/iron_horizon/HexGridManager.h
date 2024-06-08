@@ -88,6 +88,9 @@ public:
     TSubclassOf<AHexTile> MountainHexTile;
 
     UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> MountainHexTileHigh;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
     TSubclassOf<AHexTile> DesertHexTile;
 
     UPROPERTY(EditAnywhere, Category = "HexGridSetup")
