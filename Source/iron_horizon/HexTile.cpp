@@ -6,6 +6,10 @@
 #include <Components/StaticMeshComponent.h>
 #include <UObject/ConstructorHelpers.h> 
 #include <Materials/MaterialInterface.h>
+#include "UserInterface/Inventory/InventoryTooltip.h"
+#include "UserInterface/MoneyWidget.h"
+#include "Items/ItemBase.h"
+#include "UserInterface/IronHorizonHUD.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -77,8 +81,35 @@ void AHexTile::SetTileType(HexTileType NewType) {
 
 void AHexTile::ChangeToRailway()
 {
-    if (TileType == HexTileType::RAILWAY) { return; }
-    
+    if (TileType == HexTileType::RAILWAY || TileType == HexTileType::CITY || TileType == HexTileType::WATER) {
+        return;
+    }
+    // Get the player's current money
+    AIronHorizonPlayerPawn* PlayerPawn = Cast<AIronHorizonPlayerPawn>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    FString PlayerMoneyString = PlayerPawn->MoneyWidget->CurrentCurrency->GetText().ToString();
+    int32 PlayerMoney = FCString::Atoi(*PlayerMoneyString);
+
+    int32 RailwayCost;
+    if (TileType == HexTileType::MOUNTAIN) {
+        // tunnel railway
+        RailwayCost = PlayerPawn->PlayerInventory->InventoryContents[1]->NumericData.Cost;
+    } else {
+        // surface railway
+        RailwayCost = PlayerPawn->PlayerInventory->InventoryContents[0]->NumericData.Cost;
+    }
+
+    // Check if the player has enough money
+    if (PlayerMoney < RailwayCost) {
+        UE_LOG(LogTemp, Error, TEXT("Not enough money to build railway"));
+        return;
+    }
+
+    // Deduct the cost of the railway from the player's money
+    PlayerMoney -= RailwayCost;
+
+    // Update the player's money
+    PlayerPawn->UpdateMoney(-RailwayCost);
+
     // Change the tile type to railway
     TileType = HexTileType::RAILWAY;
 

@@ -20,7 +20,7 @@ AIronHorizonPlayerPawn::AIronHorizonPlayerPawn() {
     // Set this pawn to call Tick() every frame.  You can turn this off to
     // improve performance if you don't need it.
     PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
-    PlayerInventory->SetSlotsCapacity(20);
+    PlayerInventory->SetSlotsCapacity(100);
     PlayerInventory->SetWeightCapacity(100.0f);
 
     SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
@@ -203,7 +203,7 @@ void AIronHorizonPlayerPawn::BeginPlay() {
     PlayerInventory->ItemDataTable =
         LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/ItemData/TestItems.TestItems'"));
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
         UItemBase *SurfaceItem = NewObject<UItemBase>(UItemBase::StaticClass());
         SurfaceItem->ItemType = EItemType::Surface_Railway;
         SurfaceItem->ID = "1";
@@ -211,7 +211,7 @@ void AIronHorizonPlayerPawn::BeginPlay() {
         PlayerInventory->AddNewItem(SurfaceItem, 1);
     }
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
         UItemBase *TunnelItem = NewObject<UItemBase>(UItemBase::StaticClass());
         TunnelItem->ItemType = EItemType::Tunnel_Railway;
         TunnelItem->ID = "2";
