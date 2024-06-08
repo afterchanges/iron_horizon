@@ -5,6 +5,8 @@
 #include <Components/SceneComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <UObject/ConstructorHelpers.h> 
+#include <Materials/MaterialInterface.h>
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
@@ -73,22 +75,71 @@ void AHexTile::SetTileType(HexTileType NewType) {
     TileType = NewType;
 }
 
-void AHexTile::ChangeToRailway() {
+void AHexTile::ChangeToRailway()
+{
     if (TileType == HexTileType::RAILWAY) { return; }
+    
     // Change the tile type to railway
     TileType = HexTileType::RAILWAY;
 
-    // Change the tile color to red
-    if (RailwayMaterial) {
-        UMaterialInstanceDynamic *DynamicMaterial =
-            UMaterialInstanceDynamic::Create(RailwayMaterial, this);
-        if (DynamicMaterial) {
-            DynamicMaterial->SetVectorParameterValue("Color", FLinearColor::Red);
-            TileMesh->SetMaterial(0, DynamicMaterial);
-        } else {
-            UE_LOG(LogTemp, Warning, TEXT("Failed to create dynamic material instance"));
+    // Get the HexGridManager instance
+    TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
+    AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
+        UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
+    );
+    if (HexGridManagerInstance)
+    {
+        // Get the RailwayHexTile class from the HexGridManager
+        UClass* RailwayHexTileClass = HexGridManagerInstance->RailwayHexTile.Get();
+        if (RailwayHexTileClass)
+        {
+            // Create a temporary instance to access the static mesh
+            AHexTile* TempRailwayTile = RailwayHexTileClass->GetDefaultObject<AHexTile>();
+            if (TempRailwayTile)
+            {
+                UStaticMeshComponent* RailwayMeshComponent = TempRailwayTile->TileMesh;
+                if (RailwayMeshComponent && RailwayMeshComponent->GetStaticMesh())
+                {
+                    // Change the tile's static mesh to the railway mesh
+                    TileMesh->SetStaticMesh(RailwayMeshComponent->GetStaticMesh());
+                    UE_LOG(LogTemp, Warning, TEXT("Tile mesh changed to Railway"));
+
+                    // Optionally change the material if RailwayMaterial is set
+                    // if (RailwayMaterial)
+                    // {
+                    //     UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(RailwayMaterial, this);
+                    //     if (DynamicMaterial)
+                    //     {
+                    //         DynamicMaterial->SetVectorParameterValue("Color", FLinearColor::Red);
+                    //         TileMesh->SetMaterial(0, DynamicMaterial);
+                    //     }
+                    //     else
+                    //     {
+                    //         UE_LOG(LogTemp, Warning, TEXT("Failed to create dynamic material instance"));
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     UE_LOG(LogTemp, Warning, TEXT("RailwayMaterial is not set"));
+                    // }
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("Failed to get static mesh from RailwayHexTile"));
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Failed to create default object for RailwayHexTile"));
+            }
         }
-    } else {
-        UE_LOG(LogTemp, Warning, TEXT("RailwayMaterial is not set"));
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("RailwayHexTile class is not set in HexGridManager"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to get HexGridManager"));
     }
 }

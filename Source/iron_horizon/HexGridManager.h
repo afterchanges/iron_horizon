@@ -93,6 +93,9 @@ public:
     UPROPERTY(EditAnywhere, Category = "HexGridSetup")
     TSubclassOf<AHexTile> CityHexTile;
 
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> RailwayHexTile;
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
