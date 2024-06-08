@@ -57,11 +57,7 @@ void AHexTile::OnBeginCursorOver(UPrimitiveComponent *TouchedComponent) {
 }
 
 void AHexTile::OnEndCursorOver(UPrimitiveComponent *TouchedComponent) {
-    if (TileType == HexTileType::RAILWAY) {
-        TileMesh->SetMaterial(0, RailwayMaterial);
-    } else {
-        TileMesh->SetMaterial(0, DefaultMaterial);
-    }
+    TileMesh->SetMaterial(0, DefaultMaterial);
 }
 
 FString AHexTile::HexTileTypeToString(HexTileType Type) {
@@ -120,18 +116,15 @@ void AHexTile::ChangeToRailway()
     );
     if (HexGridManagerInstance)
     {
-        // Get the RailwayHexTile class from the HexGridManager
         UClass* RailwayHexTileClass = HexGridManagerInstance->RailwayHexTile.Get();
         if (RailwayHexTileClass)
         {
-            // Create a temporary instance to access the static mesh
             AHexTile* TempRailwayTile = RailwayHexTileClass->GetDefaultObject<AHexTile>();
             if (TempRailwayTile)
             {
                 UStaticMeshComponent* RailwayMeshComponent = TempRailwayTile->TileMesh;
                 if (RailwayMeshComponent && RailwayMeshComponent->GetStaticMesh())
                 {
-                    // Change the tile's static mesh to the railway mesh
                     TileMesh->SetStaticMesh(RailwayMeshComponent->GetStaticMesh());
                     UE_LOG(LogTemp, Warning, TEXT("Tile mesh changed to Railway"));
 
