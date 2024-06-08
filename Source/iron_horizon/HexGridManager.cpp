@@ -196,8 +196,21 @@ TArray<FIntPoint> AHexGridManager::determineCities() {
 }
 
 float AHexGridManager::GetTilePrestige(const FIntVector &GridPositionIndex) {
-    return TilePrestige[HexGridLayoutAxial[GridPositionIndex]->GetTileType()];
+    AHexTile *tile = GetTileAtCubeCoordinates(GridPositionIndex);
+    if (!tile) {
+        UE_LOG(LogTemp, Error, TEXT("Tile at coordinates %s is null"), *GridPositionIndex.ToString());
+        return 0.0f;
+    }
+
+    HexTileType tileType = tile->GetTileType();
+    if (TilePrestige.Contains(tileType)) {
+        return TilePrestige[tileType];
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("TilePrestige map does not contain tile type %d"), static_cast<int32>(tileType));
+        return 0.0f;
+    }
 }
+
 
 void AHexGridManager::SetTilesPrestige() {
     for (int32 x = 0; x < GridWidth; ++x) {
@@ -219,8 +232,20 @@ void AHexGridManager::SetTilesPrestige() {
                         //     neighbor_cube_coords.Y,
                         //     GetTilePrestige(neighbor_cube_coords)
                         // );
-                        current_tile->prestige += GetTilePrestige(neighbor_cube_coords) *
-                                                  PrestigeRangeInfluenceModifier[radius];
+                        if (current_tile) {
+                            float neighbor_prestige = GetTilePrestige(neighbor_cube_coords);
+                            if (neighbor_prestige == 0.0f) {
+                                continue;
+                            }
+                            UE_LOG(
+                                LogTemp,
+                                Warning,
+                                TEXT("Neighbor prestige: %f, previous prestige:"),
+                                neighbor_prestige
+                            );
+                            current_tile->prestige += neighbor_prestige *
+                                                    PrestigeRangeInfluenceModifier[radius];
+                        }   
                     }
                 }
             }
@@ -375,7 +400,6 @@ void AHexGridManager::BeginPlay() {
                 FMath::RandRange(0.f, 1.f) *
                     (TileHeightRanges[spawnTileType][1] - TileHeightRanges[spawnTileType][0]) +
                 TileHeightRanges[spawnTileType][0];
-
             newTileHeightAdjusted = noise_height_map[x][y] >= 0.0f ? noise_height_map[x][y] : 0.0f;
 
             // UE_LOG(
