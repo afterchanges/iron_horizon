@@ -55,6 +55,8 @@ public:
 
     void BeginMovement();
 
+    int iterations = 0;
+
 private:
     UPROPERTY(EditAnywhere, Category = "Movement")
     float MovementSpeed = 20.0f;
