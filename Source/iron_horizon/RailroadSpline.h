@@ -7,6 +7,7 @@
 #include "Curves/CurveFloat.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UserInterface/MoneyWidget.h"
+#include "IronHorizonPlayerPawn.h"
 #include "RailroadSpline.generated.h"
 
 UCLASS()
@@ -34,11 +35,6 @@ public:
 
     FTimeline MovementTimeline;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-    TSubclassOf<UMoneyWidget> MoneyWidgetTemplate;
-
-    void UpdateMoney(int32 PlayerMoney);
-
 protected:
     virtual void BeginPlay() override;
 
@@ -62,7 +58,4 @@ private:
     float MovementSpeed = 20.0f;
     bool bMovingForward = true;
     void CreateSplineMesh();
-
-    UPROPERTY()
-    UMoneyWidget* MoneyWidget;
 };

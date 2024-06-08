@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/InventoryComponent.h"
 #include "Interfaces/InteractionInterface.h"
+#include "UserInterface/MoneyWidget.h"
 #include "IronHorizonPlayerPawn.generated.h"
 
 class UStaticMeshComponent;
@@ -126,5 +127,13 @@ public:
     void ToggleMenu();
 
     void DropItem(UItemBase* ItemToDrop, const int32 QuantityToDrop);
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+    TSubclassOf<UMoneyWidget> MoneyWidgetTemplate;
+
+    void UpdateMoney(int32 PlayerMoney);
+
+    UPROPERTY(BlueprintReadWrite)
+    UMoneyWidget* MoneyWidget;
 
 };

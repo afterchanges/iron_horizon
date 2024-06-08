@@ -12,6 +12,7 @@ class IRON_HORIZON_API UMoneyWidget : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+    virtual void NativeConstruct() override;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
     UTextBlock* CurrentCurrency;

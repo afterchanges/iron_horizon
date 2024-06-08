@@ -33,6 +33,8 @@ AIronHorizonPlayerPawn::AIronHorizonPlayerPawn() {
     CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
     Movement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+
+
 }
 
 void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) {
@@ -171,6 +173,32 @@ void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &Acti
 
 void AIronHorizonPlayerPawn::BeginPlay() {
     Super::BeginPlay();
+    int32 CurrentMoney = 0;
+    if (MoneyWidgetTemplate)
+    {
+        if (MoneyWidget && MoneyWidget->CurrentCurrency)
+        {   
+            FString CurrentMoneyString = MoneyWidget->CurrentCurrency->GetText().ToString();
+            CurrentMoney = FCString::Atoi(*CurrentMoneyString);
+            MoneyWidget->RemoveFromParent();
+        }
+
+        MoneyWidget = CreateWidget<UMoneyWidget>(GetWorld(), MoneyWidgetTemplate);
+        if (MoneyWidget)
+        {
+            
+            MoneyWidget->AddToViewport();
+            UpdateMoney(CurrentMoney);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create MoneyWidget"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("MoneyWidgetTemplate is null"));
+    }
 
     PlayerInventory->ItemDataTable =
         LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/ItemData/TestItems.TestItems'"));
@@ -203,6 +231,17 @@ void AIronHorizonPlayerPawn::BeginPlay() {
         PlayerController->bEnableClickEvents = true; 
         PlayerController->bEnableMouseOverEvents = true;
         PlayerController->SetIgnoreLookInput(true);
+    }
+}
+
+void AIronHorizonPlayerPawn::UpdateMoney(int32 PlayerMoney) {
+    if (MoneyWidget)
+    {
+        MoneyWidget->UpdateMoney(PlayerMoney);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
     }
 }
 

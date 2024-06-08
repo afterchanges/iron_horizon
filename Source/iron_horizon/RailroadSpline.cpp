@@ -68,24 +68,6 @@ void ARailroadSpline::BeginPlay()
     Super::BeginPlay();
     UE_LOG(LogTemp, Warning, TEXT("BeginPlay called"));
 
-    if (MoneyWidgetTemplate)
-    {
-        MoneyWidget = CreateWidget<UMoneyWidget>(GetWorld(), MoneyWidgetTemplate);
-        if (MoneyWidget)
-        {
-            MoneyWidget->AddToViewport();
-            UpdateMoney(0);
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to create MoneyWidget"));
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("MoneyWidgetTemplate is null"));
-    }
-
     if (MovementCurve)
     {
         FOnTimelineFloat ProgressFunction;
@@ -95,18 +77,6 @@ void ARailroadSpline::BeginPlay()
         FOnTimelineEventStatic TimelineFinishedCallback;
         TimelineFinishedCallback.BindUFunction(this, FName("OnEndMovementTimeline"));
         MovementTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
-    }
-}
-
-void ARailroadSpline::UpdateMoney(int32 PlayerMoney)
-{
-    if (MoneyWidget)
-    {
-        MoneyWidget->UpdateMoney(PlayerMoney);
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
     }
 }
 
@@ -150,7 +120,15 @@ void ARailroadSpline::OnEndMovementTimeline()
     }
 
     // Update the money
-    UpdateMoney(10);
+    AIronHorizonPlayerPawn* PlayerPawn = Cast<AIronHorizonPlayerPawn>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    if (PlayerPawn && PlayerPawn->MoneyWidget)
+    {
+        PlayerPawn->UpdateMoney(1);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to update money"));
+    }
 }
 
 void ARailroadSpline::BeginMovement()
