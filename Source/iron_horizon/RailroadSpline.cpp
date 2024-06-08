@@ -129,6 +129,18 @@ void ARailroadSpline::OnEndMovementTimeline()
     {
         UE_LOG(LogTemp, Error, TEXT("Failed to update money"));
     }
+    ++iterations;
+    if (iterations % 10 == 0) {
+        if (PlayerPawn) {
+            if (PlayerPawn->MoneyWidget) {
+                PlayerPawn->UpdateMoney(-10);
+            } else {
+                UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
+            }
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("PlayerPawn is null"));
+        }
+    }
 }
 
 void ARailroadSpline::BeginMovement()
