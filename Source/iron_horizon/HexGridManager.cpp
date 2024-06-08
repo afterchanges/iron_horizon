@@ -218,6 +218,9 @@ void AHexGridManager::SetTilesPrestige() {
             AHexTile *current_tile = HexGridLayout[x][y];
             for (int32 radius = 0; radius < 1; radius++) {
                 for (FIntPoint &neighbor : AxialNeighbors) {
+                    if (current_tile == nullptr) {
+                        continue;
+                    }
                     const FIntVector neighbor_cube_coords = FIntVector(
                         current_tile->CubeCoordinates.X + neighbor.X,
                         current_tile->CubeCoordinates.Y + neighbor.Y,
@@ -413,13 +416,37 @@ void AHexGridManager::BeginPlay() {
                 newTileHeightAdjusted * 500.0f
             );
 
+            int32 RandomRotationIndex = FMath::RandRange(0, 5);
+            float RandomRotation = RandomRotationIndex * 60.0f;
+            FRotator Rotation = FRotator(0.0f, RandomRotation, 0.0f);
+
             TSubclassOf<AHexTile> TileToSpawn = TileTypeMap[spawnTileType];
+            if (spawnTileType == HexTileType::FOREST) {
+                int forest_type = FMath::RandRange(0, 3);
+                switch (forest_type) {
+                    case 0:
+                        TileToSpawn = ForestHexTile;
+                        break;
+                    case 1:
+                        TileToSpawn = ForestHexTile2;
+                        break;
+                    case 2:
+                        TileToSpawn = ForestHexTile3;
+                        break;
+                    case 3:
+                        TileToSpawn = ForestHexTile4;
+                        break;
+                    default:
+                        TileToSpawn = ForestHexTile;
+                        break;
+                }
+            }
 
             if (TileToSpawn) {
                 UWorld *World = GetWorld();
                 if (World) {
                     AHexTile *NewTile =
-                        World->SpawnActor<AHexTile>(TileToSpawn, Location, FRotator::ZeroRotator);
+                        World->SpawnActor<AHexTile>(TileToSpawn, Location, Rotation);
                     if (NewTile) {
                         NewTile->GridPositionIndex = FIntPoint(x, y);
 
