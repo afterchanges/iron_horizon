@@ -94,7 +94,7 @@ void ARailroadSpline::ProcessMovementTimeline(float Value)
     if (MovingMesh)
     {
         MovingMesh->SetWorldLocationAndRotation(CurrentSplineLocation, CurrentSplineRotation);
-        UE_LOG(LogTemp, Warning, TEXT("Moving Mesh to Location: %s Rotation: %s"), *CurrentSplineLocation.ToString(), *CurrentSplineRotation.ToString());
+        // UE_LOG(LogTemp, Warning, TEXT("Moving Mesh to Location: %s Rotation: %s"), *CurrentSplineLocation.ToString(), *CurrentSplineRotation.ToString());
     }
     else
     {
@@ -123,7 +123,8 @@ void ARailroadSpline::OnEndMovementTimeline()
     AIronHorizonPlayerPawn* PlayerPawn = Cast<AIronHorizonPlayerPawn>(GetWorld()->GetFirstPlayerController()->GetPawn());
     if (PlayerPawn && PlayerPawn->MoneyWidget)
     {
-        PlayerPawn->UpdateMoney(1);
+        PlayerPawn->UpdateMoney(RoutePrestige / ThisRailroadSpline->GetSplineLength() * 100);
+        UE_LOG(LogTemp, Warning, TEXT("Updated money by %f"), RoutePrestige / ThisRailroadSpline->GetSplineLength() * 100);
     }
     else
     {

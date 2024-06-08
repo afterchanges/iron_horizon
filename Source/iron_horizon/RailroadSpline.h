@@ -35,6 +35,8 @@ public:
 
     FTimeline MovementTimeline;
 
+    float RoutePrestige = 0.0f;
+
 protected:
     virtual void BeginPlay() override;
 
