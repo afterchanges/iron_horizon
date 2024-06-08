@@ -68,23 +68,6 @@ void ARailroadSpline::BeginPlay()
     Super::BeginPlay();
     UE_LOG(LogTemp, Warning, TEXT("BeginPlay called"));
 
-    if (MoneyWidgetClass)
-    {
-        MoneyWidget = CreateWidget<UMoneyWidget>(GetWorld(), MoneyWidgetClass);
-        if (MoneyWidget)
-        {
-            MoneyWidget->AddToViewport();
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("Failed to create MoneyWidget"));
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("MoneyWidgetClass is null"));
-    }
-    UE_LOG(LogTemp, Warning, TEXT("MoneyWidgetClass: %s"), *GetNameSafe(MoneyWidgetClass));
     if (MovementCurve)
     {
         FOnTimelineFloat ProgressFunction;
@@ -136,13 +119,28 @@ void ARailroadSpline::OnEndMovementTimeline()
         MovementTimeline.ReverseFromEnd();
     }
 
-    if (MoneyWidget)
+    // Update the money
+    AIronHorizonPlayerPawn* PlayerPawn = Cast<AIronHorizonPlayerPawn>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    if (PlayerPawn && PlayerPawn->MoneyWidget)
     {
-        MoneyWidget->UpdateMoney(10);
+        PlayerPawn->UpdateMoney(RoutePrestige / ThisRailroadSpline->GetSplineLength() * 100);
+        UE_LOG(LogTemp, Warning, TEXT("Updated money by %f"), RoutePrestige / ThisRailroadSpline->GetSplineLength() * 100);
     }
     else
     {
-        UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
+        UE_LOG(LogTemp, Error, TEXT("Failed to update money"));
+    }
+    ++iterations;
+    if (iterations % 10 == 0) {
+        if (PlayerPawn) {
+            if (PlayerPawn->MoneyWidget) {
+                PlayerPawn->UpdateMoney(-10);
+            } else {
+                UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
+            }
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("PlayerPawn is null"));
+        }
     }
 }
 

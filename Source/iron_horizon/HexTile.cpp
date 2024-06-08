@@ -5,6 +5,12 @@
 #include <Components/SceneComponent.h>
 #include <Components/StaticMeshComponent.h>
 #include <UObject/ConstructorHelpers.h> 
+#include <Materials/MaterialInterface.h>
+#include "UserInterface/Inventory/InventoryTooltip.h"
+#include "UserInterface/MoneyWidget.h"
+#include "Items/ItemBase.h"
+#include "UserInterface/IronHorizonHUD.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AHexTile::AHexTile() : TileType(HexTileType::DEFAULT) {
@@ -51,11 +57,7 @@ void AHexTile::OnBeginCursorOver(UPrimitiveComponent *TouchedComponent) {
 }
 
 void AHexTile::OnEndCursorOver(UPrimitiveComponent *TouchedComponent) {
-    if (TileType == HexTileType::RAILWAY) {
-        TileMesh->SetMaterial(0, RailwayMaterial);
-    } else {
-        TileMesh->SetMaterial(0, DefaultMaterial);
-    }
+    TileMesh->SetMaterial(0, DefaultMaterial);
 }
 
 FString AHexTile::HexTileTypeToString(HexTileType Type) {
@@ -73,22 +75,95 @@ void AHexTile::SetTileType(HexTileType NewType) {
     TileType = NewType;
 }
 
-void AHexTile::ChangeToRailway() {
-    if (TileType == HexTileType::RAILWAY) { return; }
+void AHexTile::ChangeToRailway()
+{
+    if (TileType == HexTileType::RAILWAY || TileType == HexTileType::CITY || TileType == HexTileType::WATER) {
+        return;
+    }
+    // Get the player's current money
+    AIronHorizonPlayerPawn* PlayerPawn = Cast<AIronHorizonPlayerPawn>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    FString PlayerMoneyString = PlayerPawn->MoneyWidget->CurrentCurrency->GetText().ToString();
+    int32 PlayerMoney = FCString::Atoi(*PlayerMoneyString);
+
+    int32 RailwayCost;
+    if (TileType == HexTileType::MOUNTAIN) {
+        // tunnel railway
+        RailwayCost = PlayerPawn->PlayerInventory->InventoryContents[1]->NumericData.Cost;
+    } else {
+        // surface railway
+        RailwayCost = PlayerPawn->PlayerInventory->InventoryContents[0]->NumericData.Cost;
+    }
+
+    // Check if the player has enough money
+    if (PlayerMoney < RailwayCost) {
+        UE_LOG(LogTemp, Error, TEXT("Not enough money to build railway"));
+        return;
+    }
+
+    // Deduct the cost of the railway from the player's money
+    PlayerMoney -= RailwayCost;
+
+    // Update the player's money
+    PlayerPawn->UpdateMoney(-RailwayCost);
+
     // Change the tile type to railway
     TileType = HexTileType::RAILWAY;
 
-    // Change the tile color to red
-    if (RailwayMaterial) {
-        UMaterialInstanceDynamic *DynamicMaterial =
-            UMaterialInstanceDynamic::Create(RailwayMaterial, this);
-        if (DynamicMaterial) {
-            DynamicMaterial->SetVectorParameterValue("Color", FLinearColor::Red);
-            TileMesh->SetMaterial(0, DynamicMaterial);
-        } else {
-            UE_LOG(LogTemp, Warning, TEXT("Failed to create dynamic material instance"));
+    // Get the HexGridManager instance
+    TSubclassOf<AActor> HexGridManagerClass = AHexGridManager::StaticClass();
+    AHexGridManager* HexGridManagerInstance = Cast<AHexGridManager>(
+        UGameplayStatics::GetActorOfClass(GetWorld(), HexGridManagerClass)
+    );
+    if (HexGridManagerInstance)
+    {
+        UClass* RailwayHexTileClass = HexGridManagerInstance->RailwayHexTile.Get();
+        if (RailwayHexTileClass)
+        {
+            AHexTile* TempRailwayTile = RailwayHexTileClass->GetDefaultObject<AHexTile>();
+            if (TempRailwayTile)
+            {
+                UStaticMeshComponent* RailwayMeshComponent = TempRailwayTile->TileMesh;
+                if (RailwayMeshComponent && RailwayMeshComponent->GetStaticMesh())
+                {
+                    TileMesh->SetStaticMesh(RailwayMeshComponent->GetStaticMesh());
+                    UE_LOG(LogTemp, Warning, TEXT("Tile mesh changed to Railway"));
+
+                    // Optionally change the material if RailwayMaterial is set
+                    // if (RailwayMaterial)
+                    // {
+                    //     UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(RailwayMaterial, this);
+                    //     if (DynamicMaterial)
+                    //     {
+                    //         DynamicMaterial->SetVectorParameterValue("Color", FLinearColor::Red);
+                    //         TileMesh->SetMaterial(0, DynamicMaterial);
+                    //     }
+                    //     else
+                    //     {
+                    //         UE_LOG(LogTemp, Warning, TEXT("Failed to create dynamic material instance"));
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     UE_LOG(LogTemp, Warning, TEXT("RailwayMaterial is not set"));
+                    // }
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Error, TEXT("Failed to get static mesh from RailwayHexTile"));
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Failed to create default object for RailwayHexTile"));
+            }
         }
-    } else {
-        UE_LOG(LogTemp, Warning, TEXT("RailwayMaterial is not set"));
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("RailwayHexTile class is not set in HexGridManager"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to get HexGridManager"));
     }
 }

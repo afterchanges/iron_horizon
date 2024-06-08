@@ -76,12 +76,28 @@ public:
     TSubclassOf<AHexTile> ForestHexTile;
 
     UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> ForestHexTile2;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> ForestHexTile3;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> ForestHexTile4;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
     TSubclassOf<AHexTile> MountainHexTile;
 
     UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> MountainHexTileHigh;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
     TSubclassOf<AHexTile> DesertHexTile;
+
     UPROPERTY(EditAnywhere, Category = "HexGridSetup")
     TSubclassOf<AHexTile> CityHexTile;
+
+    UPROPERTY(EditAnywhere, Category = "HexGridSetup")
+    TSubclassOf<AHexTile> RailwayHexTile;
 
 protected:
     // Called when the game starts or when spawned

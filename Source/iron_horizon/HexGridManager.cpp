@@ -196,8 +196,21 @@ TArray<FIntPoint> AHexGridManager::determineCities() {
 }
 
 float AHexGridManager::GetTilePrestige(const FIntVector &GridPositionIndex) {
-    return TilePrestige[HexGridLayoutAxial[GridPositionIndex]->GetTileType()];
+    AHexTile *tile = GetTileAtCubeCoordinates(GridPositionIndex);
+    if (!tile) {
+        UE_LOG(LogTemp, Error, TEXT("Tile at coordinates %s is null"), *GridPositionIndex.ToString());
+        return 0.0f;
+    }
+
+    HexTileType tileType = tile->GetTileType();
+    if (TilePrestige.Contains(tileType)) {
+        return TilePrestige[tileType];
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("TilePrestige map does not contain tile type %d"), static_cast<int32>(tileType));
+        return 0.0f;
+    }
 }
+
 
 void AHexGridManager::SetTilesPrestige() {
     for (int32 x = 0; x < GridWidth; ++x) {
@@ -205,6 +218,9 @@ void AHexGridManager::SetTilesPrestige() {
             AHexTile *current_tile = HexGridLayout[x][y];
             for (int32 radius = 0; radius < 1; radius++) {
                 for (FIntPoint &neighbor : AxialNeighbors) {
+                    if (current_tile == nullptr) {
+                        continue;
+                    }
                     const FIntVector neighbor_cube_coords = FIntVector(
                         current_tile->CubeCoordinates.X + neighbor.X,
                         current_tile->CubeCoordinates.Y + neighbor.Y,
@@ -219,8 +235,20 @@ void AHexGridManager::SetTilesPrestige() {
                         //     neighbor_cube_coords.Y,
                         //     GetTilePrestige(neighbor_cube_coords)
                         // );
-                        current_tile->prestige += GetTilePrestige(neighbor_cube_coords) *
-                                                  PrestigeRangeInfluenceModifier[radius];
+                        if (current_tile) {
+                            float neighbor_prestige = GetTilePrestige(neighbor_cube_coords);
+                            if (neighbor_prestige == 0.0f) {
+                                continue;
+                            }
+                            UE_LOG(
+                                LogTemp,
+                                Warning,
+                                TEXT("Neighbor prestige: %f, previous prestige:"),
+                                neighbor_prestige
+                            );
+                            current_tile->prestige += neighbor_prestige *
+                                                    PrestigeRangeInfluenceModifier[radius];
+                        }   
                     }
                 }
             }
@@ -246,8 +274,10 @@ float redistributeHeights(float x) {
     // UE_LOG(LogTemp, Warning, TEXT("Redistributing height %f, got %f"), x,
     // 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x
     // - 217.915 * x * x + 52.8798 * x - 5);
-    return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x -
-           217.915 * x * x + 52.8798 * x - 5;
+    // return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x -
+    //        217.915 * x * x + 52.8798 * x - 5;
+    
+    return 36.0684 * x * x * x * x - 73.7863 * x * x * x + 43.5598 * x * x - 1.84188 * x - 1;
 }
 
 // void AHexGridManager::AddNewRailroadTile(AHexTile *NewTile) {
@@ -315,14 +345,17 @@ void AHexGridManager::AddNewCityConnection(AHexTile *city_1, AHexTile *city_2) {
     }
 
     TArray<FVector3d> path_central_points;
+    float total_prestige = 0.0f;
     for (auto point : path) { 
         path_central_points.Add(point->GetActorLocation()); 
-        path_central_points.Last().Z += 500.0f;
+        path_central_points.Last().Z += 300.0f;
+        total_prestige += point->prestige;
     }
     
     ARailroadSpline *NewSpline =
         GetWorld()->SpawnActor<ARailroadSpline>(ARailroadSpline::StaticClass());
     NewSpline->SetRailroadSplinePoints(path_central_points);
+    NewSpline->RoutePrestige = total_prestige;
     NewSpline->BeginMovement();
     RailroadSplines.Add(NewSpline);
 }
@@ -375,7 +408,6 @@ void AHexGridManager::BeginPlay() {
                 FMath::RandRange(0.f, 1.f) *
                     (TileHeightRanges[spawnTileType][1] - TileHeightRanges[spawnTileType][0]) +
                 TileHeightRanges[spawnTileType][0];
-
             newTileHeightAdjusted = noise_height_map[x][y] >= 0.0f ? noise_height_map[x][y] : 0.0f;
 
             // UE_LOG(
@@ -389,13 +421,41 @@ void AHexGridManager::BeginPlay() {
                 newTileHeightAdjusted * 500.0f
             );
 
+            int32 RandomRotationIndex = FMath::RandRange(0, 5);
+            float RandomRotation = RandomRotationIndex * 60.0f;
+            FRotator Rotation = FRotator(0.0f, RandomRotation, 0.0f);
+
             TSubclassOf<AHexTile> TileToSpawn = TileTypeMap[spawnTileType];
+            if (spawnTileType == HexTileType::FOREST) {
+                int forest_type = FMath::RandRange(0, 3);
+                switch (forest_type) {
+                    case 0:
+                        TileToSpawn = ForestHexTile;
+                        break;
+                    case 1:
+                        TileToSpawn = ForestHexTile2;
+                        break;
+                    case 2:
+                        TileToSpawn = ForestHexTile3;
+                        break;
+                    case 3:
+                        TileToSpawn = ForestHexTile4;
+                        break;
+                    default:
+                        TileToSpawn = ForestHexTile;
+                        break;
+                }
+            } else if (spawnTileType == HexTileType::MOUNTAIN) {
+                if (newTileHeightAdjusted > 2.8f) {
+                    TileToSpawn = MountainHexTileHigh;
+                }
+            }
 
             if (TileToSpawn) {
                 UWorld *World = GetWorld();
                 if (World) {
                     AHexTile *NewTile =
-                        World->SpawnActor<AHexTile>(TileToSpawn, Location, FRotator::ZeroRotator);
+                        World->SpawnActor<AHexTile>(TileToSpawn, Location, Rotation);
                     if (NewTile) {
                         NewTile->GridPositionIndex = FIntPoint(x, y);
 

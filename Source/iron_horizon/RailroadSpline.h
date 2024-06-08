@@ -7,6 +7,7 @@
 #include "Curves/CurveFloat.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UserInterface/MoneyWidget.h"
+#include "IronHorizonPlayerPawn.h"
 #include "RailroadSpline.generated.h"
 
 UCLASS()
@@ -34,11 +35,7 @@ public:
 
     FTimeline MovementTimeline;
 
-    UPROPERTY(EditAnywhere, Category = "UI")
-    TSubclassOf<UMoneyWidget> MoneyWidgetClass;
-
-    UPROPERTY()
-    UMoneyWidget* MoneyWidget;
+    float RoutePrestige = 0.0f;
 
 protected:
     virtual void BeginPlay() override;
@@ -57,6 +54,8 @@ public:
     void SetRailroadSplinePoints(TArray<FVector3d> SplinePoints);
 
     void BeginMovement();
+
+    int iterations = 0;
 
 private:
     UPROPERTY(EditAnywhere, Category = "Movement")

@@ -20,7 +20,7 @@ AIronHorizonPlayerPawn::AIronHorizonPlayerPawn() {
     // Set this pawn to call Tick() every frame.  You can turn this off to
     // improve performance if you don't need it.
     PlayerInventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("PlayerInventory"));
-    PlayerInventory->SetSlotsCapacity(20);
+    PlayerInventory->SetSlotsCapacity(100);
     PlayerInventory->SetWeightCapacity(100.0f);
 
     SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
@@ -33,6 +33,8 @@ AIronHorizonPlayerPawn::AIronHorizonPlayerPawn() {
     CameraComponent->SetupAttachment(SpringArmComponent, USpringArmComponent::SocketName);
 
     Movement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("MovementComponent"));
+
+
 }
 
 void AIronHorizonPlayerPawn::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent) {
@@ -171,11 +173,37 @@ void AIronHorizonPlayerPawn::UpdateSpringArmLength(const FInputActionValue &Acti
 
 void AIronHorizonPlayerPawn::BeginPlay() {
     Super::BeginPlay();
+    int32 CurrentMoney = 0;
+    if (MoneyWidgetTemplate)
+    {
+        if (MoneyWidget && MoneyWidget->CurrentCurrency)
+        {   
+            FString CurrentMoneyString = MoneyWidget->CurrentCurrency->GetText().ToString();
+            CurrentMoney = FCString::Atoi(*CurrentMoneyString);
+            MoneyWidget->RemoveFromParent();
+        }
+
+        MoneyWidget = CreateWidget<UMoneyWidget>(GetWorld(), MoneyWidgetTemplate);
+        if (MoneyWidget)
+        {
+            
+            MoneyWidget->AddToViewport();
+            UpdateMoney(CurrentMoney);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create MoneyWidget"));
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("MoneyWidgetTemplate is null"));
+    }
 
     PlayerInventory->ItemDataTable =
         LoadObject<UDataTable>(nullptr, TEXT("DataTable'/Game/ItemData/TestItems.TestItems'"));
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
         UItemBase *SurfaceItem = NewObject<UItemBase>(UItemBase::StaticClass());
         SurfaceItem->ItemType = EItemType::Surface_Railway;
         SurfaceItem->ID = "1";
@@ -183,7 +211,7 @@ void AIronHorizonPlayerPawn::BeginPlay() {
         PlayerInventory->AddNewItem(SurfaceItem, 1);
     }
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 10; ++i) {
         UItemBase *TunnelItem = NewObject<UItemBase>(UItemBase::StaticClass());
         TunnelItem->ItemType = EItemType::Tunnel_Railway;
         TunnelItem->ID = "2";
@@ -203,6 +231,17 @@ void AIronHorizonPlayerPawn::BeginPlay() {
         PlayerController->bEnableClickEvents = true; 
         PlayerController->bEnableMouseOverEvents = true;
         PlayerController->SetIgnoreLookInput(true);
+    }
+}
+
+void AIronHorizonPlayerPawn::UpdateMoney(int32 PlayerMoney) {
+    if (MoneyWidget)
+    {
+        MoneyWidget->UpdateMoney(PlayerMoney);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("MoneyWidget is null"));
     }
 }
 
