@@ -274,8 +274,10 @@ float redistributeHeights(float x) {
     // UE_LOG(LogTemp, Warning, TEXT("Redistributing height %f, got %f"), x,
     // 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x
     // - 217.915 * x * x + 52.8798 * x - 5);
-    return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x -
-           217.915 * x * x + 52.8798 * x - 5;
+    // return 134.018 * x * x * x * x * x - 388.378 * x * x * x * x + 427.395 * x * x * x -
+    //        217.915 * x * x + 52.8798 * x - 5;
+    
+    return 36.0684 * x * x * x * x - 73.7863 * x * x * x + 43.5598 * x * x - 1.84188 * x - 1;
 }
 
 // void AHexGridManager::AddNewRailroadTile(AHexTile *NewTile) {
