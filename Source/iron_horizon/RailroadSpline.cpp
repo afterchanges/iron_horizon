@@ -19,6 +19,7 @@ ARailroadSpline::ARailroadSpline()
     {
         ThisRailroadMesh = MeshAsset.Object;
         MovingMesh->SetStaticMesh(ThisRailroadMesh);
+        UE_LOG(LogTemp, Error, TEXT("Static mesh success"));
     }
     else
     {
