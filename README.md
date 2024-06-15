@@ -21,4 +21,14 @@ In **Iron Horizons**, players delve into the strategic world of railroad managem
 - **PlayFab**: Integration with PlayFab for robust cloud-based account management and data security. ☁️🔐
 
 Feel free to explore the project or just enjoy building your rail empire! 🚂💼
+
+## 🎮 Installation
+You will need:
+- Unreal Enigne v5.3.2
+- Internet connection
+
+1. Clone this repository and open .uproject file
+2. Click "rebuild"
+
+✨Now you are all set!✨
   
